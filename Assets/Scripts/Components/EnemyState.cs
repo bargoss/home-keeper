@@ -2,10 +2,9 @@
 
 namespace Components
 {
-    public struct Health : IComponentData
+    public struct EnemyState : IComponentData
     {
         public float HitPoints;
-        public float MaxHitPoints;
         public bool IsDead => HitPoints <= 0;
     }
 }

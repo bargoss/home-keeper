@@ -14,7 +14,6 @@ namespace Systems
                 var h = health.ValueRO;
                 if (h.HitPoints > 0)
                 {
-                    h.HitPoints += h.RegenerationRate * SystemAPI.Time.fixedDeltaTime;
                     h.HitPoints = math.clamp(h.HitPoints, 0, h.MaxHitPoints);
                     health.ValueRW = h;
                 }

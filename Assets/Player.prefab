@@ -97,7 +97,6 @@ GameObject:
   - component: {fileID: 2412715494850397676}
   - component: {fileID: 5644521117048868350}
   - component: {fileID: 8338815347114929533}
-  - component: {fileID: 5415552357812218265}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -191,20 +190,6 @@ MonoBehaviour:
   SelfStunDurationOnAttack: 1
   EnemyStunDurationOnAttack: 1
   Faction: 0
---- !u!114 &5415552357812218265
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2225361765504880049}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1d9e06f6560438b83a6ed9ebabe675a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MaxHitPoints: 10
-  RegenerationRate: 0.1
 --- !u!1 &2243627673382590088
 GameObject:
   m_ObjectHideFlags: 0
