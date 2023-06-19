@@ -15,6 +15,7 @@ namespace Systems
         // follow the closest opposing faction member and attack if in range
         public void OnUpdate(ref SystemState state)
         {
+            // this might be causing a big copy?
             var collisionWorld = SystemAPI.GetSingleton<BuildPhysicsWorldData>().PhysicsData.PhysicsWorld.CollisionWorld;
             var collisions = new NativeList<DistanceHit>(Allocator.Temp);
             

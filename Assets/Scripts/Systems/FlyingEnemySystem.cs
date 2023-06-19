@@ -13,16 +13,11 @@ namespace Systems
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     public partial struct FlyingEnemySystem : ISystem
     {
-        private VectorField m_VectorField;
-
-        public void OnCreate(ref SystemState state)
-        {
-            m_VectorField = new VectorField(0.25f);
-        }
-
         public void OnUpdate(ref SystemState state)
         {
             var domePosition = new float3(0, 0, 0);
+
+            var vectorFieldConfig = VectorFieldConfig.Default;
 
             foreach (var (dome, localTransform, entity) in SystemAPI.Query<Dome, LocalTransform>().WithEntityAccess())
             {
@@ -52,8 +47,9 @@ namespace Systems
                 }
                 else
                 {
-                    desiredLinearVelocity = math.normalizesafe(m_VectorField.Sample(localTransform.Position)) *
-                                            flyingMeleeEnemy.MaxSpeed;
+                    desiredLinearVelocity = math.normalizesafe(
+                        VectorField.Sample(localTransform.Position, vectorFieldConfig)
+                    ) * flyingMeleeEnemy.MaxSpeed;
                 }
 
                 physicsVelocity.Linear = Utility.GoTowardsWithClampedMag(
