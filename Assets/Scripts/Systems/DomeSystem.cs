@@ -99,25 +99,4 @@ namespace Systems
             };
         }
     }
-
-
-    [UpdateInGroup(typeof(SimulationSystemGroup))]
-    public partial struct ProjectileSystem : ISystem
-    {
-        public void OnUpdate(ref SystemState state)
-        {
-            //SystemAPI.GetSingleton<>
-            //var collisionWorld = SystemAPI.GetSingleton<BuildPhysicsWorldData>().PhysicsData.PhysicsWorld.CollisionWorld;
-            //var collisions = new NativeList<DistanceHit>(Allocator.Temp);
-            //
-            //SystemAPI.GetSingleton<>().
-            //foreach (
-            //    var (projectileRw, localTransform, physicsVelocityRw, entity)
-            //    in SystemAPI.Query<RefRW<Projectile>, LocalTransform, RefRW<PhysicsVelocity>>().WithEntityAccess()
-            //)
-            //{
-            //    
-            //}
-        }
-    }
 }
