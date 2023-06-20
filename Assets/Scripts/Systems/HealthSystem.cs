@@ -1,4 +1,5 @@
 ﻿using Components;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 
@@ -9,15 +10,25 @@ namespace Systems
     {
         public void OnUpdate(ref SystemState state)
         {
-            foreach (var health in SystemAPI.Query<RefRW<Health>>())
+            var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
+            
+            foreach (var (healthRw, entity) in SystemAPI.Query<RefRW<Health>>().WithEntityAccess())
             {
-                var h = health.ValueRO;
-                if (h.HitPoints > 0)
+                var health = healthRw.ValueRO;
+                if (health.HitPoints > 0)
                 {
-                    h.HitPoints = math.clamp(h.HitPoints, 0, h.MaxHitPoints);
-                    health.ValueRW = h;
+                    health.HitPoints = math.clamp(health.HitPoints, 0, health.MaxHitPoints);
+                    healthRw.ValueRW = health;
+                }
+                else
+                {
+                    if(health.DestroyOnDeath){
+                        commandBuffer.DestroyEntity(entity);
+                    }
                 }
             }
+            
+            commandBuffer.Playback(state.EntityManager);
         }
     }
 }

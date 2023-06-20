@@ -10,22 +10,28 @@ namespace Systems
     {
         public void OnUpdate(ref SystemState state)
         {
-            foreach (var (statefulCollisionEvents, entity) in SystemAPI.Query<DynamicBuffer<StatefulCollisionEvent>>().WithEntityAccess())
+            foreach (var (statefulCollisionEvents, projectile, entity) in SystemAPI.Query<DynamicBuffer<StatefulCollisionEvent>, Projectile>().WithEntityAccess())
             {
-                Debug.Log("collision count: " + statefulCollisionEvents.Length + ",\nentity index: " + entity.Index);
+                foreach (var collision in statefulCollisionEvents)
+                {
+                    var other = collision.GetOtherEntity(entity);
+                    var healthRw = SystemAPI.GetComponentLookup<Health>().GetRefRWOptional(other);
+                        
+                    if(healthRw.IsValid)
+                    {
+                        if (!collision.CollisionDetails.IsValid)
+                        {
+                            Debug.LogError("Invalid collision details, adjust the component so this is calculated");
+                        }
+                        
+                        var damage = projectile.BaseDamage * collision.CollisionDetails.EstimatedImpulse;
+                        
+                        var health = healthRw.ValueRO;
+                        health.HitPoints -= damage;
+                        healthRw.ValueRW = health;
+                    }
+                }
             }
-            
-            //var collisionWorld = SystemAPI.GetSingleton<BuildPhysicsWorldData>().PhysicsData.PhysicsWorld.CollisionWorld;
-            //var collisions = new NativeList<DistanceHit>(Allocator.Temp);
-            //
-            //SystemAPI.GetSingleton<>().
-            //foreach (
-            //    var (projectileRw, localTransform, physicsVelocityRw, entity)
-            //    in SystemAPI.Query<RefRW<Projectile>, LocalTransform, RefRW<PhysicsVelocity>>().WithEntityAccess()
-            //)
-            //{
-            //    
-            //}
         }
     }
 }

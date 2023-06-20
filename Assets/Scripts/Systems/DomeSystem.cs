@@ -10,6 +10,7 @@ using UnityEngine;
 namespace Systems
 {
     [UpdateInGroup(typeof(SimulationSystemGroup))]
+    [UpdateBefore(typeof(LocalToWorldSystem))]
     public partial struct DomeSystem : ISystem
     {
         public void OnUpdate(ref SystemState state)
@@ -38,10 +39,26 @@ namespace Systems
                     var projectileEntity = state.EntityManager.Instantiate(projectilePrefab);
                     var projectileRw = SystemAPI.GetComponentRW<Projectile>(projectileEntity);
                     var projectile = projectileRw.ValueRO;
+                    var physicsVelocityRw = SystemAPI.GetComponentRW<PhysicsVelocity>(projectileEntity);
+                    var physicsVelocity = physicsVelocityRw.ValueRO;
+                    var projectileLocalTransformRw = SystemAPI.GetComponentRW<LocalTransform>(projectileEntity);
+                    var projectileLocalTransform = projectileLocalTransformRw.ValueRO;
                     
+                    var projectilePosition = projectileLocalTransform.Position;
+                    var aimDirection3 = new float3(dome.AimDirection.x, dome.AimDirection.y, 0);
+                    projectilePosition = localTransform.Position + aimDirection3 * 1.1f;
+                    projectileLocalTransform.Position = projectilePosition;
+
+
+
+
                     projectile.BaseDamage = projectileDamage;
+                    physicsVelocity.Linear = projectileSpeed;
                     
                     projectileRw.ValueRW = projectile;
+                    physicsVelocityRw.ValueRW = physicsVelocity;
+                    Debug.Log("projectile initial pos : " + projectileLocalTransform);
+                    projectileLocalTransformRw.ValueRW = projectileLocalTransform;
                 }
             }
         }

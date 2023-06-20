@@ -6,6 +6,7 @@ namespace Components
     {
         public float HitPoints;
         public float MaxHitPoints;
+        public bool DestroyOnDeath;
         public bool IsDead => HitPoints <= 0;
     }
 }

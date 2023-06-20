@@ -33,6 +33,7 @@ namespace DefaultNamespace.Utils
         }
     }
 
+    /*
     public static class VectorFieldTests
     {
         // create a menuitem
@@ -54,4 +55,5 @@ namespace DefaultNamespace.Utils
             }
         }
     }
+    */
 }

@@ -1,5 +1,6 @@
 ﻿using Unity.Entities;
 using Unity.Mathematics;
+using UnityEngine;
 
 namespace DefaultNamespace
 {
@@ -31,6 +32,19 @@ namespace DefaultNamespace
             var vertical = UnityEngine.Input.GetAxisRaw("Vertical");
             
             return new float3(horizontal, 0, vertical);
+        }
+        
+        public static float3 GetMousePositionInWorldSpace()
+        {
+            var mouseRayIntoWorld = Camera.main.ScreenPointToRay(Input.mousePosition);
+            var plane = new Plane(Vector3.forward, Vector3.zero);
+            if (plane.Raycast(mouseRayIntoWorld, out var distance))
+            {
+                var mousePositionInWorldSpace = mouseRayIntoWorld.GetPoint(distance);
+                return mousePositionInWorldSpace;
+            }
+            
+            return Vector3.zero;
         }
     }
 }

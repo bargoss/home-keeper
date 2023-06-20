@@ -25,12 +25,11 @@ namespace Systems
             }
 
 
-            foreach (var (flyingMeleeEnemyRw, enemyStateRw, localTransform, physicsVelocityRw, entity) in SystemAPI
-                         .Query<RefRW<FlyingMeleeEnemy>, RefRW<EnemyState>, LocalTransform, RefRW<PhysicsVelocity>>()
+            foreach (var (flyingMeleeEnemyRw, localTransform, physicsVelocityRw, entity) in SystemAPI
+                         .Query<RefRW<FlyingMeleeEnemy>, LocalTransform, RefRW<PhysicsVelocity>>()
                          .WithEntityAccess())
             {
                 var flyingMeleeEnemy = flyingMeleeEnemyRw.ValueRO;
-                var enemyState = enemyStateRw.ValueRO;
                 var physicsVelocity = physicsVelocityRw.ValueRO;
 
                 float3 desiredLinearVelocity;
@@ -50,6 +49,18 @@ namespace Systems
                     desiredLinearVelocity = math.normalizesafe(
                         VectorField.Sample(localTransform.Position, vectorFieldConfig)
                     ) * flyingMeleeEnemy.MaxSpeed;
+
+                    var clockwise =Mathf.PerlinNoise1D(((float)SystemAPI.Time.ElapsedTime * 0.1f + (float)entity.Index * 0.063f) % 1f) - 0.5f;
+                    var clockwiseDirection = math.cross(directionFromDome, new float3(0, 0, 1)) * clockwise;
+                    Debug.DrawRay(localTransform.Position,  math.normalize(clockwiseDirection) * 10, Color.red);
+                    desiredLinearVelocity += clockwiseDirection * 30.2f;
+                    
+                    var up = new float3(0, 1, 0);
+                    var myDir = math.normalizesafe(localTransform.Position - domePosition); 
+                    var angle = math.acos(math.dot(myDir, up));
+                    var angleAbs = math.abs(angle);
+
+                    desiredLinearVelocity += angleAbs * new float3(0, 15, 0);
                 }
 
                 physicsVelocity.Linear = Utility.GoTowardsWithClampedMag(

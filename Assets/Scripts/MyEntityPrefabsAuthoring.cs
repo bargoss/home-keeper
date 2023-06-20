@@ -3,34 +3,35 @@ using UnityEngine;
 
 public class MyEntityPrefabsAuthoring : MonoBehaviour
 {
-    public GameObject Player;
-    public GameObject Enemy;
+    public GameObject Dome;
+    public GameObject FlyingEnemy;
+    public GameObject Projectile;
 }
 
 public struct MyEntityPrefabsComponent : IComponentData
 {
-    public Entity Player;
-    public Entity Enemy;
+    public Entity Dome;
+    public Entity FlyingEnemy;
+    public Entity Projectile;
 }
 
 public class MyEntityPrefabsBaker : Baker<MyEntityPrefabsAuthoring>
 {
     public override void Bake(MyEntityPrefabsAuthoring authoring)
     {
-        /*
-        // Register the Prefab in the Baker
-        var entityPrefab = GetEntity(authoring.Prefab, TransformUsageFlags.Dynamic);
-        // Add the Entity reference to a component for instantiation later
-        var entity = GetEntity(TransformUsageFlags.Dynamic);
-        AddComponent(entity, new EntityPrefabComponent() {Value = entityPrefab});
-        */
-        
-        // Register the Prefab in the Baker
-        var playerEntityPrefab = GetEntity(authoring.Player, TransformUsageFlags.Dynamic);
-        var enemyEntityPrefab = GetEntity(authoring.Enemy, TransformUsageFlags.Dynamic);
+        var playerEntityPrefab = GetEntity(authoring.Dome, TransformUsageFlags.Dynamic);
+        var enemyEntityPrefab = GetEntity(authoring.FlyingEnemy, TransformUsageFlags.Dynamic);
+        var projectileEntityPrefab = GetEntity(authoring.Projectile, TransformUsageFlags.Dynamic);
         
         var prefabsEntity = GetEntity(authoring.gameObject, TransformUsageFlags.Dynamic);
-        
-        AddComponent(prefabsEntity, new MyEntityPrefabsComponent() {Player = playerEntityPrefab, Enemy = enemyEntityPrefab});
+
+        AddComponent(prefabsEntity,
+            new MyEntityPrefabsComponent()
+            {
+                Dome = playerEntityPrefab,
+                FlyingEnemy = enemyEntityPrefab,
+                Projectile = projectileEntityPrefab
+            }
+        );
     }
 }

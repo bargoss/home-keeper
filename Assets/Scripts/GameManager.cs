@@ -1,32 +1,47 @@
-﻿using System;
-using Components;
+﻿using Components;
 using Unity.Entities;
 using Unity.Mathematics;
-using Unity.Scenes.Editor;
 using Unity.Transforms;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace DefaultNamespace
 {
     public class GameManager : MonoBehaviour
     {
-        private Entity m_Player;
+        private Entity m_Dome;
         
         
-        public void Start()
+        private void Start()
         {
             //m_World = DefaultWorldInitialization.Initialize("MyTestWorld", false);
             //var playerLoop = UnityEngine.LowLevel.PlayerLoop.GetDefaultPlayerLoop();
             //ScriptBehaviourUpdateOrder.RemoveWorldFromPlayerLoop(m_World, ref playerLoop);
             //var query = SystemAPI.QueryBuilder().WithAll<BakedEntity>().WithOptions(EntityQueryOptions.IncludePrefab).Build();
 
-            m_Player = CreatePlayer(-math.right() * 6);
-            CreateEnemy(math.right() * 6 - math.up() * 3);
-            CreateEnemy(math.right() * 6 + math.up() * 3);
+            m_Dome = CreateDome(float3.zero);
+
+            for (var i = 0; i < 500; i++)
+            {
+                CreateFlyingEnemy(math.right() * 3 + math.up() * 12);
+            }
         }
 
+        private void Update()
+        {
+            var mousePosition = Utility.GetMousePositionInWorldSpace();
+            var dome = GetEntityManager().GetComponentData<Dome>(m_Dome);
+            var localTransform = GetEntityManager().GetComponentData<LocalTransform>(m_Dome);
+            var aimDirection3 = mousePosition - localTransform.Position;
+            var aimDirection = new float2(aimDirection3.x, aimDirection3.y);
+            var aimDirectionNormalized = math.normalize(aimDirection);
+
+            var shootInput = Input.GetMouseButton(0);
+            
+            dome.AimDirection = aimDirectionNormalized;
+            dome.ShootInput = shootInput;
+            GetEntityManager().SetComponentData(m_Dome, dome);
+        }
+        
         private MyEntityPrefabsComponent GetPrefabs()
         {
             var query = World.DefaultGameObjectInjectionWorld.EntityManager.CreateEntityQuery(typeof(MyEntityPrefabsComponent));
@@ -42,30 +57,28 @@ namespace DefaultNamespace
         {
             return GetWorld().EntityManager;
         }
-        private Entity CreatePlayer(float3 position)
+        private Entity CreateDome(float3 position)
         {
-            var prefab = GetPrefabs().Player;
+            var prefab = GetPrefabs().Dome;
             var playerEntity = GetEntityManager().Instantiate(prefab);
             GetEntityManager().SetComponentData(playerEntity, new LocalTransform() { Position = position, Rotation = Quaternion.identity, Scale = 1 });
             return playerEntity;
         }
         
-        private Entity CreateEnemy(float3 position)
+        private Entity CreateFlyingEnemy(float3 position)
         {
-            var prefab = GetPrefabs().Enemy;
+            var prefab = GetPrefabs().FlyingEnemy;
             var entity = GetEntityManager().Instantiate(prefab);
             GetEntityManager().SetComponentData(entity, new LocalTransform() { Position = position, Rotation = Quaternion.identity, Scale = 1 });
             return entity;
         }
-
-
-        public void Update()
+        
+        private Entity CreateProjectile(float3 position)
         {
-            GetEntityManager().SetComponentData(m_Player, new CharacterInput()
-            {
-                Attack = Input.GetKeyDown(KeyCode.Space),
-                Movement = Utility.GetInputDirection()
-            });
+            var prefab = GetPrefabs().Projectile;
+            var entity = GetEntityManager().Instantiate(prefab);
+            GetEntityManager().SetComponentData(entity, new LocalTransform() { Position = position, Rotation = Quaternion.identity, Scale = 1 });
+            return entity;
         }
     }
 }
