@@ -16,6 +16,7 @@ namespace Systems
         public void OnUpdate(ref SystemState state)
         {
             // get the command buffer or whatever we use to spawn entities here
+            var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
             
             foreach (var (domeRw, localTransform, entity) in SystemAPI.Query<RefRW<Dome>, LocalTransform>().WithEntityAccess())
             {
@@ -32,35 +33,35 @@ namespace Systems
                 domeRw.ValueRW = domeResult.Dome;
                 if (domeResult.ShotProjectile)
                 {
+                    var aimDirection3 = new float3(dome.AimDirection.x, dome.AimDirection.y, 0);
+                    
                     var projectileSpeed = domeResult.ShotProjectileVelocity;
                     var projectilePrefab = dome.ProjectilePrefab;
                     var projectileDamage = dome.ProjectileBaseDamage;
-
-                    var projectileEntity = state.EntityManager.Instantiate(projectilePrefab);
-                    var projectileRw = SystemAPI.GetComponentRW<Projectile>(projectileEntity);
-                    var projectile = projectileRw.ValueRO;
-                    var physicsVelocityRw = SystemAPI.GetComponentRW<PhysicsVelocity>(projectileEntity);
-                    var physicsVelocity = physicsVelocityRw.ValueRO;
-                    var projectileLocalTransformRw = SystemAPI.GetComponentRW<LocalTransform>(projectileEntity);
-                    var projectileLocalTransform = projectileLocalTransformRw.ValueRO;
+                    var projectilePosition = localTransform.Position + aimDirection3 * 1.1f;;
                     
-                    var projectilePosition = projectileLocalTransform.Position;
-                    var aimDirection3 = new float3(dome.AimDirection.x, dome.AimDirection.y, 0);
-                    projectilePosition = localTransform.Position + aimDirection3 * 1.1f;
-                    projectileLocalTransform.Position = projectilePosition;
-
-
-
-
-                    projectile.BaseDamage = projectileDamage;
-                    physicsVelocity.Linear = projectileSpeed;
-                    
-                    projectileRw.ValueRW = projectile;
-                    physicsVelocityRw.ValueRW = physicsVelocity;
-                    Debug.Log("projectile initial pos : " + projectileLocalTransform);
-                    projectileLocalTransformRw.ValueRW = projectileLocalTransform;
+                    var projectile = commandBuffer.Instantiate(projectilePrefab);
+                    commandBuffer.SetComponent(projectile, new LocalTransform()
+                    {
+                        Position = projectilePosition,
+                        Rotation = quaternion.identity,
+                        Scale = 1
+                    });
+                    commandBuffer.SetComponent(projectile, new Projectile()
+                    {
+                        BaseDamage = projectileDamage
+                    });
+                    commandBuffer.SetComponent(projectile, new PhysicsVelocity()
+                    {
+                        Linear = projectileSpeed
+                    });
+                    commandBuffer.SetComponent(projectile, new LocalToWorld()
+                    {
+                        Value = float4x4.TRS(projectilePosition, quaternion.identity, 1)
+                    });
                 }
             }
+            commandBuffer.Playback(state.EntityManager);
         }
     }
     
