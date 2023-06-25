@@ -32,7 +32,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8350596760033344952}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.22, y: 5.52, z: 0.88}
+  m_LocalPosition: {x: 4.96, y: 28.64, z: 0.88}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -308,15 +308,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a44d70c54b73480299b8d0f0b970fb38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Acceleration: 37.9
-  MaxSpeed: 5
+  Acceleration: 15
+  MaxSpeed: 3.03
   EvasiveManeuvering: 1
   AttackCooldown: 1
   AttackDamage: 1
   AttackedStunDuration: 1
   TookDamageStunDuration: 1
   DesiredMinDistanceToDome: 17.2
-  DesiredMaxDistanceToDome: 37.6
+  DesiredMaxDistanceToDome: 46.7
 --- !u!114 &7651400439084459285
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -331,7 +331,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   LockX: 0
   LockY: 0
-  LockZ: 1
+  LockZ: 0
 --- !u!114 &3633835740123811197
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -344,5 +344,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 740f9aed6fa040ddb2c980424b5bbd4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxHitPoints: 10
+  MaxHitPoints: 1
   DestroyOnDeath: 1

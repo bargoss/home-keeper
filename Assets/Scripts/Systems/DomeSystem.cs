@@ -10,7 +10,6 @@ using UnityEngine;
 namespace Systems
 {
     [UpdateInGroup(typeof(SimulationSystemGroup))]
-    [UpdateBefore(typeof(LocalToWorldSystem))]
     public partial struct DomeSystem : ISystem
     {
         public void OnUpdate(ref SystemState state)
