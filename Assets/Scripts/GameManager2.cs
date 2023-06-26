@@ -1,9 +1,11 @@
 ﻿using Components;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Entities.Serialization;
 using Unity.Mathematics;
 using Unity.Scenes;
 using Unity.Transforms;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -17,11 +19,24 @@ namespace DefaultNamespace
         //private SystemHandle m_InitializationSystemGroup;
         private int m_Frames = 0;
         
-        public SubScene SubScene;
-        private Entity m_SceneEntity;
+        //public SubScene SubScene;
+        //private Entity m_SceneEntity;
 
-        
-        
+
+
+        private World CreateWorld2(string name)
+        {
+            var world = new World(name);
+            // add default system groups
+            world.GetOrCreateSystem<InitializationSystemGroup>();
+            world.GetOrCreateSystem<SimulationSystemGroup>();
+            world.GetOrCreateSystem<PresentationSystemGroup>();
+
+            var systems = DefaultWorldInitialization.GetAllSystems(WorldSystemFilterFlags.Default);
+            DefaultWorldInitialization.AddSystemsToRootLevelSystemGroups(world, systems);
+
+            return world;
+        }
         private World CreateWorld(string name)
         {
             var world = BaransWorldInitialization.Initialize(name);
@@ -29,18 +44,25 @@ namespace DefaultNamespace
             //Entity sceneEntity = world.EntityManager.CreateEntity();
             //world.EntityManager.AddComponentData(sceneEntity, new SceneReference {SceneGUID = new GUID("New Sub Scene")});
             
-            m_SceneEntity = world.EntityManager.CreateEntity();
-            world.EntityManager.AddComponentData(m_SceneEntity, new SceneReference {SceneGUID = SubScene.SceneGUID});
-            //SceneSystem.LoadSceneAsync(world.Unmanaged,SubScene.SceneGUID, new SceneSystem.LoadParameters() { Flags = SceneLoadFlags.LoadAdditive });
-            SceneSystem.LoadSceneAsync(world.Unmanaged, m_SceneEntity, new SceneSystem.LoadParameters() { Flags = SceneLoadFlags.LoadAdditive });
             return world;
+        }
+        private void LoadScene(){
+            //m_SceneEntity = m_World.EntityManager.CreateEntity();
+            //m_World.EntityManager.AddComponentData(m_SceneEntity, new SceneReference {SceneGUID = SubScene.SceneGUID});
+            //SceneSystem.LoadSceneAsync(m_World.Unmanaged,SubScene.SceneGUID, new SceneSystem.LoadParameters() { Flags = SceneLoadFlags.LoadAdditive });
+            //SceneSystem.LoadSceneAsync(m_World.Unmanaged, m_SceneEntity, new SceneSystem.LoadParameters() { Flags = SceneLoadFlags.LoadAdditive });
+            
+            
+            
+            const string subScenePath = "Assets/Scenes/SampleScene/New Sub Scene.unity";
+            var guid = AssetDatabase.GUIDFromAssetPath(subScenePath);
+            var subSceneEntity = SceneSystem.LoadSceneAsync(m_World.Unmanaged, guid,
+                new SceneSystem.LoadParameters() { Flags = SceneLoadFlags.LoadAdditive });
         }
 
 
-        private void Initialize()
+        private void InitializeMyStuff()
         {
-            m_World.GetExistingSystem<InitializationSystemGroup>();
-            
             var prefabsComponent = m_World.EntityManager
                 .CreateEntityQuery(typeof(MyEntityPrefabsComponent))
                 .GetSingleton<MyEntityPrefabsComponent>();
@@ -57,12 +79,13 @@ namespace DefaultNamespace
                 Scale = 2,
             });
             
-            CreateTestEntity();
+            //CreateTestEntity();
         }
         private void Start()
         {
-            m_World = CreateWorld("barans world");
-            
+            //m_World = CreateWorld("barans world");
+            m_World = CreateWorld2("barans world");
+            LoadScene();
         }
 
         private Entity CreateTestEntity()
@@ -89,16 +112,18 @@ namespace DefaultNamespace
 
         private void FixedUpdate()
         {
-            var sceneLoaded = SceneSystem.IsSceneLoaded(m_World.Unmanaged, m_SceneEntity);
-            Debug.Log("scene loaded: " + sceneLoaded);
-            if (sceneLoaded)
+            //var sceneLoaded = SceneSystem.IsSceneLoaded(m_World.Unmanaged, m_SceneEntity);
+            //Debug.Log("scene loaded: " + sceneLoaded);
+            //if (sceneLoaded)
+            if (true)
             {
                 if (m_Frames == 0)
                 {
-                    Initialize();
+                    m_World.GetExistingSystem<InitializationSystemGroup>().Update(m_World.Unmanaged);
+                    //InitializeMyStuff();
                 }
+                
                 m_World.GetExistingSystem<SimulationSystemGroup>().Update(m_World.Unmanaged);
-
                 m_Frames++;
             }
         }
