@@ -407,6 +407,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13d36052f1f343ee87338b473e94fcaa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  subScenePath: Assets/Scenes/SampleScene/New Sub Scene.unity
 --- !u!4 &2096448822
 Transform:
   m_ObjectHideFlags: 0

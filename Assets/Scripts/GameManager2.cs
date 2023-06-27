@@ -1,74 +1,35 @@
-﻿using Components;
-using Unity.Collections;
-using Unity.Entities;
-using Unity.Entities.Serialization;
-using Unity.Mathematics;
-using Unity.Scenes;
-using Unity.Transforms;
-using UnityEditor;
+﻿using Unity.Entities;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
-namespace DefaultNamespace
+public class GameManager2 : MonoBehaviour
 {
-    public class GameManager2 : MonoBehaviour
+    private World m_World;
+    private CoroutineRunner m_CoroutineRunner;
+    [SerializeField] private string subScenePath = "Assets/Scenes/SampleScene/New Sub Scene.unity";
+
+    private void Awake()
     {
-        private World m_World;
-        //private SystemHandle m_SimulationSystemGroup;
-        //private SystemHandle m_PresentationSystemGroup;
-        //private SystemHandle m_InitializationSystemGroup;
-        public static Entity SubSceneEntity;
+        m_CoroutineRunner = gameObject.AddComponent<CoroutineRunner>();
+    }
 
-        //public SubScene SubScene;
-        //private Entity m_SceneEntity;
-
-
-
-        private World GetDefaultWorld()
+    private void Start()
+    {
+        //public static void Create(string worldName,string subScenePath,CoroutineRunner coroutineRunner,float timeoutSeconds,Action<Result<World>> onCreated)
+        WorldCreator.Create("MyWorld", subScenePath, m_CoroutineRunner, 9999, result =>
         {
-            return World.DefaultGameObjectInjectionWorld;
-        }
-        private World CreateWorld(string name)
-        {
-            var world = new World(name);
-            
-            // add default system groups
-            var initializationSystemGroup = world.GetOrCreateSystem<InitializationSystemGroup>();
-            world.GetOrCreateSystem<SimulationSystemGroup>();
-            world.GetOrCreateSystem<PresentationSystemGroup>();
+            switch (result)
+            {
+                case Result<World>.Success success:
+                    m_World = success.Value;
+                    break;
+                case Result<World>.Error error:
+                    Debug.LogError(error.Message);
+                    break;
+            }
+        });
+    }
 
-            var systems = DefaultWorldInitialization.GetAllSystems(WorldSystemFilterFlags.Default);
-            DefaultWorldInitialization.AddSystemsToRootLevelSystemGroups(world, systems);
-            
-            initializationSystemGroup.Update(world.Unmanaged);
-            
-            return world;
-        }
-        private void LoadScene(){
-            const string subScenePath = "Assets/Scenes/SampleScene/New Sub Scene.unity";
-            var guid = AssetDatabase.GUIDFromAssetPath(subScenePath);
-            SubSceneEntity = SceneSystem.LoadSceneAsync(m_World.Unmanaged, guid,
-                new SceneSystem.LoadParameters() { Flags = SceneLoadFlags.LoadAdditive });
-        }
-
-
-        private void Start()
-        {
-            m_World = CreateWorld("bargos world");
-            //m_World = GetDefaultWorld();
-            
-            DebugSceneLoadStatus();
-            
-            LoadScene();
-            
-            //const string subScenePath = "Assets/Scenes/SampleScene/New Sub Scene.unity";
-            //var guid = AssetDatabase.GUIDFromAssetPath(subScenePath);
-            //SubSceneEntity = SceneSystem.LoadSceneAsync(m_World.Unmanaged, guid,
-            //    new SceneSystem.LoadParameters() { Flags = SceneLoadFlags.LoadAdditive });
-            
-        }
-
-          /*      
+    /*      
         private Entity CreateTestEntity()
         {
             var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
@@ -91,7 +52,7 @@ namespace DefaultNamespace
         }
 */
 
-        /*
+    /*
         private void InitializeMyStuff()
         {
             var prefabsComponent = m_World.EntityManager
@@ -114,47 +75,30 @@ namespace DefaultNamespace
         }
         */
         
-        private void FixedUpdate()
+    private void FixedUpdate()
+    {
+        if (m_World != null)
         {
-            DebugSceneLoadStatus();
-
-
-            if (!Input.GetKey(KeyCode.Space))
-            {
-                m_World.GetExistingSystem<InitializationSystemGroup>().Update(m_World.Unmanaged);
-                m_World.GetExistingSystem<SimulationSystemGroup>().Update(m_World.Unmanaged);
-            }
-            
-            var time = m_World.Time.ElapsedTime;
-            Debug.Log("time: " + time);
+            m_World.GetExistingSystem<InitializationSystemGroup>().Update(m_World.Unmanaged);
+            m_World.GetExistingSystem<SimulationSystemGroup>().Update(m_World.Unmanaged);
         }
+    }
 
-        private void LateUpdate()
+    private void LateUpdate()
+    {
+        if (m_World != null)
         {
             m_World.GetExistingSystem<PresentationSystemGroup>().Update(m_World.Unmanaged);        
         }
+    }
 
-        private void DebugSceneLoadStatus()
-        {
-            //var sceneLoadStatus = SceneSystem.GetSceneStreamingState(m_World.Unmanaged, SubSceneEntity);
-            var sceneLoadStatus = SceneSystem.GetSceneStreamingState(m_World.Unmanaged, SubSceneEntity);
-            Debug.Log("scene loading status: " + sceneLoadStatus);
-
-            /*
-            if (Input.GetKey(KeyCode.D))
-            {
-                var sceneLoadedBool = SceneSystem.IsSceneLoaded(World.DefaultGameObjectInjectionWorld.Unmanaged, SubSceneEntity);
-                Debug.Log("scene loaded bool: " + sceneLoadedBool);
-            }
-            */
-        }
-
-        private void Noted()
-        {
-            // This query will return all baked entities, including the prefab entities
-            //var prefabQuery = SystemAPI.QueryBuilder().WithAll<BakedEntity>().WithOptions(EntityQueryOptions.IncludePrefab).Build();
-        }
-        /*
+        
+    private void Noted()
+    {
+        // This query will return all baked entities, including the prefab entities
+        //var prefabQuery = SystemAPI.QueryBuilder().WithAll<BakedEntity>().WithOptions(EntityQueryOptions.IncludePrefab).Build();
+    }
+    /*
         private void RegisterPrefabs()
         {
             var prefabsComponent = World.DefaultGameObjectInjectionWorld.EntityManager
@@ -167,5 +111,4 @@ namespace DefaultNamespace
             );
         }
         */
-    }
 }
