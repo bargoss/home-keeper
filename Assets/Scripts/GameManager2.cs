@@ -118,9 +118,15 @@ namespace DefaultNamespace
         {
             DebugSceneLoadStatus();
 
+
+            if (!Input.GetKey(KeyCode.Space))
+            {
+                m_World.GetExistingSystem<InitializationSystemGroup>().Update(m_World.Unmanaged);
+                m_World.GetExistingSystem<SimulationSystemGroup>().Update(m_World.Unmanaged);
+            }
             
-            m_World.GetExistingSystem<InitializationSystemGroup>().Update(m_World.Unmanaged);
-            m_World.GetExistingSystem<SimulationSystemGroup>().Update(m_World.Unmanaged);
+            var time = m_World.Time.ElapsedTime;
+            Debug.Log("time: " + time);
         }
 
         private void LateUpdate()
