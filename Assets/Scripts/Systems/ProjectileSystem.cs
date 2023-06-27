@@ -1,4 +1,5 @@
 ﻿using Components;
+using HomeKeeper.Components;
 using Unity.Entities;
 using Unity.Physics.Stateful;
 using UnityEngine;
@@ -24,7 +25,8 @@ namespace Systems
                             Debug.LogError("Invalid collision details, adjust the component so this is calculated");
                         }
                         
-                        var damage = projectile.BaseDamage * collision.CollisionDetails.EstimatedImpulse;
+                        //var damage = projectile.BaseDamage * collision.CollisionDetails.EstimatedImpulse;
+                        var damage = 1 * collision.CollisionDetails.EstimatedImpulse;
                         
                         var health = healthRw.ValueRO;
                         health.HitPoints -= damage;

@@ -21,6 +21,7 @@ public class GameManager2 : MonoBehaviour
             {
                 case Result<World>.Success success:
                     m_World = success.Value;
+                    Debug.Log("world loaded");
                     break;
                 case Result<World>.Error error:
                     Debug.LogError(error.Message);

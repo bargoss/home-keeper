@@ -1,4 +1,5 @@
 ﻿using Components;
+using HomeKeeper.Components;
 using Unity.Entities;
 using UnityEngine;
 
@@ -6,9 +7,9 @@ namespace Authoring
 {
     public class RigidbodyAxisLockAuthoring : MonoBehaviour
     {
-        public bool LockX = false;
-        public bool LockY = false;
-        public bool LockZ = true;
+        public bool LockLinearX = false;
+        public bool LockLinearY = false;
+        public bool LockLinearZ = true;
     }
     
     public class RigidbodyAxisLockBaker : Baker<RigidbodyAxisLockAuthoring>
@@ -18,9 +19,9 @@ namespace Authoring
             var entity = GetEntity(authoring.gameObject, TransformUsageFlags.Dynamic);
             AddComponent(entity, new RigidbodyAxisLock()
             {
-                LockX = authoring.LockX,
-                LockY = authoring.LockY,
-                LockZ = authoring.LockZ,
+                LockLinearX = authoring.LockLinearX,
+                LockLinearY = authoring.LockLinearY,
+                LockLinearZ = authoring.LockLinearZ,
             });
         }
     }

@@ -1,4 +1,5 @@
 ﻿using Components;
+using HomeKeeper.Components;
 using Unity.Collections;
 using Unity.Entities;
 

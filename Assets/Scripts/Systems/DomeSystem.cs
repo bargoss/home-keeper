@@ -1,4 +1,5 @@
 ﻿using Components;
+using HomeKeeper.Components;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -48,7 +49,7 @@ namespace Systems
                     });
                     commandBuffer.SetComponent(projectile, new Projectile()
                     {
-                        BaseDamage = projectileDamage
+                        //BaseDamage = projectileDamage
                     });
                     commandBuffer.SetComponent(projectile, new PhysicsVelocity()
                     {

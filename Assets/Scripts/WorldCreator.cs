@@ -23,7 +23,7 @@ public static class WorldCreator{
 
         var systems = DefaultWorldInitialization.GetAllSystems(WorldSystemFilterFlags.Default);
         DefaultWorldInitialization.AddSystemsToRootLevelSystemGroups(world, systems);
-            
+        
         initializationSystemGroup.Update(world.Unmanaged);
             
         return world;

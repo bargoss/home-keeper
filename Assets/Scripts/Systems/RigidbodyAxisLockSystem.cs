@@ -1,4 +1,5 @@
 ﻿using Components;
+using HomeKeeper.Components;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
@@ -20,17 +21,17 @@ namespace Systems
                 var linearVelocity = physicsVelocity.Linear;
                 var position = localTransform.Position;
                 
-                if (rigidbodyAxisLock.LockX)
+                if (rigidbodyAxisLock.LockLinearX)
                 {
                     linearVelocity.x = 0;
                     position.x = 0;
                 }
-                if (rigidbodyAxisLock.LockY)
+                if (rigidbodyAxisLock.LockLinearY)
                 {
                     linearVelocity.y = 0;
                     position.y = 0;
                 }
-                if (rigidbodyAxisLock.LockZ)
+                if (rigidbodyAxisLock.LockLinearZ)
                 {
                     linearVelocity.z = 0;
                     position.z = 0;
