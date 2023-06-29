@@ -33,5 +33,23 @@ public class ShooterViewTest : MonoBehaviour
         look = Quaternion.Euler(Vector3.up * m_LookX) * look;
         
         GetComponent<ShooterView>().UpdateLookDirection(look);
+
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            Time.timeScale -= 0.2f;
+            if (Time.timeScale <= 0)
+            {
+                Time.timeScale = 0.1f;
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            Time.timeScale += 0.2f;
+            if (Time.timeScale >= 1)
+            {
+                Time.timeScale = 1;
+            }
+        }
     }
 }

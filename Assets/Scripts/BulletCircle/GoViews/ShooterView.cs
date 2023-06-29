@@ -72,7 +72,7 @@ namespace BulletCircle.GoViews
                 .Append(m_Barrel.DOLocalMove(m_BarrelFrontPos.localPosition, 0.55f * scaler));
             
             DOTween.Sequence(m_Slide)
-                .AppendInterval(0.15f)
+                .AppendInterval(0.025f * scaler)
                 .Append(m_Slide.DOLocalMove(m_SlideBackPos.localPosition, 0.15f * scaler).OnUpdate(() =>
                 {
                     m_Bullet0.transform.position = m_Chamber.transform.position;
@@ -85,6 +85,7 @@ namespace BulletCircle.GoViews
 
                     m_Bullet1.transform.SetParent(m_Chamber);
                 })
+                .AppendInterval(0.2f * scaler)
                 .Append(m_Slide.DOLocalMove(m_SlideFrontPos.localPosition, 0.15f * scaler))
                 .Join(m_Bullet1.DOLocalMove(Vector3.zero, 0.15f * scaler))
                 .Join(m_Bullet1.DOLocalRotateQuaternion(Quaternion.identity, 0.15f * scaler));
