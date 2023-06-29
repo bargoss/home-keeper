@@ -586,6 +586,17 @@ PrefabInstance:
       propertyPath: EjectForce
       value: 468.1
       objectReference: {fileID: 0}
+    - target: {fileID: 3396015738664773049, guid: c4e8efcb994d44f4da3d3df20c6355f2,
+        type: 3}
+      propertyPath: m_ExplosionVfxPoint
+      value: 
+      objectReference: {fileID: 4690773731897633624}
+    - target: {fileID: 3396015738664773049, guid: c4e8efcb994d44f4da3d3df20c6355f2,
+        type: 3}
+      propertyPath: m_ExplosionVfxPrefab
+      value: 
+      objectReference: {fileID: 7952902059039820435, guid: 4538cc0fc4ac47044bf32770d9f10578,
+        type: 3}
     - target: {fileID: 3935648929667721174, guid: c4e8efcb994d44f4da3d3df20c6355f2,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -754,6 +765,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 107482780}
+    - targetCorrespondingSourceObject: {fileID: 1997267451397810786, guid: c4e8efcb994d44f4da3d3df20c6355f2,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4690773731897633624}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 4033226429246862564, guid: c4e8efcb994d44f4da3d3df20c6355f2,
         type: 3}
@@ -778,7 +793,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23c22ddd11a72504f9d2caee7f9364a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CycleDuration: 1
+  CycleDuration: 0.25
 --- !u!4 &890116177 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8211633131528927978, guid: c4e8efcb994d44f4da3d3df20c6355f2,
@@ -1714,3 +1729,34 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1692305375}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &482871723996357265
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4690773731897633624}
+  m_Layer: 0
+  m_Name: ExplosionVfxPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4690773731897633624
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 482871723996357265}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.26, z: 9.65}
+  m_LocalScale: {x: 3, y: 3, z: 3}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1563302156}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

@@ -31,6 +31,7 @@ namespace BulletCircle.GoViews
         [SerializeField] private Transform m_Chamber;
         
         
+        [SerializeField] private Transform m_ExplosionVfxPoint;
         [SerializeField] private Transform m_BodyBasePos;
         [SerializeField] private Transform m_BulletLoadPosition;
         [SerializeField] private Transform m_BarrelBackPos;
@@ -39,6 +40,7 @@ namespace BulletCircle.GoViews
         [SerializeField] private Transform m_SlideFrontPos;
         
         [SerializeField] private GameObject m_EmptyShellPrefab;
+        [SerializeField] private GameObject m_ExplosionVfxPrefab;
         
         [SerializeField] private Transform m_Bullet0;
         [SerializeField] private Transform m_Bullet1;
@@ -62,12 +64,12 @@ namespace BulletCircle.GoViews
         {
             ResetAnimation();
             ShootVfx();
-
             var scaler = animationDuration / 0.8f;
             
             DOTween.Sequence(m_Barrel)
                 .Append(m_Barrel.DOLocalMove(m_BarrelBackPos.localPosition, 0.075f).SetEase(Ease.OutCirc))
-                .Append(m_Barrel.DOLocalMove(m_BarrelFrontPos.localPosition, 0.65f * scaler));
+                .AppendInterval(0.1f * scaler)
+                .Append(m_Barrel.DOLocalMove(m_BarrelFrontPos.localPosition, 0.55f * scaler));
             
             DOTween.Sequence(m_Slide)
                 .AppendInterval(0.15f)
@@ -164,7 +166,8 @@ namespace BulletCircle.GoViews
 
         private void ShootVfx()
         {
-            
+            var explosion = Instantiate(m_ExplosionVfxPrefab, m_ExplosionVfxPoint.position, m_ExplosionVfxPoint.rotation);
+            explosion.transform.localScale = m_ExplosionVfxPoint.localScale;
         } 
     }
 }
