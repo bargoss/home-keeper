@@ -1,5 +1,7 @@
-﻿using DG.Tweening;
+﻿using System;
+using DG.Tweening;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace BulletCircle.GoViews
 {
@@ -43,7 +45,14 @@ namespace BulletCircle.GoViews
         
 
         public float BodyRecoilDistance = 0.5f;
-        
+        public float EjectForce = 300;
+        public float EjectForcePosition = 0.1f;
+
+        private void Awake()
+        {
+            ResetAnimation();
+        }
+
         public void UpdateLookDirection(Vector3 aimDirection)
         {
             m_Parent.transform.rotation = Quaternion.LookRotation(aimDirection, Vector3.up);
@@ -54,8 +63,37 @@ namespace BulletCircle.GoViews
             ResetAnimation();
             ShootVfx();
 
-            var scaler = animationDuration / 0.6f;
+            var scaler = animationDuration / 0.8f;
             
+            DOTween.Sequence(m_Barrel)
+                .Append(m_Barrel.DOLocalMove(m_BarrelBackPos.localPosition, 0.075f).SetEase(Ease.OutCirc))
+                .Append(m_Barrel.DOLocalMove(m_BarrelFrontPos.localPosition, 0.65f * scaler));
+            
+            DOTween.Sequence(m_Slide)
+                .AppendInterval(0.15f)
+                .Append(m_Slide.DOLocalMove(m_SlideBackPos.localPosition, 0.15f * scaler).OnUpdate(() =>
+                {
+                    m_Bullet0.transform.position = m_Chamber.transform.position;
+                    m_Bullet0.transform.rotation = m_Chamber.transform.rotation;
+                }))
+                .AppendCallback(() =>
+                {
+                    BulletEjectionAnimation();
+                    m_Bullet0.gameObject.SetActive(false);
+
+                    m_Bullet1.transform.SetParent(m_Chamber);
+                })
+                .Append(m_Slide.DOLocalMove(m_SlideFrontPos.localPosition, 0.15f * scaler))
+                .Join(m_Bullet1.DOLocalMove(Vector3.zero, 0.15f * scaler))
+                .Join(m_Bullet1.DOLocalRotateQuaternion(Quaternion.identity, 0.15f * scaler));
+            
+            DOTween.Sequence(m_Body)
+                .AppendInterval(0.2f)
+                .Append(m_Body.DOLocalMove(m_BodyBasePos.localPosition - Vector3.forward * BodyRecoilDistance, 0.3f * scaler))
+                .Append(m_Body.DOLocalMove(m_BodyBasePos.localPosition, 0.3f * scaler));
+                
+            
+            /*
             DOTween.Sequence(gameObject)
                 // shoot
                 .Append(m_Barrel.DOLocalMove(m_BarrelBackPos.localPosition, 0.15f * scaler))
@@ -78,6 +116,7 @@ namespace BulletCircle.GoViews
                 .Join(m_Bullet0.DOLocalRotateQuaternion(Quaternion.identity, 0.8f * scaler))
                 .Join(m_Slide.DOLocalMove(m_SlideFrontPos.localPosition, 0.15f * scaler))
                 .Join(m_Barrel.DOLocalMove(m_BarrelFrontPos.localPosition, 0.15f * scaler));
+                */
         }
 
         private void BulletEjectionAnimation()
@@ -87,15 +126,15 @@ namespace BulletCircle.GoViews
             
             var shell = Instantiate(m_EmptyShellPrefab, pos, rot);
             shell.transform.localScale = Vector3.one;
-            shell.GetComponent<Rigidbody>().AddForceAtPosition(m_Body.transform.up * 20, pos + shell.transform.forward * 1);
+            shell.GetComponent<Rigidbody>().AddForceAtPosition((m_Body.transform.up * 0.8f - m_Body.transform.forward * 0.2f + Random.insideUnitSphere * 0.1f) * EjectForce, pos + shell.transform.forward * EjectForcePosition);
         }
 
         private void ResetAnimation()
         {
             DOTween.Kill(gameObject,true);
-            //DOTween.Kill(m_Barrel, true);
-            //DOTween.Kill(m_Slide, true);
-            //DOTween.Kill(m_Body, true);
+            DOTween.Kill(m_Barrel, true);
+            DOTween.Kill(m_Slide, true);
+            DOTween.Kill(m_Body, true);
             
             m_Bullet0.gameObject.SetActive(true);
             m_Bullet1.gameObject.SetActive(true);
