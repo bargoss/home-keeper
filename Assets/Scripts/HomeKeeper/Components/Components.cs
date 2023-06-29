@@ -42,10 +42,4 @@ namespace HomeKeeper.Components
         public bool LockLinearZ;
     }
     
-    // create a record
-    public record Abc
-    {
-        public int X;
-        public int Y;
-    }
 }
