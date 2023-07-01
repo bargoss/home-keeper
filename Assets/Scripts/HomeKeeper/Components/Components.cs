@@ -1,20 +1,9 @@
-﻿using Unity.Entities;
+﻿using Unity.Collections;
+using Unity.Entities;
 using Unity.Mathematics;
 
 namespace HomeKeeper.Components
 {
-    public struct MeleeAttackStats : IComponentData
-    {
-        public float AttackCooldown;
-    }
-    public struct MeleeAttacksState : IComponentData
-    {
-        public float LastAttack;
-    }
-    public struct MovementInput : IComponentData
-    {
-        public float2 Value;
-    }
     public struct Health : IComponentData
     {
         public float HitPoints;
@@ -26,11 +15,6 @@ namespace HomeKeeper.Components
     {
         public float SecondsToLive;
     }
-    public struct DamageOthersOnCollision : IComponentData
-    {
-        public float Damage;
-        public float CollisionDamage;
-    }
     public struct Projectile : IComponentData
     {
         
@@ -41,5 +25,36 @@ namespace HomeKeeper.Components
         public bool LockLinearY;
         public bool LockLinearZ;
     }
-    
+
+    public struct Shooter : IComponentData
+    {
+        public ShooterStats Stats;
+        
+        // state
+        public float LastShotTime;
+        public bool ShotThisFrame;
+        
+        // input
+        public bool ShootInput;
+        public float3 LookInput;
+    }
+
+    public struct ShooterStats
+    {
+        public float FireRate;
+        public Entity ProjectilePrefab;
+        public float MuzzleVelocity;
+        public float AccuracyAngles;
+        public Entity ShootPositionEntity;
+    }
+
+    public struct Enemy : IComponentData
+    {
+
+    }
+
+    public struct DyingEnemy : IComponentData
+    {
+        public FixedList128Bytes<Entity> BodyParts;
+    }
 }
