@@ -49,4 +49,13 @@ namespace HomeKeeper.Systems
             commandBuffer.Playback(state.EntityManager);
         }
     }
+
+    public partial class MSystem : SystemBase
+    {
+        protected override void OnUpdate()
+        {
+            
+
+        }
+    }
 }
