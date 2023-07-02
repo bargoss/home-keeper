@@ -1,5 +1,6 @@
 ﻿using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
 
 namespace DefaultNamespace
@@ -16,6 +17,32 @@ namespace DefaultNamespace
         //     }
         //     return false;
         // }
+        
+        public static float3 ClampMagnitude(this float3 vector, float maxLength)
+        {
+            var length = math.length(vector);
+            if (length > maxLength)
+            {
+                return vector / length * maxLength;
+            }
+            return vector;
+        }
+
+        public static void SetLocalPositionRotation(this ref EntityCommandBuffer commandBuffer, float3 position, quaternion rotation, Entity entity)
+        {
+            commandBuffer.SetComponent(entity, new LocalTransform()
+            {
+                Position = position,
+                Rotation = rotation,
+                Scale = 1
+            });
+            
+            commandBuffer.SetComponent(entity,new LocalToWorld()
+            {
+                Value = float4x4.TRS(position, rotation, 1)
+            });
+            
+        }
 
         public static float3 GoTowardsWithClampedMag(float3 start, float3 target, float maxMovement)
         {

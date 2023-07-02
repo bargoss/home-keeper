@@ -42,7 +42,6 @@ namespace HomeKeeper.Components
     public struct ShooterStats
     {
         public float FireRate;
-        public Entity ProjectilePrefab;
         public float MuzzleVelocity;
         public float AccuracyAngles;
         public Entity ShootPositionEntity;
@@ -50,11 +49,48 @@ namespace HomeKeeper.Components
 
     public struct Enemy : IComponentData
     {
+        
+    }
 
+    public struct CharacterMovement : IComponentData
+    {
+        public struct SStats
+        {
+            public float MaxSpeed;
+            public float AccelerationMultiplier;
+            public float MaxAcceleration;
+        }
+
+        public SStats Stats;
+        public float3 DirectionInput;
     }
 
     public struct DyingEnemy : IComponentData
     {
         public FixedList128Bytes<Entity> BodyParts;
+    }
+
+    // consumed by a gameobject view system
+    public struct BloodEffect : IComponentData
+    {
+        
+    }
+    
+    public struct GameResources : IComponentData
+    {
+        public Entity ProjectilePrefab;
+        public Entity EnemyPrefab;
+        public Entity DyingEnemyPrefab;
+        public Entity BloodEffectPrefab;
+    }
+
+    public struct EnemySpawner : IComponentData
+    {
+        public float SpawnInterval;
+        public float LastSpawnTime;
+        public float SpawnInnerRadius;
+        public float SpawnOuterRadius;
+        public float3 SpawnDirection;
+        public float SpawnArcDegrees;
     }
 }
