@@ -156,5 +156,5 @@ namespace HomeKeeper.Components
         public float GrabDistance;
     }
     
-    public struct DestroyAfterTick : IComponentData { }
+    public struct EcsEvent : IComponentData { }
 }

@@ -6,14 +6,15 @@ namespace HomeKeeper.Systems
 {
     // run just after SimulationSystemGroup
     
-    [UpdateInGroup(typeof(LateSimulationSystemGroup))]
-    public partial struct DestroyAfterTickSystem : ISystem
+    [UpdateInGroup(typeof(SimulationSystemGroup))]
+    [UpdateAfter(typeof(EventConsumingSystemGroup))]
+    public partial struct EventCleanupSystem : ISystem
     {
         public void OnUpdate(ref SystemState state)
         {
             var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
 
-            foreach (var (destroyAfterTick, entity) in SystemAPI.Query<DestroyAfterTick>().WithEntityAccess())
+            foreach (var (_, entity) in SystemAPI.Query<EcsEvent>().WithEntityAccess())
             {
                 commandBuffer.DestroyEntity(entity);
             }
