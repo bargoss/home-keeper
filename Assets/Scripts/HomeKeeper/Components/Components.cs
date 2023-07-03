@@ -58,31 +58,33 @@ namespace HomeKeeper.Components
     }
 
     [Flags]
-    public enum GrabObjectType
+    public enum ItemType
     {
-        Regular = 0,
+        Resource = 0,
         Magazine = 2,
+        All = ~0
     }
-    public struct GrabObject : IComponentData
+    public struct Item : IComponentData
     {
-        public GrabObjectType GrabObjectType;
+        public ItemType ItemType;
     }
-
-    public struct GrabObjectSocket : IComponentData
+    
+    public struct ItemSocket : IComponentData
     {
         // stats
-        public GrabObjectType AcceptedGrabObjectType;
+        public ItemType AcceptedItemType;
         
         // states
-        public Entity IsOccupiedByOpt;
+        public Entity HeldItemOpt;
     }
     
     public static class CollisionTags
     {
         public const uint Default = 0;
-        public const uint GrabObject = 2;
-        public const uint Projectile = 4;
-        public const uint Enemy = 8;
+        public const uint Item = 2;
+        public const uint GrabObjectSocket = 4;
+        public const uint Projectile = 8;
+        public const uint Enemy = 16;
     }
     
     public struct Magazine : IComponentData
@@ -152,9 +154,10 @@ namespace HomeKeeper.Components
         public bool Drop;
         
         // state
-        public Entity GrabbedEntityOpt;
+        public Entity ItemOpt;
         public float GrabDistance;
     }
     
+    // events
     public struct EcsEvent : IComponentData { }
 }
