@@ -20,7 +20,7 @@ public static class WorldCreator{
         var initializationSystemGroup = world.GetOrCreateSystem<InitializationSystemGroup>();
         world.GetOrCreateSystem<SimulationSystemGroup>();
         world.GetOrCreateSystem<PresentationSystemGroup>();
-
+        
         var systems = DefaultWorldInitialization.GetAllSystems(WorldSystemFilterFlags.Default);
         DefaultWorldInitialization.AddSystemsToRootLevelSystemGroups(world, systems);
         

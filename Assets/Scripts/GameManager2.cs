@@ -82,6 +82,7 @@ public class GameManager2 : MonoBehaviour
         {
             m_World.GetExistingSystem<InitializationSystemGroup>().Update(m_World.Unmanaged);
             m_World.GetExistingSystem<SimulationSystemGroup>().Update(m_World.Unmanaged);
+            // todo: should I include LateSimulationSystemGroup?
         }
     }
 

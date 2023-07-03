@@ -1,4 +1,5 @@
-﻿using Unity.Collections;
+﻿using System;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 
@@ -41,7 +42,7 @@ namespace HomeKeeper.Components
         // state
         public float LastShotTime;
         public bool ShotThisFrame;
-        public Entity AttachedMagazine;
+        //public Entity AttachedMagazine;
         
         // input
         public bool ShootInput;
@@ -54,9 +55,36 @@ namespace HomeKeeper.Components
             public float AccuracyAngles;
             public Entity ShootPositionEntity;
         }
-        
     }
 
+    [Flags]
+    public enum GrabObjectType
+    {
+        Regular = 0,
+        Magazine = 2,
+    }
+    public struct GrabObject : IComponentData
+    {
+        public GrabObjectType GrabObjectType;
+    }
+
+    public struct GrabObjectSocket : IComponentData
+    {
+        // stats
+        public GrabObjectType AcceptedGrabObjectType;
+        
+        // states
+        public Entity IsOccupiedByOpt;
+    }
+    
+    public static class CollisionTags
+    {
+        public const uint Default = 0;
+        public const uint GrabObject = 2;
+        public const uint Projectile = 4;
+        public const uint Enemy = 8;
+    }
+    
     public struct Magazine : IComponentData
     {
         // Stats
@@ -113,4 +141,20 @@ namespace HomeKeeper.Components
         public float3 SpawnDirection;
         public float SpawnArcDegrees;
     }
+    
+    public struct PlayerAction : IComponentData
+    {
+        // input
+        public float3 CameraPosition;
+        public float3 CameraForward;
+        public float3 MouseDirection;
+        public bool Grab;
+        public bool Drop;
+        
+        // state
+        public Entity GrabbedEntityOpt;
+        public float GrabDistance;
+    }
+    
+    public struct DestroyAfterTick : IComponentData { }
 }

@@ -15,7 +15,7 @@ namespace HomeKeeper.Systems
         public void OnUpdate(ref SystemState state)
         {
             var commandBuffer = new EntityCommandBuffer();
-            foreach (var (shooterRw, localToWorld, localTransformRw,entity) in SystemAPI.Query<RefRW<Shooter>, LocalToWorld, RefRW<LocalTransform>>().WithEntityAccess())
+            foreach (var (shooterRw, grabObjectSocket, localToWorld, localTransformRw,entity) in SystemAPI.Query<RefRW<Shooter>, GrabObjectSocket, LocalToWorld, RefRW<LocalTransform>>().WithEntityAccess())
             {
                 var shooter = shooterRw.ValueRO;
                 var localTransform = localTransformRw.ValueRO;
@@ -26,7 +26,7 @@ namespace HomeKeeper.Systems
                 // shoot
                 if (shooter.ShootInput)
                 {
-                    if (TryGetMagazineRw(shooter.AttachedMagazine, out var magazineRw))
+                    if (TryGetMagazineRw(grabObjectSocket.IsOccupiedByOpt, out var magazineRw))
                     {
                         var magazine = magazineRw.ValueRO;
                         
