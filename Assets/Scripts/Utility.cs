@@ -1,7 +1,9 @@
 ﻿using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Physics;
 using Unity.Transforms;
 using UnityEngine;
+using Plane = UnityEngine.Plane;
 
 namespace DefaultNamespace
 {
@@ -28,7 +30,15 @@ namespace DefaultNamespace
             return vector;
         }
 
-        public static void SetLocalPositionRotation(this ref EntityCommandBuffer commandBuffer, float3 position, quaternion rotation, Entity entity)
+        public static void SetVelocity(this ref EntityCommandBuffer commandBuffer, Entity entity, float3 velocity)
+        {
+            commandBuffer.SetComponent(entity, new PhysicsVelocity()
+            {
+                Linear = velocity,
+                Angular = float3.zero
+            });
+        }
+        public static void SetLocalPositionRotation(this ref EntityCommandBuffer commandBuffer, Entity entity, float3 position, quaternion rotation)
         {
             commandBuffer.SetComponent(entity, new LocalTransform()
             {

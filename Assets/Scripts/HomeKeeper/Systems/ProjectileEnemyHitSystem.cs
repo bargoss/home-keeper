@@ -33,14 +33,14 @@ namespace HomeKeeper.Systems
                     )
                     {
                         var bloodEffect = commandBuffer.CreateEntity();
-                        commandBuffer.SetLocalPositionRotation(localToWorld.Position, localToWorld.Rotation, bloodEffect);
+                        commandBuffer.SetLocalPositionRotation(bloodEffect, localToWorld.Position, localToWorld.Rotation);
 
                         if (health.IsDead)
                         {
                             commandBuffer.DestroyEntity(otherEntity);
                             
                             var dyingEnemy = commandBuffer.Instantiate(SystemAPI.GetSingleton<GameResources>().DyingEnemyPrefab);
-                            commandBuffer.SetLocalPositionRotation(localToWorld.Position, localToWorld.Rotation, dyingEnemy);
+                            commandBuffer.SetLocalPositionRotation(dyingEnemy, localToWorld.Position, localToWorld.Rotation);
                         }
                     }
                 }

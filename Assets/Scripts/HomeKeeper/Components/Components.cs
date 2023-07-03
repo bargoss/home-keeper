@@ -17,8 +17,16 @@ namespace HomeKeeper.Components
     }
     public struct Projectile : IComponentData
     {
-        
+        public float BaseDamage;
+        public float Penetration;
     }
+
+    public struct FlakProjectile : IComponentData
+    {
+        public int NumShards;
+        public float ShardBaseDamage;
+    }
+    
     public struct RigidbodyAxisLock : IComponentData
     {
         public bool LockLinearX;
@@ -33,18 +41,30 @@ namespace HomeKeeper.Components
         // state
         public float LastShotTime;
         public bool ShotThisFrame;
+        public Entity AttachedMagazine;
         
         // input
         public bool ShootInput;
         public float3 LookInput;
+        
+        public struct ShooterStats
+        {
+            public float FireRate;
+            public float MuzzleVelocity;
+            public float AccuracyAngles;
+            public Entity ShootPositionEntity;
+        }
+        
     }
 
-    public struct ShooterStats
+    public struct Magazine : IComponentData
     {
-        public float FireRate;
-        public float MuzzleVelocity;
-        public float AccuracyAngles;
-        public Entity ShootPositionEntity;
+        // Stats
+        public int Capacity;
+        public Entity ProjectilePrefab;
+        
+        // State
+        public int Current;
     }
 
     public struct Enemy : IComponentData
