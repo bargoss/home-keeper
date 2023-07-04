@@ -99,7 +99,7 @@ namespace HomeKeeper.Systems
             grabItem = Entity.Null;
             var collisionWorld = SystemAPI.GetSingleton<BuildPhysicsWorldData>().PhysicsData.PhysicsWorld.CollisionWorld;
             var collisionFilter = CollisionFilter.Default;
-            collisionFilter.BelongsTo = CollisionTags.Item;
+            collisionFilter.BelongsTo = CollisionTags.GroundItem;
             var raycastInput = new RaycastInput
             {
                 Start = origin,
