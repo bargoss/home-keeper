@@ -17,15 +17,19 @@ namespace HomeKeeper.Systems
             var commandBuffer = new EntityCommandBuffer();
             foreach (var (shooterRw, grabObjectSocket, localToWorld, localTransformRw,entity) in SystemAPI.Query<RefRW<Shooter>, ItemSocket, LocalToWorld, RefRW<LocalTransform>>().WithEntityAccess())
             {
+                SystemAPI.GetComponentLookup<ItemAspect.LookUp>()
+                
                 var shooter = shooterRw.ValueRO;
                 var localTransform = localTransformRw.ValueRO;
                 
                 // look
-                HandleLook(shooter, localToWorld, ref localTransform);
+                HandleLook(shooter, localToWorld, ref localTransform, SystemAPI.Time.DeltaTime);
 
                 // shoot
                 if (shooter.ShootInput)
                 {
+                    // todo
+                    /*
                     if (TryGetMagazineRw(grabObjectSocket.HeldItemOpt, out var magazineRw))
                     {
                         var magazine = magazineRw.ValueRO;
@@ -34,9 +38,19 @@ namespace HomeKeeper.Systems
                         
                         magazineRw.ValueRW = magazine;
                     }
+                    */
+                    var placeHolderProjectilePrefab = SystemAPI.GetSingleton<GameResources>().ProjectilePrefab;
+                    HandleShoot(
+                        new Magazine { Capacity = 99, Current = 99, ProjectilePrefab = placeHolderProjectilePrefab },
+                        ref shooter,
+                        localToWorld,
+                        ref commandBuffer,
+                        (float)SystemAPI.Time.ElapsedTime,
+                        SystemAPI.GetSingleton<GameResources>().ProjectilePrefab,
+                        SystemAPI.GetComponent<LocalToWorld>(shooter.Stats.ShootPositionEntity).Position
+                    );
                 }
-                
-                
+
                 shooterRw.ValueRW = shooter;
                 localTransformRw.ValueRW = localTransform;
             }
@@ -45,29 +59,29 @@ namespace HomeKeeper.Systems
         }
 
         private void HandleShoot(Magazine magazine, ref Shooter shooter, LocalToWorld localToWorld,
-            ref EntityCommandBuffer commandBuffer)
+            ref EntityCommandBuffer commandBuffer, float elapsedTime, Entity projectilePrefab, float3 shootPosition)
         {
             if (magazine.Current > 0)
             {
                 var cooldown = 1.0f / shooter.Stats.FireRate;
-                var cooldownFinished = (float)SystemAPI.Time.ElapsedTime > shooter.LastShotTime + cooldown;
+                var cooldownFinished = elapsedTime > shooter.LastShotTime + cooldown;
 
                 if (cooldownFinished)
                 {
-                    var shootPosition = SystemAPI.GetComponent<LocalToWorld>(shooter.Stats.ShootPositionEntity).Position;
+                    //var shootPosition = SystemAPI.GetComponent<LocalToWorld>(shooter.Stats.ShootPositionEntity).Position
                     var shootVelocity = localToWorld.Forward * shooter.Stats.MuzzleVelocity;
                     CreateProjectile(
                         shootPosition,
                         shootVelocity,
-                        SystemAPI.GetSingleton<GameResources>().ProjectilePrefab,
+                        projectilePrefab,
                         ref commandBuffer
                     );
-                    shooter.LastShotTime = (float)SystemAPI.Time.ElapsedTime;
+                    shooter.LastShotTime = elapsedTime;
                 }
             }
         }
 
-        private void HandleLook(Shooter shooter, LocalToWorld localToWorld, ref LocalTransform localTransform)
+        private void HandleLook(Shooter shooter, LocalToWorld localToWorld, ref LocalTransform localTransform, float deltaTime)
         {
             var lookInput = shooter.LookInput;
             if (math.lengthsq(lookInput) < 0.0001f) // if its zero, make it forward
@@ -79,7 +93,7 @@ namespace HomeKeeper.Systems
                 shooter.LookInput + localToWorld.Forward * 0.001f,
                 new float3(0, 1, 0)
             );
-            localTransform.Rotation = math.slerp(localTransform.Rotation, targetRotation, 1.0f * SystemAPI.Time.DeltaTime);
+            localTransform.Rotation = math.slerp(localTransform.Rotation, targetRotation, 1.0f * deltaTime);
         }
 
         private Entity CreateProjectile(float3 position, float3 velocity, Entity prefab, ref EntityCommandBuffer entityCommandBuffer)
@@ -99,6 +113,7 @@ namespace HomeKeeper.Systems
             
             return projectile;
         }
+        /*
         private bool TryGetMagazineRw(Entity magazineEntity, out RefRW<Magazine> magazineRw)
         {
             magazineRw = default;
@@ -116,5 +131,6 @@ namespace HomeKeeper.Systems
             magazineRw = SystemAPI.GetComponentRW<Magazine>(magazineEntity);
             return true;
         }
+        */
     }
 }

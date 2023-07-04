@@ -88,7 +88,7 @@ namespace HomeKeeper.Components
         public ItemType ItemType;
     }
     
-    public struct GroundItem : IComponentData
+    public struct GroundItemParent : IComponentData
     {
         public Entity ItemPrefab;
     }
@@ -96,9 +96,9 @@ namespace HomeKeeper.Components
     {
         // stats
         public ItemType AcceptedItemType;
-        
-        // states
-        public Entity HeldItemOpt;
+        public bool TempSocket;
+
+        // the first child is the held item
     }
     
     public struct Magazine : IComponentData
@@ -146,6 +146,7 @@ namespace HomeKeeper.Components
         public Entity EnemyPrefab;
         public Entity DyingEnemyPrefab;
         public Entity BloodEffectPrefab;
+        public Entity ItemSocketPrefab;
     }
 
     public struct EnemySpawner : IComponentData
@@ -168,17 +169,19 @@ namespace HomeKeeper.Components
         public bool Drop;
         
         // state
-        public Entity ItemOpt;
+        public Entity ItemEntityOpt;
         public float GrabDistance;
     }
     
     public static class CollisionTags
     {
-        public const uint Default = 0;
-        public const uint GroundItem = 2;
+        public const uint None = 0;
+        public const uint Default = 2;
         public const uint ItemSocket = 4;
         public const uint Projectile = 8;
         public const uint Enemy = 16;
+        
+        public const uint All = 0xffffffff;
     }
     
     
