@@ -22,10 +22,37 @@ namespace HomeKeeper.Components
         public float Penetration;
     }
 
-    public struct FlakProjectile : IComponentData
+    public struct FlakDetonation : IComponentData
     {
-        public int NumShards;
+        // stats
         public float ShardBaseDamage;
+        public float ShardPenetration;
+        public int ShardCount;
+        public float DetonationRange;
+        
+        // state
+        public float TravelledDistance;
+    }
+    
+    public struct DamageRangeCurve : IComponentData
+    {
+        public float RangeA;
+        public float RangeB;
+        public float DamageA;
+        public float DamageB;
+
+        public float GetDamage(float range)
+        {
+            var t = math.unlerp(RangeA, RangeB, range);
+            
+            if (t <= 0) return DamageA;
+            if (t >= 1) return DamageB;
+            return math.lerp(DamageA, DamageB, t);
+        }
+    }
+    public struct ExplosiveContact : IComponentData
+    {
+        public DamageRangeCurve DamageRangeCurve;
     }
     
     public struct RigidbodyAxisLock : IComponentData

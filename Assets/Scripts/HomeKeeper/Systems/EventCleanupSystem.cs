@@ -6,8 +6,7 @@ namespace HomeKeeper.Systems
 {
     // run just after SimulationSystemGroup
     
-    [UpdateInGroup(typeof(SimulationSystemGroup))]
-    [UpdateAfter(typeof(EventConsumingSystemGroup))]
+    [UpdateInGroup(typeof(SimulationSystemGroup), OrderFirst = true)]
     public partial struct EventCleanupSystem : ISystem
     {
         public void OnUpdate(ref SystemState state)
