@@ -22,8 +22,7 @@ namespace Systems
                 {
                     var other = collision.GetOtherEntity(entity);
                     var healthRw = SystemAPI.GetComponentLookup<Health>().GetRefRWOptional(other);
-                    var a = SystemAPI.GetAspect<ItemAspect>();
-                        
+                    
                     if(healthRw.IsValid)
                     {
                         if (!collision.CollisionDetails.IsValid)

@@ -17,7 +17,8 @@ namespace HomeKeeper.Systems
             var commandBuffer = new EntityCommandBuffer();
             foreach (var (shooterRw, grabObjectSocket, localToWorld, localTransformRw,entity) in SystemAPI.Query<RefRW<Shooter>, ItemSocket, LocalToWorld, RefRW<LocalTransform>>().WithEntityAccess())
             {
-                SystemAPI.GetComponentLookup<ItemAspect.LookUp>()
+                var itemSocketAspectLookup = new ItemSocketAspect.Lookup(ref state);
+                var itemSocketAspect = itemSocketAspectLookup[entity];
                 
                 var shooter = shooterRw.ValueRO;
                 var localTransform = localTransformRw.ValueRO;

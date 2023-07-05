@@ -6,6 +6,7 @@ using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
+using Unity.Physics.Aspects;
 using Unity.Physics.Systems;
 using Unity.Transforms;
 
@@ -254,21 +255,14 @@ namespace HomeKeeper.Systems
         // This is required for registering commands in an EntityCommandBuffer for example.
         public readonly Entity Self;
         public readonly RefRW<ItemSocket> ItemSocket;
-        private readonly RefRO<LocalToWorld> LocalToWorld;
+        private readonly RefRW<LocalToWorld> LocalToWorld;
+        private readonly RefRW<LocalTransform> LocalTransform;
         public float3 WorldPosition => LocalToWorld.ValueRO.Position;
         // todo add the children info here somewhere
         
-        private readonly ComponentLookup<Item> m_ItemLookup;
-
         public bool TryGetItem(out ItemAspect itemAspect)
         {
             itemAspect = default;
-            var itemEntity = GetFirstChild();
-            //SystemAPI.GetAspect<ItemAspect>(itemEntity);
-            //var a  = SystemAPI.GetComponentLookup<Item>()[Self].ItemType;
-            var a  = m_ItemLookup[Self].ItemType;
-            TransformHelpers.ComputeWorldTransformMatrix();
-
             return false;
         }
         private Entity GetFirstChild()
