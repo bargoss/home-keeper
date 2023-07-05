@@ -257,18 +257,57 @@ namespace HomeKeeper.Systems
         public readonly RefRW<ItemSocket> ItemSocket;
         private readonly RefRW<LocalToWorld> LocalToWorld;
         private readonly RefRW<LocalTransform> LocalTransform;
+        private readonly DynamicBuffer<Child> m_Children;
         public float3 WorldPosition => LocalToWorld.ValueRO.Position;
         // todo add the children info here somewhere
         
-        public bool TryGetItem(out ItemAspect itemAspect)
+        public bool TryGetItem(
+            out ItemAspect itemAspect, 
+            ref SystemState state,
+            ref ComponentLookup<>)
         {
             itemAspect = default;
+
+            if (m_Children.Length > 0)
+            {
+                var itemEntity = m_Children[0].Value;
+                if(state.GetComponentLookup<Item>().HasComponent(itemEntity))
+                {
+                    var itemAspectLookUp = new ItemAspect.Lookup(ref state);
+                    
+                    
+                    itemAspect = itemAspectLookUp[itemEntity];
+                }
+            }
+            state.EntityManager.GetAspect<>()
+            
+            
             return false;
         }
-        private Entity GetFirstChild()
+    }
+
+    public static class ItemSystemHelpers
+    {
+        public struct ItemSocketAsp
         {
-            // todo
-            throw new NotImplementedException("dont know how to get children yet");
+            private readonly Entity m_ItemSocketEntity;
+            private ItemSocket m_ItemSocket;
+
+            private bool m_HasItem;
+            private readonly Entity m_ItemEntityOpt;
+            private readonly Item m_ItemOpt;
+
+            public bool TryGetItem(out Item item)
+            {
+                
+            }
+
+            
+            public static ItemSocketAsp Create(Entity itemSocketEntity, Entity itemEntity)
+            {
+                
+            }
         }
+        public static bool TryGetItemSocket(Entity itemSocketEntity)
     }
 }
