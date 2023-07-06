@@ -18,7 +18,7 @@ namespace HomeKeeper.Systems
     {
         public void OnUpdate(ref SystemState state)
         {
-            var entityCommandBuffer = new EntityCommandBuffer();
+            var entityCommandBuffer = new EntityCommandBuffer(Allocator.Temp);
             foreach (var playerActionRw in SystemAPI.Query<RefRW<PlayerAction>>())
             {
                 var playerAction = playerActionRw.ValueRO;

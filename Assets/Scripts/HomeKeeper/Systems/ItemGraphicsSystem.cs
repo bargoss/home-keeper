@@ -16,8 +16,6 @@ namespace HomeKeeper.Systems
         
         protected override void OnUpdate()
         {
-            var gameResourcesManaged = SystemAPI.ManagedAPI.GetSingleton<GameResourcesManaged>();
-
             Entities.ForEach((ref Item item, in LocalToWorld localToWorld) =>
             {
                 switch (item.ItemType)
@@ -32,8 +30,31 @@ namespace HomeKeeper.Systems
                 }
             }).WithoutBurst().Run();
 
-            Graphics.DrawMeshInstanced(gameResourcesManaged.Magazine.Mesh, 0, gameResourcesManaged.Magazine.Material,
-                m_MagazineMatrices);
+            //Graphics.DrawMeshInstanced(gameResourcesManaged.Magazine.Mesh.Result, 0, gameResourcesManaged.Magazine.Material.Result, m_MagazineMatrices);
+            
+            // create a simple cube mesh
+            var mesh = new Mesh();
+            mesh.vertices = new Vector3[]
+            {
+                new Vector3(0, 0, 0),
+                new Vector3(1, 0, 0),
+                new Vector3(1, 1, 0),
+                new Vector3(0, 1, 0),
+            };
+            mesh.triangles = new int[]
+            {
+                0, 1, 2,
+                0, 2, 3,
+            };
+            mesh.RecalculateNormals();
+            
+            // create a simple urp material
+            var material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            material.enableInstancing = true;
+            
+            Graphics.DrawMeshInstanced(mesh, 0, material, m_MagazineMatrices);
+            
+            m_MagazineMatrices.Clear();
         }
     }
 }

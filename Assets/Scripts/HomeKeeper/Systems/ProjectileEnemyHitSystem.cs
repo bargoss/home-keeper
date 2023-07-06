@@ -2,6 +2,7 @@
 using DefaultNamespace;
 using HomeKeeper.Components;
 using Systems;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Physics.Stateful;
 using Unity.Transforms;
@@ -20,7 +21,7 @@ namespace HomeKeeper.Systems
     {
         public void OnUpdate(ref SystemState state)
         {
-            var commandBuffer = new EntityCommandBuffer();
+            var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
             
             foreach (var (projectile, statefulCollisionEvents, entity) in SystemAPI.Query<Projectile, DynamicBuffer<StatefulCollisionEvent>>().WithEntityAccess())
             {

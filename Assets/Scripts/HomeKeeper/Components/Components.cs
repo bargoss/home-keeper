@@ -1,6 +1,7 @@
 ﻿using System;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Entities.Content;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
@@ -183,25 +184,18 @@ namespace HomeKeeper.Components
         }
     }
 
-    public class GameResourcesManaged : IComponentData
+    public class GameResourcesManaged : IComponentData 
     {
-        public readonly Drawable Magazine;
-
-        public GameResourcesManaged(Drawable magazine)
+        public GameResourcesManaged() {} // Add parameterless constructor
+    
+        public Drawable Magazine;
+    
+        public class Drawable 
         {
-            Magazine = magazine;
-        }
-
-        public class Drawable
-        {
-            public readonly Mesh Mesh;
-            public readonly Material Material;
-
-            public Drawable(Mesh mesh, Material material)
-            {
-                Mesh = mesh;
-                Material = material;
-            }
+            public Drawable() {} // Add parameterless constructor
+        
+            public WeakObjectReference<Mesh> Mesh;
+            public WeakObjectReference<Material> Material;
         }
     }
 
@@ -244,7 +238,7 @@ namespace HomeKeeper.Components
     [Flags]
     public enum ItemType
     {
-        Resource = 0,
+        Resource = 1,
         Magazine = 2,
         All = ~0
     }

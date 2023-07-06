@@ -12,11 +12,11 @@ namespace Systems
             int count = 0;
             foreach (var (testComponent, entity) in SystemAPI.Query<TestComponent>().WithEntityAccess())
             {
-                Debug.Log($"Seen TestComponent");
+                //Debug.Log($"Seen TestComponent");
                 count++;
             }
             
-            Debug.Log($"TestComponent count: {count}");
+            //Debug.Log($"TestComponent count: {count}");
         }
     }
 }

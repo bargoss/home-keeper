@@ -1,5 +1,6 @@
 ﻿using DefaultNamespace;
 using HomeKeeper.Components;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -11,7 +12,7 @@ namespace HomeKeeper.Systems
     {
         public void OnUpdate(ref SystemState state)
         {
-            var commandBuffer = new EntityCommandBuffer();
+            var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
 
             foreach (var (enemySpawnerRw, localToWorld, spawnerEntity)
                      in SystemAPI.Query<RefRW<EnemySpawner>, LocalToWorld>().WithEntityAccess())

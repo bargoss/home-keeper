@@ -1,4 +1,5 @@
-﻿using Unity.Entities;
+﻿using Unity.Collections;
+using Unity.Entities;
 
 namespace BulletCircle.Systems
 {
@@ -7,7 +8,7 @@ namespace BulletCircle.Systems
     {
         public void OnUpdate(ref SystemState state)
         {
-            var commandBuffer = new EntityCommandBuffer();
+            var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
             foreach (var (ball, entity) in SystemAPI.Query<Ball>().WithEntityAccess())
             {
                 if (ball.Bounces >= ball.MaxBounces)

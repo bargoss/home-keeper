@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using DefaultNamespace;
 using HomeKeeper.Components;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
@@ -14,7 +15,7 @@ namespace HomeKeeper.Systems
     {
         public void OnUpdate(ref SystemState state)
         {
-            var commandBuffer = new EntityCommandBuffer();
+            var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
             foreach (var (shooterRw, grabObjectSocket, localToWorld, localTransformRw,entity) in SystemAPI.Query<RefRW<Shooter>, ItemSocket, LocalToWorld, RefRW<LocalTransform>>().WithEntityAccess())
             {
                 var itemSocketAspectLookup = new ItemSocketAspect.Lookup(ref state);

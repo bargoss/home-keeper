@@ -1,5 +1,6 @@
 ﻿using HomeKeeper.Components;
 using Unity.Entities;
+using Unity.Entities.Content;
 using UnityEngine;
 
 namespace HomeKeeper.Authoring
@@ -23,11 +24,16 @@ namespace HomeKeeper.Authoring
         public override void Bake(GameResourcesAuthoring authoring)
         {
             var entity = GetEntity(TransformUsageFlags.None);
-            AddComponentObject(entity,
-                new GameResourcesManaged(
-                    new GameResourcesManaged.Drawable(authoring.MagazineMesh, authoring.MagazineMaterial)
-                )
-            );
+
+            var gameResourcesManaged = new GameResourcesManaged
+            {
+                Magazine = new GameResourcesManaged.Drawable
+                {
+                    Material = new WeakObjectReference<Material>(authoring.MagazineMaterial),
+                    Mesh = new WeakObjectReference<Mesh>(authoring.MagazineMesh)
+                }
+            };
+            AddComponentObject(entity, gameResourcesManaged);
             AddComponent(entity, new GameResourcesUnmanaged(
                 GetEntity(authoring.EnemyPrefab, TransformUsageFlags.Dynamic),
                 GetEntity(authoring.DyingEnemyPrefab, TransformUsageFlags.Dynamic),
