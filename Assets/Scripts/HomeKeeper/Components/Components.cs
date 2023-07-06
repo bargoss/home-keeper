@@ -85,27 +85,18 @@ namespace HomeKeeper.Components
             public Entity ShootPositionEntity;
         }
     }
-    public struct ItemView : IComponentData
-    {
-        public Entity ItemEntity;
-    }
-    
-    public struct GroundItemParent : IComponentData
-    {
-        public Entity ItemPrefab;
-    }
     public struct ItemSocket : IComponentData
     {
-        // stats
         public ItemType AcceptedItemType;
-        public bool TempSocket;
+        public bool DestroyedIfEmpty;
         
-        // if it holds an item, it will be an ItemComponent in the same entity
+        // if it has an item, there will be an Item component on the entity as well as this
     }
+    
     public struct Item : IComponentData
     {
         public ItemType ItemType;
-        public int ItemId; // within type
+        public int ItemId;
     }
     
     public readonly partial struct ItemSocketAspect : IAspect
@@ -174,23 +165,43 @@ namespace HomeKeeper.Components
         
     }
     
-    public struct GameResources : IComponentData
+    public struct GameResourcesUnmanaged : IComponentData
     {
         public Entity ProjectilePrefab;
         public Entity EnemyPrefab;
         public Entity DyingEnemyPrefab;
         public Entity BloodEffectPrefab;
         public Entity FreeItemSocketPrefab;
+        
+        public GameResourcesUnmanaged(Entity projectilePrefab, Entity enemyPrefab, Entity dyingEnemyPrefab, Entity bloodEffectPrefab, Entity freeItemSocketPrefab)
+        {
+            ProjectilePrefab = projectilePrefab;
+            EnemyPrefab = enemyPrefab;
+            DyingEnemyPrefab = dyingEnemyPrefab;
+            BloodEffectPrefab = bloodEffectPrefab;
+            FreeItemSocketPrefab = freeItemSocketPrefab;
+        }
     }
 
     public class GameResourcesManaged : IComponentData
     {
-        public Drawable Magazine;
+        public readonly Drawable Magazine;
+
+        public GameResourcesManaged(Drawable magazine)
+        {
+            Magazine = magazine;
+        }
 
         public class Drawable
         {
-            public Mesh Mesh;
-            public Material Material;
+            public readonly Mesh Mesh;
+            public readonly Material Material;
+
+            public Drawable(Mesh mesh, Material material)
+            {
+                Mesh = mesh;
+                Material = material;
+            }
         }
     }
 

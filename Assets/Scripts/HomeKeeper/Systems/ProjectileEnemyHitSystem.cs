@@ -39,7 +39,7 @@ namespace HomeKeeper.Systems
                         {
                             commandBuffer.DestroyEntity(otherEntity);
                             
-                            var dyingEnemy = commandBuffer.Instantiate(SystemAPI.GetSingleton<GameResources>().DyingEnemyPrefab);
+                            var dyingEnemy = commandBuffer.Instantiate(SystemAPI.GetSingleton<GameResourcesUnmanaged>().DyingEnemyPrefab);
                             commandBuffer.SetLocalPositionRotation(dyingEnemy, localToWorld.Position, localToWorld.Rotation);
                         }
                     }

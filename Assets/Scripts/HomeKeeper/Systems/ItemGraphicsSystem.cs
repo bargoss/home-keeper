@@ -13,7 +13,6 @@ namespace HomeKeeper.Systems
     public partial class ItemGraphicsSystem : SystemBase
     {
         private readonly List<Matrix4x4> m_MagazineMatrices = new();
-
         
         protected override void OnUpdate()
         {
@@ -31,7 +30,7 @@ namespace HomeKeeper.Systems
                     default:
                         break;
                 }
-            }).Run();
+            }).WithoutBurst().Run();
 
             Graphics.DrawMeshInstanced(gameResourcesManaged.Magazine.Mesh, 0, gameResourcesManaged.Magazine.Material,
                 m_MagazineMatrices);

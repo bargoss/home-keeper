@@ -40,14 +40,14 @@ namespace HomeKeeper.Systems
                         magazineRw.ValueRW = magazine;
                     }
                     */
-                    var placeHolderProjectilePrefab = SystemAPI.GetSingleton<GameResources>().ProjectilePrefab;
+                    var placeHolderProjectilePrefab = SystemAPI.GetSingleton<GameResourcesUnmanaged>().ProjectilePrefab;
                     HandleShoot(
                         new Magazine { Capacity = 99, Current = 99, ProjectilePrefab = placeHolderProjectilePrefab },
                         ref shooter,
                         localToWorld,
                         ref commandBuffer,
                         (float)SystemAPI.Time.ElapsedTime,
-                        SystemAPI.GetSingleton<GameResources>().ProjectilePrefab,
+                        SystemAPI.GetSingleton<GameResourcesUnmanaged>().ProjectilePrefab,
                         SystemAPI.GetComponent<LocalToWorld>(shooter.Stats.ShootPositionEntity).Position
                     );
                 }
