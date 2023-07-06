@@ -2,6 +2,8 @@
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Transforms;
+using UnityEngine;
 
 namespace HomeKeeper.Components
 {
@@ -83,9 +85,9 @@ namespace HomeKeeper.Components
             public Entity ShootPositionEntity;
         }
     }
-    public struct Item : IComponentData
+    public struct ItemView : IComponentData
     {
-        public ItemType ItemType;
+        public Entity ItemEntity;
     }
     
     public struct GroundItemParent : IComponentData
@@ -97,8 +99,40 @@ namespace HomeKeeper.Components
         // stats
         public ItemType AcceptedItemType;
         public bool TempSocket;
+        
+        // if it holds an item, it will be an ItemComponent in the same entity
+    }
+    public struct Item : IComponentData
+    {
+        public ItemType ItemType;
+        public int ItemId; // within type
+    }
+    
+    public readonly partial struct ItemSocketAspect : IAspect
+    {
+        // An Entity field in an Aspect gives access to the Entity itself.
+        // This is required for registering commands in an EntityCommandBuffer for example.
+        public readonly Entity Self;
+        public readonly RefRO<ItemSocket> ItemSocket;
+        [Optional] private readonly RefRO<Item> m_Item;
+        private readonly RefRO<LocalToWorld> LocalToWorld;
+        private readonly RefRW<LocalTransform> LocalTransform;
+        public float3 WorldPosition => LocalToWorld.ValueRO.Position;
 
-        // the first child is the held item
+        public bool TryGetItem(out Item item)
+        {
+            item = default;
+            
+            if (m_Item.IsValid)
+            {
+                item = m_Item.ValueRO;
+                return true;
+            }
+
+            return false;
+        }
+        
+        
     }
     
     public struct Magazine : IComponentData
@@ -146,7 +180,18 @@ namespace HomeKeeper.Components
         public Entity EnemyPrefab;
         public Entity DyingEnemyPrefab;
         public Entity BloodEffectPrefab;
-        public Entity ItemSocketPrefab;
+        public Entity FreeItemSocketPrefab;
+    }
+
+    public class GameResourcesManaged : IComponentData
+    {
+        public Drawable Magazine;
+
+        public class Drawable
+        {
+            public Mesh Mesh;
+            public Material Material;
+        }
     }
 
     public struct EnemySpawner : IComponentData
