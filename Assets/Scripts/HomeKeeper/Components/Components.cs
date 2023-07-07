@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Entities.Content;
@@ -209,6 +210,22 @@ namespace HomeKeeper.Components
         public Item HeldItem;
         public float GrabDistance;
     }
+    
+    /*
+     * Platform will be an entity, it will have health
+     * There will be no other entity
+     * 
+     */
+    public class Platform : IComponentData
+    {
+        public List<int> Slots;
+    }
+
+    public abstract class PlatformObject
+    {
+        
+    }
+    
     
     public static class CollisionTags
     {
