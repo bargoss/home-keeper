@@ -110,7 +110,8 @@ namespace HomeKeeper.Components
         private readonly RefRO<LocalToWorld> LocalToWorld;
         private readonly RefRW<LocalTransform> LocalTransform;
         public float3 WorldPosition => LocalToWorld.ValueRO.Position;
-
+        public bool DestroyedIfEmpty => ItemSocket.ValueRO.DestroyedIfEmpty;
+        
         public bool TryGetItem(out Item item)
         {
             item = default;
@@ -171,15 +172,13 @@ namespace HomeKeeper.Components
         public Entity ProjectilePrefab;
         public Entity EnemyPrefab;
         public Entity DyingEnemyPrefab;
-        public Entity BloodEffectPrefab;
         public Entity FreeItemSocketPrefab;
         
-        public GameResourcesUnmanaged(Entity projectilePrefab, Entity enemyPrefab, Entity dyingEnemyPrefab, Entity bloodEffectPrefab, Entity freeItemSocketPrefab)
+        public GameResourcesUnmanaged(Entity projectilePrefab, Entity enemyPrefab, Entity dyingEnemyPrefab, Entity freeItemSocketPrefab)
         {
             ProjectilePrefab = projectilePrefab;
             EnemyPrefab = enemyPrefab;
             DyingEnemyPrefab = dyingEnemyPrefab;
-            BloodEffectPrefab = bloodEffectPrefab;
             FreeItemSocketPrefab = freeItemSocketPrefab;
         }
     }
@@ -205,7 +204,9 @@ namespace HomeKeeper.Components
         public bool Drop;
         
         // state
-        public Entity ItemEntityOpt;
+        //public Entity ItemEntityOpt;
+        public bool HoldsItem;
+        public Item HeldItem;
         public float GrabDistance;
     }
     
