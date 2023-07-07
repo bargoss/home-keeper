@@ -29,27 +29,10 @@ namespace HomeKeeper.Systems
                         break;
                 }
             }).WithoutBurst().Run();
-
-            //Graphics.DrawMeshInstanced(gameResourcesManaged.Magazine.Mesh.Result, 0, gameResourcesManaged.Magazine.Material.Result, m_MagazineMatrices);
             
-            // create a simple cube mesh
-            var mesh = new Mesh();
-            mesh.vertices = new Vector3[]
-            {
-                new Vector3(0, 0, 0),
-                new Vector3(1, 0, 0),
-                new Vector3(1, 1, 0),
-                new Vector3(0, 1, 0),
-            };
-            mesh.triangles = new int[]
-            {
-                0, 1, 2,
-                0, 2, 3,
-            };
-            mesh.RecalculateNormals();
+            var mesh = GameResources.Instance.MagazineMesh; //new Mesh();
             
-            // create a simple urp material
-            var material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            var material = GameResources.Instance.MagazineMaterial; //new Material(Shader.Find("Universal Render Pipeline/Lit"));
             material.enableInstancing = true;
             
             Graphics.DrawMeshInstanced(mesh, 0, material, m_MagazineMatrices);

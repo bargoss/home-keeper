@@ -7,10 +7,6 @@ namespace HomeKeeper.Authoring
 {
     public class GameResourcesAuthoring : MonoBehaviour
     {
-        // goes into managed
-        public Mesh MagazineMesh;
-        public Material MagazineMaterial;
-        
         // goes into unmanaged
         public GameObject ProjectilePrefab;
         public GameObject EnemyPrefab;
@@ -24,16 +20,7 @@ namespace HomeKeeper.Authoring
         public override void Bake(GameResourcesAuthoring authoring)
         {
             var entity = GetEntity(TransformUsageFlags.None);
-
-            var gameResourcesManaged = new GameResourcesManaged
-            {
-                Magazine = new GameResourcesManaged.Drawable
-                {
-                    Material = new WeakObjectReference<Material>(authoring.MagazineMaterial),
-                    Mesh = new WeakObjectReference<Mesh>(authoring.MagazineMesh)
-                }
-            };
-            AddComponentObject(entity, gameResourcesManaged);
+            
             AddComponent(entity, new GameResourcesUnmanaged(
                 GetEntity(authoring.EnemyPrefab, TransformUsageFlags.Dynamic),
                 GetEntity(authoring.DyingEnemyPrefab, TransformUsageFlags.Dynamic),

@@ -184,21 +184,7 @@ namespace HomeKeeper.Components
         }
     }
 
-    public class GameResourcesManaged : IComponentData 
-    {
-        public GameResourcesManaged() {} // Add parameterless constructor
     
-        public Drawable Magazine;
-    
-        public class Drawable 
-        {
-            public Drawable() {} // Add parameterless constructor
-        
-            public WeakObjectReference<Mesh> Mesh;
-            public WeakObjectReference<Material> Material;
-        }
-    }
-
     public struct EnemySpawner : IComponentData
     {
         public float SpawnInterval;

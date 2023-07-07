@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e52f57e6417641eaa98f72460b46a70b, type: 3}
+  m_Name: GameResources
+  m_EditorClassIdentifier: 
+  MagazineMesh: {fileID: 4300000, guid: 0bab4a3c3f4398a42af6441e8490cba2, type: 3}
+  MagazineMaterial: {fileID: 2100002, guid: 717e09a45c980834587d00ab49fc2cf6, type: 3}
+  ShooterViewPrefab: {fileID: 3396015738664773049, guid: b65b251491836b9428c58265cd640af1,
+    type: 3}
