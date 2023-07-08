@@ -74,6 +74,7 @@ namespace HomeKeeper.Components
         public float LastShotTime;
         public bool ShotThisFrame;
         //public Entity AttachedMagazine;
+        public float3 Look;
         
         // input
         public bool ShootInput;

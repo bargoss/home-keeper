@@ -24,7 +24,7 @@ namespace HomeKeeper.Systems
                 shooter.ShotThisFrame = false; // reset
                 
                 // look
-                HandleLook(shooter, localToWorld, ref localTransform, SystemAPI.Time.DeltaTime);
+                HandleLook(ref shooter, localToWorld, SystemAPI.Time.DeltaTime);
 
                 // shoot
                 if (shooter.ShootInput)
@@ -47,7 +47,7 @@ namespace HomeKeeper.Systems
                         localToWorld,
                         ref commandBuffer,
                         (float)SystemAPI.Time.ElapsedTime,
-                        SystemAPI.GetSingleton<GameResourcesUnmanaged>().ProjectilePrefab,
+                        placeHolderProjectilePrefab,
                         SystemAPI.GetComponent<LocalToWorld>(shooter.Stats.ShootPositionEntity).Position
                     );
                 }
@@ -70,7 +70,7 @@ namespace HomeKeeper.Systems
                 if (cooldownFinished)
                 {
                     //var shootPosition = SystemAPI.GetComponent<LocalToWorld>(shooter.Stats.ShootPositionEntity).Position
-                    var shootVelocity = localToWorld.Forward * shooter.Stats.MuzzleVelocity;
+                    var shootVelocity = shooter.Look * shooter.Stats.MuzzleVelocity;
                     CreateProjectile(
                         shootPosition,
                         shootVelocity,
@@ -83,19 +83,15 @@ namespace HomeKeeper.Systems
             }
         }
 
-        private void HandleLook(Shooter shooter, LocalToWorld localToWorld, ref LocalTransform localTransform, float deltaTime)
+        private void HandleLook(ref Shooter shooter, LocalToWorld localToWorld, float deltaTime)
         {
             var lookInput = shooter.LookInput;
             if (math.lengthsq(lookInput) < 0.0001f) // if its zero, make it forward
             {
                 lookInput = localToWorld.Forward;
             }
-
-            var targetRotation = quaternion.LookRotationSafe(
-                shooter.LookInput + localToWorld.Forward * 0.001f,
-                new float3(0, 1, 0)
-            );
-            localTransform.Rotation = math.slerp(localTransform.Rotation, targetRotation, 1.0f * deltaTime);
+            
+            shooter.Look = math.normalizesafe(math.lerp(shooter.Look, shooter.LookInput, 1.0f * deltaTime));
         }
 
         private Entity CreateProjectile(float3 position, float3 velocity, Entity prefab, ref EntityCommandBuffer entityCommandBuffer)

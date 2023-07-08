@@ -47,7 +47,7 @@ namespace HomeKeeper.ViewSystems
                     {
                         goView.ShootAnimation(1f / shooter.Stats.FireRate);
                     }
-                    goView.UpdateLookDirection( math.normalizesafe(shooter.LookInput));
+                    goView.UpdateLookDirection( math.normalizesafe(shooter.Look));
                 }
             }).WithoutBurst().Run();
             
