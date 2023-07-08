@@ -5,7 +5,7 @@ using Random = UnityEngine.Random;
 
 namespace BulletCircle.GoViews
 {
-    public class ShooterView : MonoBehaviour
+    public class ShooterGOView : MonoBehaviour
     {
         /*
         * Hierarchy:

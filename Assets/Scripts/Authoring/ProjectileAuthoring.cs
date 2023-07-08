@@ -17,7 +17,8 @@ namespace DefaultNamespace.Authoring
             var entity = GetEntity(authoring.gameObject, TransformUsageFlags.Dynamic);
             AddComponent(entity, new Projectile()
             {
-                //BaseDamage = authoring.BaseDamage
+                Penetration = 0,
+                BaseDamage = 1
             });
         }
     }

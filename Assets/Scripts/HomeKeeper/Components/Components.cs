@@ -87,6 +87,11 @@ namespace HomeKeeper.Components
             public Entity ShootPositionEntity;
         }
     }
+
+    public struct ShooterView : ICleanupComponentData
+    {
+        
+    }
     public struct ItemSocket : IComponentData
     {
         public ItemType AcceptedItemType;

@@ -12,7 +12,7 @@ public class GameResources : ScriptableObject
     
     public Mesh MagazineMesh;
     public Material MagazineMaterial;
-    public ShooterView ShooterViewPrefab;
+    public ShooterGOView shooterGoViewPrefab;
 
     
 

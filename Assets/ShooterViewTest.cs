@@ -21,7 +21,7 @@ public class ShooterViewTest : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.Space)&& Time.time - m_LastShoot > CycleDuration)
         {
-            GetComponent<ShooterView>().ShootAnimation(CycleDuration);
+            GetComponent<ShooterGOView>().ShootAnimation(CycleDuration);
             m_LastShoot = Time.time;
         }
 
@@ -32,7 +32,7 @@ public class ShooterViewTest : MonoBehaviour
         look = Quaternion.Euler(Vector3.right * m_LookY) * look;
         look = Quaternion.Euler(Vector3.up * m_LookX) * look;
         
-        GetComponent<ShooterView>().UpdateLookDirection(look);
+        GetComponent<ShooterGOView>().UpdateLookDirection(look);
 
         if (Input.GetKeyDown(KeyCode.Q))
         {

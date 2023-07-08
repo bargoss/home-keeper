@@ -37,7 +37,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &8607654022593400012
 MeshFilter:
@@ -329,9 +329,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fde2d55ad4324d56acaaef74680db640, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LockX: 0
-  LockY: 0
-  LockZ: 0
+  LockLinearX: 0
+  LockLinearY: 0
+  LockLinearZ: 1
 --- !u!114 &3633835740123811197
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -345,4 +345,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MaxHitPoints: 1
-  DestroyOnDeath: 1
+  DestroyOnDeath: 0

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using HomeKeeper.Components;
 using Unity.Collections;
 using Unity.Entities;
@@ -10,7 +9,7 @@ using UnityEngine;
 namespace HomeKeeper.Systems
 {
     [UpdateInGroup(typeof(LateSimulationSystemGroup))]
-    public partial class ItemGraphicsSystem : SystemBase
+    public partial class ItemViewSystem : SystemBase
     {
         private readonly List<Matrix4x4> m_MagazineMatrices = new();
         
