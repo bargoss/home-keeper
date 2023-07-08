@@ -22,6 +22,10 @@ namespace HomeKeeper.Systems
         public void OnUpdate(ref SystemState state)
         {
             var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
+            var localToWorldLookUp = SystemAPI.GetComponentLookup<LocalToWorld>();
+            
+            // create a list
+            var dyingEnemies = new NativeList<Entity>(Allocator.Temp);
             
             foreach (var (projectile, statefulCollisionEvents, entity) in SystemAPI.Query<Projectile, DynamicBuffer<StatefulCollisionEvent>>().WithEntityAccess())
             {
@@ -30,18 +34,23 @@ namespace HomeKeeper.Systems
                     var otherEntity = statefulCollisionEvent.GetOtherEntity(entity);
                     if (
                         SystemAPI.GetComponentLookup<Health>().TryGetComponent(otherEntity, out var health) &&
-                        SystemAPI.GetComponentLookup<LocalToWorld>().TryGetComponent(otherEntity, out var localToWorld)
+                        localToWorldLookUp.TryGetComponent(otherEntity, out var localToWorld)
                     )
                     {
-                        var bloodEffect = commandBuffer.CreateEntity();
-                        commandBuffer.SetLocalPositionRotation(bloodEffect, localToWorld.Position, localToWorld.Rotation);
+                        //var bloodEffect = commandBuffer.CreateEntity();
+                        //commandBuffer.SetLocalPositionRotation(bloodEffect, localToWorld.Position, localToWorld.Rotation);
 
                         if (health.IsDead)
                         {
                             commandBuffer.DestroyEntity(otherEntity);
-                            
-                            var dyingEnemy = commandBuffer.Instantiate(SystemAPI.GetSingleton<GameResourcesUnmanaged>().DyingEnemyPrefab);
-                            commandBuffer.SetLocalPositionRotation(dyingEnemy, localToWorld.Position, localToWorld.Rotation);
+
+                            var dyingEnemyPrefab = SystemAPI.GetSingleton<GameResourcesUnmanaged>().DyingEnemyPrefab;
+                            //dyingEnemies.Add();
+                            var dyingEnemy = commandBuffer.Instantiate(dyingEnemyPrefab);
+                            //commandBuffer.SetLocalPositionRotation(dyingEnemy, localToWorld.Position, localToWorld.Rotation);
+                            // public static void TranslateLEG(DynamicBuffer<LinkedEntityGroup> leg, float4x4 translation, ref ComponentLookup<LocalToWorld> localToWorldLookup,ref EntityCommandBuffer entityCommandBuffer)
+                            var leg = SystemAPI.GetBuffer<LinkedEntityGroup>(dyingEnemy);
+                            Utility.TranslateLEG(leg, localToWorld.Value, ref localToWorldLookUp, ref commandBuffer);
                         }
                     }
                 }

@@ -1,4 +1,5 @@
-﻿using Unity.Entities;
+﻿using Unity.Collections;
+using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
@@ -82,6 +83,34 @@ namespace DefaultNamespace
             }
 
             return Vector3.zero;
+        }
+        
+        public static void TranslateLEG(DynamicBuffer<LinkedEntityGroup> leg, float4x4 translation, ref ComponentLookup<LocalToWorld> localToWorldLookup,ref EntityCommandBuffer entityCommandBuffer)
+        {
+            foreach (var e in leg)
+            {
+                var entity = e.Value;
+                var localToWorld = localToWorldLookup.GetRefRO(entity).ValueRO;
+                var newTransform = LocalTransform.FromMatrix(math.mul(translation, localToWorld.Value));
+                entityCommandBuffer.SetComponent(entity, newTransform);
+                entityCommandBuffer.SetComponent(entity, new LocalToWorld()
+                {
+                    Value = float4x4.TRS(newTransform.Position, newTransform.Rotation, newTransform.Scale)
+                });
+                
+                //if (localTransformLookup.GetRefRWOptional(entity) is var localTransformRwOptional && localTransformRwOptional.IsValid)
+                //{
+                    //var localTransform = localTransformRwOptional.ValueRO;
+                    //var currentTransform = float4x4.TRS(localTransform.Position, localTransform.Rotation, localTransform.Scale);
+                    //var newTransform = math.mul(translation, currentTransform);
+                    //localTransformRwOptional.ValueRW = new LocalTransform()
+                    //{
+                    //    Position = newTransform.c3.xyz,
+                    //    Rotation = quaternion.LookRotationSafe(newTransform.c2.xyz, newTransform.c1.xyz),
+                    //    Scale = newTransform.c0.x
+                    //};
+                //}
+            }
         }
     }
 }

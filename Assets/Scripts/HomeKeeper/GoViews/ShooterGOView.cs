@@ -49,6 +49,7 @@ namespace BulletCircle.GoViews
         public float BodyRecoilDistance = 0.5f;
         public float EjectForce = 300;
         public float EjectForcePosition = 0.1f;
+        public bool DoEjectAnimation = false;
 
         private void Awake()
         {
@@ -80,7 +81,7 @@ namespace BulletCircle.GoViews
                 }))
                 .AppendCallback(() =>
                 {
-                    BulletEjectionAnimation();
+                    if(DoEjectAnimation) BulletEjectionAnimation();
                     m_Bullet0.gameObject.SetActive(false);
 
                     m_Bullet1.transform.SetParent(m_Chamber);
