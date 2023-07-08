@@ -88,7 +88,7 @@ namespace HomeKeeper.Components
         }
     }
 
-    public struct ShooterView : ICleanupComponentData
+    public struct ShooterView : IComponentData //ICleanupComponentData
     {
         
     }
@@ -179,13 +179,15 @@ namespace HomeKeeper.Components
         public Entity EnemyPrefab;
         public Entity DyingEnemyPrefab;
         public Entity FreeItemSocketPrefab;
+        public Entity ShooterPrefab;
         
-        public GameResourcesUnmanaged(Entity projectilePrefab, Entity enemyPrefab, Entity dyingEnemyPrefab, Entity freeItemSocketPrefab)
+        public GameResourcesUnmanaged(Entity projectilePrefab, Entity enemyPrefab, Entity dyingEnemyPrefab, Entity freeItemSocketPrefab, Entity shooterPrefab)
         {
             ProjectilePrefab = projectilePrefab;
             EnemyPrefab = enemyPrefab;
             DyingEnemyPrefab = dyingEnemyPrefab;
             FreeItemSocketPrefab = freeItemSocketPrefab;
+            ShooterPrefab = shooterPrefab;
         }
     }
 
@@ -214,6 +216,19 @@ namespace HomeKeeper.Components
         public bool HoldsItem;
         public Item HeldItem;
         public float GrabDistance;
+    }
+    
+    public struct GameManagerState : IComponentData
+    {
+        public float LastEnemySpawnTime;
+        public float EnemySpawnInterval;
+        
+        
+        public GameManagerState(float lastEnemySpawnTime, float enemySpawnInterval)
+        {
+            LastEnemySpawnTime = lastEnemySpawnTime;
+            EnemySpawnInterval = enemySpawnInterval;
+        }
     }
     
     /*

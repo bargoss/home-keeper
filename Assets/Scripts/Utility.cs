@@ -80,7 +80,7 @@ namespace DefaultNamespace
                 var mousePositionInWorldSpace = mouseRayIntoWorld.GetPoint(distance);
                 return mousePositionInWorldSpace;
             }
-            
+
             return Vector3.zero;
         }
     }

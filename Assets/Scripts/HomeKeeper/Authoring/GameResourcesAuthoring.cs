@@ -12,6 +12,7 @@ namespace HomeKeeper.Authoring
         public GameObject EnemyPrefab;
         public GameObject DyingEnemyPrefab;
         public GameObject FreeItemSocketPrefab;
+        public GameObject ShooterPrefab;
     }
     
     public class GameResourcesBaker : Baker<GameResourcesAuthoring>
@@ -24,7 +25,8 @@ namespace HomeKeeper.Authoring
                 GetEntity(authoring.EnemyPrefab, TransformUsageFlags.Dynamic),
                 GetEntity(authoring.DyingEnemyPrefab, TransformUsageFlags.Dynamic),
                 GetEntity(authoring.ProjectilePrefab, TransformUsageFlags.Dynamic),
-                GetEntity(authoring.FreeItemSocketPrefab, TransformUsageFlags.Dynamic)
+                GetEntity(authoring.FreeItemSocketPrefab, TransformUsageFlags.Dynamic),
+                GetEntity(authoring.ShooterPrefab, TransformUsageFlags.Dynamic)
             ));
         }
     }

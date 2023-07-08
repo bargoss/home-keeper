@@ -29,9 +29,8 @@ namespace HomeKeeper.Systems
                 }
             }).WithoutBurst().Run();
             
-            var mesh = GameResources.Instance.MagazineMesh; //new Mesh();
-            
-            var material = GameResources.Instance.MagazineMaterial; //new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            var mesh = GameResources.Instance.MagazineMesh;
+            var material = GameResources.Instance.MagazineMaterial;
             material.enableInstancing = true;
             
             Graphics.DrawMeshInstanced(mesh, 0, material, m_MagazineMatrices);

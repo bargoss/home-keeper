@@ -14,9 +14,9 @@ GameObject:
   - component: {fileID: 2502031210479105760}
   - component: {fileID: 732904765248147517}
   - component: {fileID: 6392197576075853346}
-  - component: {fileID: 8396631536405198810}
   - component: {fileID: 7651400439084459285}
   - component: {fileID: 3633835740123811197}
+  - component: {fileID: 7622000060380692025}
   m_Layer: 0
   m_Name: FlyingEnemy
   m_TagString: Untagged
@@ -296,27 +296,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CalculateDetails: 1
---- !u!114 &8396631536405198810
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8350596760033344952}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a44d70c54b73480299b8d0f0b970fb38, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Acceleration: 15
-  MaxSpeed: 3.03
-  EvasiveManeuvering: 1
-  AttackCooldown: 1
-  AttackDamage: 1
-  AttackedStunDuration: 1
-  TookDamageStunDuration: 1
-  DesiredMinDistanceToDome: 17.2
-  DesiredMaxDistanceToDome: 46.7
 --- !u!114 &7651400439084459285
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -346,3 +325,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MaxHitPoints: 1
   DestroyOnDeath: 0
+--- !u!114 &7622000060380692025
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8350596760033344952}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e5d8706961b492bab886c827c5bbd71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

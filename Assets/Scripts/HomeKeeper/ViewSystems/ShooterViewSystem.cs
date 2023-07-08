@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using BulletCircle.GoViews;
 using HomeKeeper.Components;
 using Unity.Collections;
@@ -8,7 +7,7 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 
-namespace HomeKeeper.Systems
+namespace HomeKeeper.ViewSystems
 {
     [UpdateInGroup(typeof(LateSimulationSystemGroup))]
     public partial class ShooterViewSystem : SystemBase

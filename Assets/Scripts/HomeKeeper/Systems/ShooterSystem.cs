@@ -16,13 +16,12 @@ namespace HomeKeeper.Systems
         public void OnUpdate(ref SystemState state)
         {
             var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
-            foreach (var (shooterRw, grabObjectSocket, localToWorld, localTransformRw,entity) in SystemAPI.Query<RefRW<Shooter>, ItemSocket, LocalToWorld, RefRW<LocalTransform>>().WithEntityAccess())
+            foreach (var (shooterRw, localToWorld, localTransformRw,entity) in SystemAPI.Query<RefRW<Shooter>, LocalToWorld, RefRW<LocalTransform>>().WithEntityAccess())
             {
-                var itemSocketAspectLookup = new ItemSocketAspect.Lookup(ref state);
-                var itemSocketAspect = itemSocketAspectLookup[entity];
-                
                 var shooter = shooterRw.ValueRO;
                 var localTransform = localTransformRw.ValueRO;
+                
+                shooter.ShotThisFrame = false; // reset
                 
                 // look
                 HandleLook(shooter, localToWorld, ref localTransform, SystemAPI.Time.DeltaTime);
@@ -79,6 +78,7 @@ namespace HomeKeeper.Systems
                         ref commandBuffer
                     );
                     shooter.LastShotTime = elapsedTime;
+                    shooter.ShotThisFrame = true;
                 }
             }
         }
