@@ -42,7 +42,7 @@ namespace HomeKeeper.Systems
                 (enemySpawner.SpawnOuterRadius - enemySpawner.SpawnInnerRadius);
 
             var spawnOffset = math.mul(
-                quaternion.Euler(new float3(0, 0, angle)),
+                quaternion.Euler(new float3(0, 0, math.radians(angle))),
                 enemySpawner.SpawnDirection * radius
             );
 

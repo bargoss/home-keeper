@@ -13,9 +13,6 @@ namespace Systems
     {
         public void OnUpdate(ref SystemState state)
         {
-            Entity e;
-            
-            
             foreach (var (statefulCollisionEvents, projectile, entity) in SystemAPI.Query<DynamicBuffer<StatefulCollisionEvent>, Projectile>().WithEntityAccess())
             {
                 foreach (var collision in statefulCollisionEvents)

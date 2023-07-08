@@ -16,7 +16,7 @@ namespace HomeKeeper.Systems
      */
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     [UpdateAfter(typeof(HealthSystem))]
-    [UpdateAfter(typeof(DamageOnCollision))]
+    [UpdateAfter(typeof(DamageOnCollisionSystem))]
     public partial struct ProjectileEnemyHitSystem : ISystem
     {
         public void OnUpdate(ref SystemState state)

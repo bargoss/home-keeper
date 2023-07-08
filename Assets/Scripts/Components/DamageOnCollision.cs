@@ -4,7 +4,8 @@ namespace Components
 {
     public struct DamageOnCollision : IComponentData
     {
-        public float DamageRate;
-        public float KnockbackForce;
+        public float FlatDamage;
+        public float KineticDamage;
+        public float KnockBackForce;
     }
 }
