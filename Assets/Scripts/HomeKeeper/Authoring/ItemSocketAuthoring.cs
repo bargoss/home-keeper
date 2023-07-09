@@ -1,6 +1,5 @@
 ﻿using HomeKeeper.Components;
 using Unity.Entities;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace HomeKeeper.Authoring

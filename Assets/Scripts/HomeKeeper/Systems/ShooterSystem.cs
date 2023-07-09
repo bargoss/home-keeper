@@ -29,17 +29,6 @@ namespace HomeKeeper.Systems
                 // shoot
                 if (shooter.ShootInput)
                 {
-                    // todo
-                    /*
-                    if (TryGetMagazineRw(grabObjectSocket.HeldItemOpt, out var magazineRw))
-                    {
-                        var magazine = magazineRw.ValueRO;
-                        
-                        HandleShoot(magazine, ref shooter, localToWorld, ref commandBuffer);
-                        
-                        magazineRw.ValueRW = magazine;
-                    }
-                    */
                     var placeHolderProjectilePrefab = SystemAPI.GetSingleton<GameResourcesUnmanaged>().ProjectilePrefab;
                     HandleShoot(
                         new Magazine { Capacity = 99, Current = 99, ProjectilePrefab = placeHolderProjectilePrefab },
@@ -70,7 +59,6 @@ namespace HomeKeeper.Systems
 
                 if (cooldownFinished)
                 {
-                    //var shootPosition = SystemAPI.GetComponent<LocalToWorld>(shooter.Stats.ShootPositionEntity).Position
                     var shootVelocity = shooter.Look * shooter.Stats.MuzzleVelocity;
                     CreateProjectile(
                         shootPosition,
@@ -112,24 +100,5 @@ namespace HomeKeeper.Systems
             
             return projectile;
         }
-        /*
-        private bool TryGetMagazineRw(Entity magazineEntity, out RefRW<Magazine> magazineRw)
-        {
-            magazineRw = default;
-            if (!SystemAPI.Exists(magazineEntity))
-            {
-                return false;
-            }
-
-            if (!SystemAPI.HasComponent<Magazine>(magazineEntity))
-            {
-                Debug.LogError($"Entity {magazineEntity} does not have a magazine component but is being used as a magazine");
-                return false;
-            }
-
-            magazineRw = SystemAPI.GetComponentRW<Magazine>(magazineEntity);
-            return true;
-        }
-        */
     }
 }

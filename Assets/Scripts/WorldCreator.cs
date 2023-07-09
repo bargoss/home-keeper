@@ -3,9 +3,8 @@ using System.Collections;
 using Unity.Core;
 using Unity.Entities;
 using Unity.Scenes;
-using UnityEditor;
 using UnityEngine;
-
+/*
 public static class WorldCreator{
     public static void Create(string worldName,string subScenePath,CoroutineRunner coroutineRunner,float timeoutSeconds,Action<Result<World>> onCreated)
     {
@@ -64,3 +63,4 @@ public static class WorldCreator{
         world.Dispose();
     }
 }
+*/
