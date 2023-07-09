@@ -102,7 +102,7 @@ namespace BulletCircle.GoViews
         public void ShootAnimation(float animationDuration)
         {
             ResetAnimation();
-            ShootVfx();
+            //ShootVfx();
             var scaler = animationDuration / 0.8f;
             
             DOTween.Sequence(m_Barrel)
