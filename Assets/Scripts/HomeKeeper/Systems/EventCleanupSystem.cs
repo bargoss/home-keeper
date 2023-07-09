@@ -17,6 +17,9 @@ namespace HomeKeeper.Systems
             {
                 commandBuffer.DestroyEntity(entity);
             }
+            
+            commandBuffer.Playback(state.EntityManager);
+            commandBuffer.Dispose();
         }
     }
 }

@@ -46,6 +46,7 @@ namespace HomeKeeper.Systems
             
             
             entityCommandBuffer.Playback(state.EntityManager);
+            entityCommandBuffer.Dispose();
         }
     }
 }

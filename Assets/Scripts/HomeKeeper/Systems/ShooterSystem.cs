@@ -57,6 +57,7 @@ namespace HomeKeeper.Systems
             }
             
             commandBuffer.Playback(state.EntityManager);
+            commandBuffer.Dispose();
         }
 
         private void HandleShoot(Magazine magazine, ref Shooter shooter, LocalToWorld localToWorld,

@@ -84,6 +84,7 @@ namespace HomeKeeper.Systems
             }
             
             entityCommandBuffer.Playback(state.EntityManager);
+            entityCommandBuffer.Dispose();
         }
         
         private float3 GetDropPosition(PlayerAction playerAction)

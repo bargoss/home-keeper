@@ -32,6 +32,7 @@ namespace HomeKeeper.Systems
             }
             
             commandBuffer.Playback(state.EntityManager);
+            commandBuffer.Dispose();
         }
 
         private static float3 CalculateEnemySpawnPosition(EnemySpawner enemySpawner, float3 spawnerPosition, uint seed)
