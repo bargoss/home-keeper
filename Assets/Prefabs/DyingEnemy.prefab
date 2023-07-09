@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 1992300609393784913}
   - component: {fileID: 4021503610303349723}
   - component: {fileID: 2642517914376935699}
+  - component: {fileID: 6428906548695009723}
   m_Layer: 0
   m_Name: Cube (5)
   m_TagString: Untagged
@@ -293,6 +294,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SecondsToLive: 1
+--- !u!114 &6428906548695009723
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2068315063662047816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f855a7ed327a4b5192b6ea84ae3cf01b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3197064767667779856
 GameObject:
   m_ObjectHideFlags: 0
@@ -308,6 +321,7 @@ GameObject:
   - component: {fileID: 5022344166319010782}
   - component: {fileID: 2381350744207138023}
   - component: {fileID: 3611533579183712404}
+  - component: {fileID: 8329857559212751885}
   m_Layer: 0
   m_Name: Cube (1)
   m_TagString: Untagged
@@ -601,6 +615,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SecondsToLive: 1
+--- !u!114 &8329857559212751885
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3197064767667779856}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f855a7ed327a4b5192b6ea84ae3cf01b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3570625037059570811
 GameObject:
   m_ObjectHideFlags: 0
@@ -615,6 +641,7 @@ GameObject:
   - component: {fileID: 7697502211422143921}
   - component: {fileID: 2011427725121387451}
   - component: {fileID: 2583780266156938705}
+  - component: {fileID: 7682428324930057361}
   m_Layer: 0
   m_Name: Cube (3)
   m_TagString: Untagged
@@ -894,6 +921,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SecondsToLive: 1
+--- !u!114 &7682428324930057361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3570625037059570811}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f855a7ed327a4b5192b6ea84ae3cf01b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4381230615503522355
 GameObject:
   m_ObjectHideFlags: 0
@@ -908,6 +947,7 @@ GameObject:
   - component: {fileID: 8200631888528340368}
   - component: {fileID: 2133516283953585835}
   - component: {fileID: 1302202042312828861}
+  - component: {fileID: 5574859657164619208}
   m_Layer: 0
   m_Name: Cube (6)
   m_TagString: Untagged
@@ -1187,6 +1227,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SecondsToLive: 1
+--- !u!114 &5574859657164619208
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4381230615503522355}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f855a7ed327a4b5192b6ea84ae3cf01b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4774571741261369260
 GameObject:
   m_ObjectHideFlags: 0
@@ -1201,6 +1253,7 @@ GameObject:
   - component: {fileID: 2477315763786154077}
   - component: {fileID: 2878537340799226049}
   - component: {fileID: 5684882667777028591}
+  - component: {fileID: 8608138969483211741}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -1480,6 +1533,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SecondsToLive: 1
+--- !u!114 &8608138969483211741
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4774571741261369260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f855a7ed327a4b5192b6ea84ae3cf01b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7287424007991327198
 GameObject:
   m_ObjectHideFlags: 0
@@ -1494,6 +1559,7 @@ GameObject:
   - component: {fileID: 5972618341515726273}
   - component: {fileID: 7931916960420010417}
   - component: {fileID: 7624649421452766696}
+  - component: {fileID: 6364103180601747327}
   m_Layer: 0
   m_Name: Cube (7)
   m_TagString: Untagged
@@ -1773,6 +1839,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SecondsToLive: 1
+--- !u!114 &6364103180601747327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7287424007991327198}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f855a7ed327a4b5192b6ea84ae3cf01b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8300992634460502925
 GameObject:
   m_ObjectHideFlags: 0
@@ -1787,6 +1865,7 @@ GameObject:
   - component: {fileID: 8414762812851364435}
   - component: {fileID: 4117952142987779492}
   - component: {fileID: 11751195282268461}
+  - component: {fileID: 346240873112704790}
   m_Layer: 0
   m_Name: Cube (4)
   m_TagString: Untagged
@@ -2066,6 +2145,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SecondsToLive: 1
+--- !u!114 &346240873112704790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8300992634460502925}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f855a7ed327a4b5192b6ea84ae3cf01b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8350596760033344952
 GameObject:
   m_ObjectHideFlags: 0
@@ -2133,6 +2224,7 @@ GameObject:
   - component: {fileID: 4714007695954449566}
   - component: {fileID: 6233290004321371442}
   - component: {fileID: 4159797289545043913}
+  - component: {fileID: 5462599213205499701}
   m_Layer: 0
   m_Name: Cube (2)
   m_TagString: Untagged
@@ -2412,3 +2504,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SecondsToLive: 1
+--- !u!114 &5462599213205499701
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8823260988926205973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f855a7ed327a4b5192b6ea84ae3cf01b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

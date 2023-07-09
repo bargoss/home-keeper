@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e63129047d15450bb2c83431e8403af7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  FireRate: 64
+  FireRate: 77.25
   MuzzleVelocity: 62.6
   AccuracyAngles: 1
   ShootPosition: {fileID: 1051757377371591111}

@@ -21,6 +21,45 @@ namespace DefaultNamespace
         //     return false;
         // }
         
+// add dynamic, interpolated rigidbody
+        
+        public static Entity CreateBody(Entity entity, float3 position, quaternion orientation, BlobAssetReference<Unity.Physics.Collider> collider, float3 linearVelocity, float3 angularVelocity, float mass, bool isDynamic, ref EntityCommandBuffer commandBuffer)
+        {
+
+            //Entity entity = commandBuffer.CreateEntity();
+
+            //entityManager.AddComponent(entity, new LocalToWorld {});
+
+            //entityManager.AddComponent(entity, LocalTransform.FromPositionRotation(position, orientation));
+
+
+            var colliderComponent = new PhysicsCollider { Value = collider };
+            commandBuffer.AddComponent(entity, colliderComponent);
+
+            commandBuffer.AddSharedComponent(entity, new PhysicsWorldIndex());
+            
+
+            if (isDynamic)
+            {
+                commandBuffer.AddComponent(entity, PhysicsMass.CreateDynamic(colliderComponent.MassProperties, mass));
+
+                float3 angularVelocityLocal = math.mul(math.inverse(colliderComponent.MassProperties.MassDistribution.Transform.rot), angularVelocity);
+                commandBuffer.AddComponent(entity, new PhysicsVelocity
+                {
+                    Linear = linearVelocity,
+                    Angular = angularVelocityLocal
+                });
+                commandBuffer.AddComponent(entity, new PhysicsDamping
+                {
+                    Linear = 0.01f,
+                    Angular = 0.05f
+                });
+            }
+
+            return entity;
+        }
+
+        
         public static float3 ClampMagnitude(this float3 vector, float maxLength)
         {
             var length = math.length(vector);
@@ -39,6 +78,7 @@ namespace DefaultNamespace
                 Angular = float3.zero
             });
         }
+        
         public static void SetLocalPositionRotation(this ref EntityCommandBuffer commandBuffer, Entity entity, float3 position, quaternion rotation)
         {
             commandBuffer.SetComponent(entity, new LocalTransform()

@@ -232,6 +232,12 @@ namespace HomeKeeper.Components
         }
     }
     
+    public struct ChildForOneFrame : IComponentData
+    {
+        public Entity Parent;
+        public float4x4 LocalTransform;
+    }
+    
     /*
      * Platform will be an entity, it will have health
      * There will be no other entity
