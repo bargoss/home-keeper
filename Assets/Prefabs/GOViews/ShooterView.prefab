@@ -998,6 +998,7 @@ MonoBehaviour:
   BodyRecoilDistance: 0.15
   EjectForce: 468.1
   EjectForcePosition: 0.1
+  DoEjectAnimation: 0
 --- !u!1 &4138959041629666014
 GameObject:
   m_ObjectHideFlags: 0

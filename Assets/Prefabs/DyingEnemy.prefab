@@ -293,7 +293,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e941f852a1be42f2a3953c48eedda0a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SecondsToLive: 1
+  SecondsToLive: 3.22
 --- !u!114 &6428906548695009723
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -614,7 +614,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e941f852a1be42f2a3953c48eedda0a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SecondsToLive: 1
+  SecondsToLive: 3.22
 --- !u!114 &8329857559212751885
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -920,7 +920,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e941f852a1be42f2a3953c48eedda0a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SecondsToLive: 1
+  SecondsToLive: 3.22
 --- !u!114 &7682428324930057361
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1226,7 +1226,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e941f852a1be42f2a3953c48eedda0a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SecondsToLive: 1
+  SecondsToLive: 3.22
 --- !u!114 &5574859657164619208
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1532,7 +1532,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e941f852a1be42f2a3953c48eedda0a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SecondsToLive: 1
+  SecondsToLive: 3.22
 --- !u!114 &8608138969483211741
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1838,7 +1838,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e941f852a1be42f2a3953c48eedda0a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SecondsToLive: 1
+  SecondsToLive: 3.22
 --- !u!114 &6364103180601747327
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2144,7 +2144,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e941f852a1be42f2a3953c48eedda0a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SecondsToLive: 1
+  SecondsToLive: 3.22
 --- !u!114 &346240873112704790
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2209,7 +2209,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e941f852a1be42f2a3953c48eedda0a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SecondsToLive: 1
+  SecondsToLive: 3.22
 --- !u!1 &8823260988926205973
 GameObject:
   m_ObjectHideFlags: 0
@@ -2503,7 +2503,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e941f852a1be42f2a3953c48eedda0a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SecondsToLive: 1
+  SecondsToLive: 3.22
 --- !u!114 &5462599213205499701
 MonoBehaviour:
   m_ObjectHideFlags: 0

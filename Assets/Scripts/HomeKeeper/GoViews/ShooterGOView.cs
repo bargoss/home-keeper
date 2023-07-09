@@ -1,7 +1,10 @@
 ﻿using System;
 using DG.Tweening;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Pool;
 using Random = UnityEngine.Random;
+using Timer = System.Timers.Timer;
 
 namespace BulletCircle.GoViews
 {
@@ -51,8 +54,43 @@ namespace BulletCircle.GoViews
         public float EjectForcePosition = 0.1f;
         public bool DoEjectAnimation = false;
 
+        private ObjectPool<GameObject> m_ExplosionVfxPool;
+
         private void Awake()
         {
+            m_ExplosionVfxPool = new ObjectPool<GameObject>(() =>
+            {
+                var go = Instantiate(m_ExplosionVfxPrefab);
+                go.SetActive(false);
+                return go;
+            }, go =>
+            {
+                go.SetActive(true);
+                // reset all the particle systems
+                var systems = go.GetComponentsInChildren<ParticleSystem>();
+                foreach (var system in systems)
+                {
+                    system.Clear();
+                    system.Play();
+                    // set the particle system callback
+                    
+                    DOTween.Kill(go);
+                    DOTween.Sequence(go)
+                        .AppendInterval(0.5f)
+                        .AppendCallback(() =>
+                            {
+                                m_ExplosionVfxPool.Release(go);
+                            }
+                        );
+                }
+            }, go =>
+            {
+                go.SetActive(false);
+            }, go =>
+            {
+                Destroy(go.gameObject);
+            });
+             
             ResetAnimation();
         }
 
@@ -168,7 +206,12 @@ namespace BulletCircle.GoViews
 
         private void ShootVfx()
         {
-            var explosion = Instantiate(m_ExplosionVfxPrefab, m_ExplosionVfxPoint.position, m_ExplosionVfxPoint.rotation);
+            //var explosion = Instantiate(m_ExplosionVfxPrefab, m_ExplosionVfxPoint.position, m_ExplosionVfxPoint.rotation);
+            //explosion.transform.localScale = m_ExplosionVfxPoint.localScale;
+
+            var explosion = m_ExplosionVfxPool.Get();
+            explosion.transform.position = m_ExplosionVfxPoint.position;
+            explosion.transform.rotation = m_ExplosionVfxPoint.rotation;
             explosion.transform.localScale = m_ExplosionVfxPoint.localScale;
         } 
     }

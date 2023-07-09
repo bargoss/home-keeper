@@ -205,7 +205,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4173e4316cdb40c9b5cd5ac2e1dc6520, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SpawnInterval: 1
+  SpawnInterval: 0.17
   SpawnInnerRadius: 30
   SpawnOuterRadius: 50
   SpawnDirection:
@@ -402,7 +402,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1642294745}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.5, z: 0}
+  m_LocalPosition: {x: 0, y: -3.24, z: 0}
   m_LocalScale: {x: 10, y: 1, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children: []
