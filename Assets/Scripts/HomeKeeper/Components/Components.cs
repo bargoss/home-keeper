@@ -237,7 +237,11 @@ namespace HomeKeeper.Components
         public Entity Parent;
         public float4x4 LocalTransform;
     }
-    
+
+    public struct MyTag : IComponentData
+    {
+        
+    }
     /*
      * Platform will be an entity, it will have health
      * There will be no other entity

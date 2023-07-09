@@ -13,7 +13,7 @@ namespace HomeKeeper.Systems
         public void OnUpdate(ref SystemState state)
         {
             var mousePositionInWorldSpace = Utility.GetMousePositionInWorldSpace();
-            var shootInput = Input.GetMouseButton(0);
+            var shootInput = Input.GetMouseButton(0) || Input.GetMouseButtonDown(1);
 
             int shooterCount = 0;
             

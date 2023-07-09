@@ -15,6 +15,8 @@ GameObject:
   - component: {fileID: -1545960795651215050}
   - component: {fileID: 505528155142003742}
   - component: {fileID: 6335825191954741938}
+  - component: {fileID: -1979582907289485209}
+  - component: {fileID: -6307110959088848995}
   m_Layer: 0
   m_Name: Projectile
   m_TagString: Untagged
@@ -86,7 +88,7 @@ MonoBehaviour:
     m_Template: {fileID: 11400000, guid: 543b29d3921fe7f4ba418cd04929eb68, type: 2}
     m_CollisionResponse:
       m_Override: 0
-      m_Value: 0
+      m_Value: 1
     m_Friction:
       m_Override: 0
       m_Value:
@@ -309,3 +311,28 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &-1979582907289485209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6888259757493708531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c7b792aa6e74e31a25df27fc00a2c9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-6307110959088848995
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6888259757493708531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a444254202384e4ea55b4fe97742fbf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CalculateDetails: 1
