@@ -14,6 +14,7 @@ namespace HomeKeeper.Systems
         {
             var mousePositionInWorldSpace = Utility.GetMousePositionInWorldSpace();
             var shootInput = Input.GetMouseButton(0) || Input.GetMouseButtonDown(1);
+            var spawnMore = Input.GetKey(KeyCode.Space);
 
             int shooterCount = 0;
             
@@ -42,7 +43,21 @@ namespace HomeKeeper.Systems
             }
             
             
-            // todo: handle enemy spawning
+            foreach (var enemySpawnerRw in SystemAPI.Query<RefRW<EnemySpawner>>())
+            {
+                var enemySpawner = enemySpawnerRw.ValueRO;
+
+                if (spawnMore)
+                {
+                    enemySpawner.SpawnInterval = math.lerp(enemySpawner.SpawnInterval, 0, SystemAPI.Time.DeltaTime);
+                }
+                else
+                {
+                    enemySpawner.SpawnInterval = math.lerp(enemySpawner.SpawnInterval, 2, SystemAPI.Time.DeltaTime);
+                }
+                
+                enemySpawnerRw.ValueRW = enemySpawner;
+            }
             
             
             entityCommandBuffer.Playback(state.EntityManager);
