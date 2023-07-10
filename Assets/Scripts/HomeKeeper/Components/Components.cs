@@ -89,7 +89,7 @@ namespace HomeKeeper.Components
         }
     }
 
-    public struct ShooterView : IComponentData //ICleanupComponentData
+    public struct ShooterView : ICleanupComponentData
     {
         
     }
