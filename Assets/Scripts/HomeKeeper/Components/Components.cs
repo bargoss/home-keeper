@@ -85,11 +85,12 @@ namespace HomeKeeper.Components
             public float FireRate;
             public float MuzzleVelocity;
             public float AccuracyAngles;
-            public Entity ShootPositionEntity;
+            //public Entity ShootPositionEntity;
         }
     }
 
-    public struct ShooterView : ICleanupComponentData
+    // todo, need to use cleanupdata or something
+    public struct ShooterView : IComponentData //ICleanupComponentData
     {
         
     }

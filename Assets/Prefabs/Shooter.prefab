@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8821016074621648838}
-  - component: {fileID: 6247597253594052039}
+  - component: {fileID: 2133100564385031974}
   m_Layer: 0
   m_Name: Shooter
   m_TagString: Untagged
@@ -33,7 +33,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6247597253594052039
+--- !u!114 &2133100564385031974
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -48,7 +48,6 @@ MonoBehaviour:
   FireRate: 83.76
   MuzzleVelocity: 62.6
   AccuracyAngles: 1
-  ShootPosition: {fileID: 1051757377371591111}
 --- !u!1 &1051757377371591111
 GameObject:
   m_ObjectHideFlags: 0

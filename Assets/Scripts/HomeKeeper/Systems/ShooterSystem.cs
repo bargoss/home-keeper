@@ -37,7 +37,7 @@ namespace HomeKeeper.Systems
                         ref commandBuffer,
                         (float)SystemAPI.Time.ElapsedTime,
                         placeHolderProjectilePrefab,
-                        SystemAPI.GetComponent<LocalToWorld>(shooter.Stats.ShootPositionEntity).Position
+                        localToWorld.Position + new float3(0,1,0) //SystemAPI.GetComponent<LocalToWorld>(shooter.Stats.ShootPositionEntity).Position
                     );
                 }
 
