@@ -20,7 +20,9 @@ namespace HomeKeeper.Systems
     {
         public void OnUpdate(ref SystemState state)
         {
-            var gameResources = SystemAPI.GetSingleton<GameResourcesUnmanaged>();
+            var gameResourcesFound = SystemAPI.TryGetSingleton<GameResourcesUnmanaged>(out var gameResources);
+            if(!gameResourcesFound) return;
+            
             var entityCommandBuffer = new EntityCommandBuffer(Allocator.Temp);
             foreach (var playerActionRw in SystemAPI.Query<RefRW<PlayerAction>>())
             {

@@ -8,6 +8,8 @@ using UnityEngine;
 
 namespace HomeKeeper.Systems
 {
+    [UpdateInGroup(typeof(SimulationSystemGroup))]
+    [RequireMatchingQueriesForUpdate]
     public partial struct GameManagerSystem : ISystem
     {
         public void OnUpdate(ref SystemState state)

@@ -19,6 +19,7 @@ namespace HomeKeeper.Systems
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     [UpdateAfter(typeof(HealthSystem))]
     [UpdateAfter(typeof(DamageOnCollisionSystem))]
+    [RequireMatchingQueriesForUpdate]
     public partial struct EnemyDeathSystem : ISystem
     {
         public void OnUpdate(ref SystemState state)
