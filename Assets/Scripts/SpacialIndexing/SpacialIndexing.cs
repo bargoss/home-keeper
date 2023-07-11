@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Unity.Assertions;
 using Unity.Collections;
@@ -46,22 +47,25 @@ namespace SpacialIndexing
         }
     }
 
-    public class SpacialPartitioning<T> where T : unmanaged
+    public struct SpacialPartitioning<T> where T : unmanaged, IEquatable<T>
     {
         private readonly float m_GridSize;
-        private readonly Dictionary<(int, int), GridContent<T>> m_Grids;
-        private readonly Dictionary<T, GridBoundingBox> m_ObjectGridBoundingBoxes;
+        private NativeHashMap<(int, int), GridContent<T>> m_Grids;
+        private NativeHashMap<T, GridBoundingBox> m_ObjectGridBoundingBoxes;
 
-        public SpacialPartitioning(float gridSze)
+        public SpacialPartitioning(float gridSze, Allocator allocator = Allocator.Temp)
         {
             m_GridSize = gridSze;
-            m_Grids = new Dictionary<(int, int), GridContent<T>>();
-            m_ObjectGridBoundingBoxes = new Dictionary<T, GridBoundingBox>();
+            m_Grids = new NativeHashMap<(int, int), GridContent<T>>(250, allocator);
+            m_ObjectGridBoundingBoxes = new NativeHashMap<T, GridBoundingBox>(1000, allocator);
         }
         
-        public List<GridContent<T>> GetGrids()
+        public void GetGrids(ref NativeList<GridContent<T>> list)
         {
-            return m_Grids.Values.ToList();
+            foreach (var grid in m_Grids)
+            {
+                list.Add(grid.Value);
+            }
         }
 
         public bool TryGetObject(T item, out GridBoundingBox gridBoundingBox)
@@ -190,6 +194,7 @@ namespace SpacialIndexing
             buffer.Sort();
         }
 
+        /*
         public void GetAllNeighbours(List<(T, T)> buffer)
         {
             var neighbourDeltas = new[] { (1, 0), (1, 1), (0, 1), (-1, 1) };
@@ -224,6 +229,7 @@ namespace SpacialIndexing
                 }
             }
         }
+        */
 
         public void Clear()
         {
@@ -245,6 +251,30 @@ namespace SpacialIndexing
 // Unit tests
     public static class SpacialPartitioningTests
     {
+        private static int GetCount(SpacialPartitioning<int> spacialPartitioning)
+        {
+            var list = new NativeList<GridContent<int>>(Allocator.Temp);
+            spacialPartitioning.GetGrids(ref list);
+            
+            var len = list.Length;
+            list.Dispose();
+            return len;
+        }
+        private static List<GridContent<int>> GetGrids(SpacialPartitioning<int> spacialPartitioning)
+        {
+            var nativeList = new NativeList<GridContent<int>>(Allocator.Temp);
+            spacialPartitioning.GetGrids(ref nativeList);
+            
+            var list = new List<GridContent<int>>();
+            for (int i = 0; i < nativeList.Length; i++)
+            {
+                list.Add(nativeList[i]);
+            }
+            nativeList.Dispose();
+            return list;
+        }
+        
+        
         [MenuItem("Tests/23151231")]
         public static void TestAdd()
         {
@@ -253,13 +283,13 @@ namespace SpacialIndexing
             spacialPartitioning.AddPoint(2, new float3(0.0f, 0.0f,0.0f));
             spacialPartitioning.AddPoint(2, new float3(9.9f, 0.0f,0.0f));
 
-            Assert.AreEqual(1, spacialPartitioning.GetGrids().Count);
-            Assert.AreEqual(2, spacialPartitioning.GetGrids()[0].GetItems().Length);
+            Assert.AreEqual(1, GetGrids(spacialPartitioning).Count);
+            Assert.AreEqual(2, GetGrids(spacialPartitioning)[0].GetItems().Length);
 
             spacialPartitioning.AddPoint(3, new float3(10.0f, 0.0f,0.0f));
-            Assert.AreEqual(2, spacialPartitioning.GetGrids().Count);
-            Assert.AreEqual(2, spacialPartitioning.GetGrids()[0].GetItems().Length);
-            Assert.AreEqual(1, spacialPartitioning.GetGrids()[^1].GetItems().Length);
+            Assert.AreEqual(2, GetGrids(spacialPartitioning).Count);
+            Assert.AreEqual(2, GetGrids(spacialPartitioning)[0].GetItems().Length);
+            Assert.AreEqual(1, GetGrids(spacialPartitioning)[^1].GetItems().Length);
         }
 
         [MenuItem("Tests/6345312")]
@@ -308,13 +338,13 @@ namespace SpacialIndexing
 
             spacialPartitioning.AddPoint(2, new float3(9.9f, 0.0f, 0));
 
-            Assert.AreEqual(1, spacialPartitioning.GetGrids().Count);
-            Assert.AreEqual(2, spacialPartitioning.GetGrids()[0].GetItems().Length);
+            Assert.AreEqual(1, GetGrids(spacialPartitioning).Count);
+            Assert.AreEqual(2, GetGrids(spacialPartitioning)[0].GetItems().Length);
 
             spacialPartitioning.AddPoint(3, new float3(10.0f, 0.0f, 0));
-            Assert.AreEqual(2, spacialPartitioning.GetGrids().Count);
-            Assert.AreEqual(2, spacialPartitioning.GetGrids()[0].GetItems().Length);
-            Assert.AreEqual(1, spacialPartitioning.GetGrids()[^1].GetItems().Length);
+            Assert.AreEqual(2, GetGrids(spacialPartitioning).Count);
+            Assert.AreEqual(2, GetGrids(spacialPartitioning)[0].GetItems().Length);
+            Assert.AreEqual(1, GetGrids(spacialPartitioning)[^1].GetItems().Length);
         }
     }
 
