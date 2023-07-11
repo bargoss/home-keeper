@@ -38,27 +38,27 @@ namespace SpacialIndexing
 
     public struct GridBoundingBox
     {
-        public (int, int) StartCorner { get; }
-        public (int, int) EndCorner { get; }
+        public int2 StartCorner { get; }
+        public int2 EndCorner { get; }
 
-        public GridBoundingBox((int, int) startCorner, (int, int) endCorner)
+        public GridBoundingBox(int2 startCorner, int2 endCorner)
         {
             StartCorner = startCorner;
             EndCorner = endCorner;
         }
     }
-
+    
     public struct SpacialPartitioning<T> : IDisposable where T : unmanaged, IEquatable<T>, IComparable<T>
     {
         private readonly float m_GridSize;
         
-        private NativeHashMap<(int, int), GridContent<T>> m_Grids;
+        private NativeHashMap<int2, GridContent<T>> m_Grids;
         private NativeHashMap<T, GridBoundingBox> m_ObjectGridBoundingBoxes;
 
         public SpacialPartitioning(float gridSze, Allocator allocator = Allocator.Temp)
         {
             m_GridSize = gridSze;
-            m_Grids = new NativeHashMap<(int, int), GridContent<T>>(250, allocator);
+            m_Grids = new NativeHashMap<int2, GridContent<T>>(250, allocator);
             m_ObjectGridBoundingBoxes = new NativeHashMap<T, GridBoundingBox>(1000, allocator);
         }
         
@@ -86,15 +86,17 @@ namespace SpacialIndexing
             {
                 RemoveWithId(item);
             }
+            
+            var g0 = GetGrid(startCorner);
+            var g1 = GetGrid(endCorner);
 
-            (int x0, int y0) = GetGrid(startCorner);
-            (int x1, int y1) = GetGrid(endCorner);
 
-            for (int i = x0; i <= x1; i++)
+            for (int i = g0.x; i <= g1.x; i++)
             {
-                for (int j = y0; j <= y1; j++)
+                for (int j = g0.y; j <= g1.y; j++)
                 {
-                    var gridKey = (i, j);
+                    //var gridKey = (i, j);
+                    var gridKey = new int2(i, j);
 
                     m_Grids.TryGetValue(gridKey, out var gridContent);
                     gridContent.Add(item);
@@ -102,18 +104,20 @@ namespace SpacialIndexing
                 }
             }
             
-            m_ObjectGridBoundingBoxes.Add(item, new GridBoundingBox((x0, y0), (x1, y1)));
+            //m_ObjectGridBoundingBoxes.Add(item, new GridBoundingBox((x0, y0), (x1, y1)));
+            m_ObjectGridBoundingBoxes.Add(item, new GridBoundingBox(new int2(g0.x, g0.y), new int2(g1.x, g1.y)));
         }
 
         public void RemoveWithId(T item)
         {
             if (m_ObjectGridBoundingBoxes.TryGetValue(item, out var gridBoundingBox))
             {
-                for (int i = gridBoundingBox.StartCorner.Item1; i <= gridBoundingBox.EndCorner.Item1; i++)
+                for (int i = gridBoundingBox.StartCorner.x; i <= gridBoundingBox.EndCorner.x; i++)
                 {
-                    for (int j = gridBoundingBox.StartCorner.Item2; j <= gridBoundingBox.EndCorner.Item2; j++)
+                    for (int j = gridBoundingBox.StartCorner.y; j <= gridBoundingBox.EndCorner.y; j++)
                     {
-                        var gridKey = (i, j);
+                        //var gridKey = (i, j);
+                        var gridKey = new int2(i, j);
                         if (m_Grids.TryGetValue(gridKey, out var gridContent))
                         {
                             gridContent.Remove(item);
@@ -143,14 +147,19 @@ namespace SpacialIndexing
             AddBox(item, boxStartCorner, boxEndCorner);
         }
 
+        
         public IEnumerable<T> GetNeighbours(float3 position)
         {
-            var (x, y) = GetGrid(position);
+            //var (x, y) = GetGrid(position);
+            var g = GetGrid(position);
+            var x = g.x;
+            var y = g.y;
             for (int i = -1; i <= 1; i++)
             {
                 for (int j = -1; j <= 1; j++)
                 {
-                    if (m_Grids.TryGetValue((x + i, y + j), out var gridContent))
+                    //if (m_Grids.TryGetValue((x + i, y + j), out var gridContent))
+                    if (m_Grids.TryGetValue(new int2(x + i, y + j), out var gridContent))
                     {
                         foreach (var item in gridContent.GetItems())
                         {
@@ -172,15 +181,22 @@ namespace SpacialIndexing
 
         public void OverlapBox(float3 startCorner, float3 endCorner, List<T> buffer)
         {
-            var (x0, y0) = GetGrid(startCorner);
-            var (x1, y1) = GetGrid(endCorner);
+            //var (x0, y0) = GetGrid(startCorner);
+            var g0 = GetGrid(startCorner);
+            var x0 = g0.x;
+            var y0 = g0.y;
+            //var (x1, y1) = GetGrid(endCorner);
+            var g1 = GetGrid(endCorner);
+            var x1 = g1.x;
+            var y1 = g1.y;
             buffer.Clear();
 
             for (int i = x0; i <= x1; i++)
             {
                 for (int j = y0; j <= y1; j++)
                 {
-                    if (m_Grids.TryGetValue((i, j), out var gridContent))
+                    //if (m_Grids.TryGetValue((i, j), out var gridContent))
+                    if (m_Grids.TryGetValue(new int2(i, j), out var gridContent))
                     {
                         foreach (var item in gridContent.GetItems())
                         {
@@ -239,11 +255,11 @@ namespace SpacialIndexing
             m_ObjectGridBoundingBoxes.Clear();
         }
 
-        private (int, int) GetGrid(float3 position)
+        private int2 GetGrid(float3 position)
         {
             int x = (int)math.floor(position.x / m_GridSize);
             int y = (int)math.floor(position.y / m_GridSize);
-            return (x, y);
+            return new int2(x, y);
         }
 
         public void Dispose()
