@@ -238,6 +238,11 @@ namespace HomeKeeper.Components
         public Entity Parent;
         public float4x4 LocalTransform;
     }
+    
+    public struct SpacialPartitioningEntry : IComponentData
+    {
+        
+    }
 
     public struct MyTag : IComponentData
     {
