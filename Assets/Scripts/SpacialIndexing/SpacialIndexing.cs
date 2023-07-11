@@ -8,7 +8,8 @@ using UnityEditor;
 
 namespace SpacialIndexing
 {
-    public struct GridContent<T> where T : unmanaged
+    
+    public struct GridContent<T> where T : unmanaged, IEquatable<T>
     {
         private FixedList512Bytes<T> m_Elements;
 
@@ -47,9 +48,10 @@ namespace SpacialIndexing
         }
     }
 
-    public struct SpacialPartitioning<T> where T : unmanaged, IEquatable<T>
+    public struct SpacialPartitioning<T> : IDisposable where T : unmanaged, IEquatable<T>, IComparable<T>
     {
         private readonly float m_GridSize;
+        
         private NativeHashMap<(int, int), GridContent<T>> m_Grids;
         private NativeHashMap<T, GridBoundingBox> m_ObjectGridBoundingBoxes;
 
@@ -242,6 +244,12 @@ namespace SpacialIndexing
             int x = (int)math.floor(position.x / m_GridSize);
             int y = (int)math.floor(position.y / m_GridSize);
             return (x, y);
+        }
+
+        public void Dispose()
+        {
+            m_Grids.Dispose();
+            m_ObjectGridBoundingBoxes.Dispose();
         }
     }
 
