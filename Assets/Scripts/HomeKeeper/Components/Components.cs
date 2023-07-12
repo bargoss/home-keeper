@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using SpacialIndexing;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Entities.Content;
@@ -239,6 +240,10 @@ namespace HomeKeeper.Components
         public float4x4 LocalTransform;
     }
     
+    public struct SpacialPartitioningSingleton : IComponentData
+    {
+        public SpacialPartitioning<Entity> Partitioning;
+    }
     public struct SpacialPartitioningEntry : IComponentData
     {
         

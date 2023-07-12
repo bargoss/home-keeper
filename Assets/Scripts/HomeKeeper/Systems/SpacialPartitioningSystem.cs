@@ -14,24 +14,35 @@ namespace HomeKeeper.Systems
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     public partial struct SpacialPartitioningSystem : ISystem
     {
-        private SpacialPartitioning<Entity> m_SpacialPartitioning;
-        
         public void OnCreate(ref SystemState state)
         {
-            m_SpacialPartitioning = new SpacialPartitioning<Entity>(10, Allocator.Persistent);
+            var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
+            var e = commandBuffer.CreateEntity();
+            commandBuffer.AddComponent(e, new SpacialPartitioningSingleton()
+            {
+                Partitioning = new SpacialPartitioning<Entity>(10, Allocator.Persistent)
+            });
+            commandBuffer.Playback(state.EntityManager);
+            commandBuffer.Dispose();
         }
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            m_SpacialPartitioning.Clear();
+            var spacialPartitioningRw = SystemAPI.GetSingletonRW<SpacialPartitioningSingleton>();
+            spacialPartitioningRw.ValueRW.Partitioning.Clear();
             foreach (var (localToWorld, spacialPartitioningEntry, entity) in SystemAPI.Query<LocalToWorld, SpacialPartitioningEntry>().WithEntityAccess())
             {
-                m_SpacialPartitioning.AddPoint(entity, localToWorld.Position);
+                spacialPartitioningRw.ValueRW.Partitioning.AddPoint(entity, localToWorld.Position);
             }
         }
         public void OnDestroy(ref SystemState state)
         {
-            m_SpacialPartitioning.Dispose();
+            var spacialPartitioningRw = SystemAPI.GetSingletonRW<SpacialPartitioningSingleton>();
+            spacialPartitioningRw.ValueRW.Partitioning.Dispose();
+            
+            var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
+            var e = SystemAPI.GetSingletonEntity<SpacialPartitioningSingleton>();
+            commandBuffer.DestroyEntity(e);
         }
         
         public struct ForcePoint
