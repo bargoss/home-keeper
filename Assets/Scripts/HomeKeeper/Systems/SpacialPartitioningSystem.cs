@@ -43,6 +43,8 @@ namespace HomeKeeper.Systems
             var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
             var e = SystemAPI.GetSingletonEntity<SpacialPartitioningSingleton>();
             commandBuffer.DestroyEntity(e);
+            commandBuffer.Playback(state.EntityManager);
+            commandBuffer.Dispose();
         }
         
         public struct ForcePoint
