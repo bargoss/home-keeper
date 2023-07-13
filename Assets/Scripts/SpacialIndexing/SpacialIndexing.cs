@@ -170,16 +170,16 @@ namespace SpacialIndexing
             }
         }
 
-        public void OverlapCircle(float3 center, float radius, List<T> buffer)
+        public void OverlapCircle(float3 center, float radius, ref NativeList<T> buffer)
         {
             var halfSize = new float3(radius, radius, radius);
             var boxStartCorner = center - halfSize;
             var boxEndCorner = center + halfSize;
 
-            OverlapBox(boxStartCorner, boxEndCorner, buffer);
+            OverlapBox(boxStartCorner, boxEndCorner, ref buffer);
         }
 
-        public void OverlapBox(float3 startCorner, float3 endCorner, List<T> buffer)
+        public void OverlapBox(float3 startCorner, float3 endCorner, ref NativeList<T> buffer)
         {
             //var (x0, y0) = GetGrid(startCorner);
             var g0 = GetGrid(startCorner);
@@ -325,13 +325,13 @@ namespace SpacialIndexing
             partitioning.AddPoint(3, new float3(-5.0f, -5.0f,0.0f));
             partitioning.AddPoint(4, new float3(-25.0f, -25.0f,0.0f));
 
-            var buffer = new List<int>();
-            partitioning.OverlapBox(new float3(0.0f, 0.0f,0.0f), new float3(11.0f, 11.0f,0.0f), buffer);
-            Assert.AreEqual(1, buffer.Count);
+            var buffer = new NativeList<int>();
+            partitioning.OverlapBox(new float3(0.0f, 0.0f,0.0f), new float3(11.0f, 11.0f,0.0f), ref buffer);
+            Assert.AreEqual(1, buffer.Length);
             Assert.AreEqual(1, buffer[0]);
 
-            partitioning.OverlapBox(new float3(-11.0f, -11.0f,0.0f), new float3(11.0f, 11.0f,0.0f), buffer);
-            Assert.AreEqual(2, buffer.Count);
+            partitioning.OverlapBox(new float3(-11.0f, -11.0f,0.0f), new float3(11.0f, 11.0f,0.0f), ref buffer);
+            Assert.AreEqual(2, buffer.Length);
 
             buffer.Sort();
             Assert.AreEqual(1, buffer[0]);
@@ -344,12 +344,12 @@ namespace SpacialIndexing
             var partitioning = new SpacialPartitioning<int>(10.0f);
             partitioning.AddBox(1, new float3(9.0f, 23.0f,0.0f), new float3(21.0f, 25.0f,0.0f));
 
-            var buffer = new List<int>();
-            partitioning.OverlapBox(new float3(0.0f, 0.0f,0.0f), new float3(11.0f, 11.0f,0.0f), buffer);
-            Assert.AreEqual(0, buffer.Count);
+            var buffer = new NativeList<int>();
+            partitioning.OverlapBox(new float3(0.0f, 0.0f,0.0f), new float3(11.0f, 11.0f,0.0f), ref buffer);
+            Assert.AreEqual(0, buffer.Length);
 
-            partitioning.OverlapBox(new float3(0.0f, 0.0f,0.0f), new float3(21.0f, 25.0f,0.0f), buffer);
-            Assert.AreEqual(1, buffer.Count);
+            partitioning.OverlapBox(new float3(0.0f, 0.0f,0.0f), new float3(21.0f, 25.0f,0.0f), ref buffer);
+            Assert.AreEqual(1, buffer.Length);
             Assert.AreEqual(1, buffer[0]);
         }
 
