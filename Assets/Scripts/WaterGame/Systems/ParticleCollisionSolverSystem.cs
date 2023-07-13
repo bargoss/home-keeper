@@ -83,54 +83,6 @@ namespace HomeKeeper.Systems
                 physicsVelocityRwA.ValueRW.Linear += force;
                 physicsVelocityRwB.ValueRW.Linear -= force;
             }
-
-
-            /*
-            foreach (var (physicsVelocityRw, localToWorld, particle, entity) in SystemAPI.Query<RefRW<PhysicsVelocity>, LocalToWorld, Particle>().WithEntityAccess())
-            {
-                var physicsVelocityLinear = m_VelocityCache[entity];
-                // public void OverlapCircle(float3 center, float radius, ref NativeList<T> buffer)
-                
-                m_Neighbours.Clear();
-                partitioning.OverlapCircle(localToWorld.Position, config.OuterRadius, ref m_Neighbours);
-                
-                foreach (var neighbour in m_Neighbours)
-                {
-                    if (neighbour == entity) continue;
-
-                    if (
-                        localToWorldLookup.TryGetComponent(neighbour, out var neighbourLocalToWorld) &&
-                        m_VelocityCache.TryGetValue(neighbour, out var neighbourPhysicsVelocityLinear)
-                    )
-                    {
-                        var force = CalculateCollisionForce(
-                            new ForcePoint()
-                            {
-                                Position = localToWorld.Position,
-                                Velocity = physicsVelocityLinear,
-                                OuterRadius = config.OuterRadius,
-                                InnerRadius = config.InnerRadius
-                            },
-                            new ForcePoint()
-                            {
-                                Position = neighbourLocalToWorld.Position,
-                                Velocity = neighbourPhysicsVelocityLinear,
-                                OuterRadius = config.OuterRadius,
-                                InnerRadius = config.InnerRadius
-                            },
-                            SystemAPI.Time.DeltaTime,
-                            config.PushForce,
-                            config.Viscosity
-                        );
-                        physicsVelocityLinear += force;
-                    }
-                }
-
-                var physicsVelocity = physicsVelocityRw.ValueRO;
-                physicsVelocity.Linear = physicsVelocityLinear;
-                physicsVelocityRw.ValueRW = physicsVelocity;
-            }
-            */
         }
         
         public struct ForcePoint
@@ -182,3 +134,49 @@ namespace HomeKeeper.Systems
         }
     }
 }
+/*
+            foreach (var (physicsVelocityRw, localToWorld, particle, entity) in SystemAPI.Query<RefRW<PhysicsVelocity>, LocalToWorld, Particle>().WithEntityAccess())
+            {
+                var physicsVelocityLinear = m_VelocityCache[entity];
+                // public void OverlapCircle(float3 center, float radius, ref NativeList<T> buffer)
+                
+                m_Neighbours.Clear();
+                partitioning.OverlapCircle(localToWorld.Position, config.OuterRadius, ref m_Neighbours);
+                
+                foreach (var neighbour in m_Neighbours)
+                {
+                    if (neighbour == entity) continue;
+
+                    if (
+                        localToWorldLookup.TryGetComponent(neighbour, out var neighbourLocalToWorld) &&
+                        m_VelocityCache.TryGetValue(neighbour, out var neighbourPhysicsVelocityLinear)
+                    )
+                    {
+                        var force = CalculateCollisionForce(
+                            new ForcePoint()
+                            {
+                                Position = localToWorld.Position,
+                                Velocity = physicsVelocityLinear,
+                                OuterRadius = config.OuterRadius,
+                                InnerRadius = config.InnerRadius
+                            },
+                            new ForcePoint()
+                            {
+                                Position = neighbourLocalToWorld.Position,
+                                Velocity = neighbourPhysicsVelocityLinear,
+                                OuterRadius = config.OuterRadius,
+                                InnerRadius = config.InnerRadius
+                            },
+                            SystemAPI.Time.DeltaTime,
+                            config.PushForce,
+                            config.Viscosity
+                        );
+                        physicsVelocityLinear += force;
+                    }
+                }
+
+                var physicsVelocity = physicsVelocityRw.ValueRO;
+                physicsVelocity.Linear = physicsVelocityLinear;
+                physicsVelocityRw.ValueRW = physicsVelocity;
+            }
+            */
