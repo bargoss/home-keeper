@@ -6,6 +6,7 @@ using Unity.Collections;
 using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
+using WaterGame.Components;
 
 namespace SpacialIndexing
 {
@@ -225,13 +226,13 @@ namespace SpacialIndexing
             buffer.Sort();
         }
 
-        /*
-        public void GetAllNeighbours(List<(T, T)> buffer)
+
+        public void GetAllNeighbours(ref NativeList<MyPair<T>> buffer)
         {
             var neighbourDeltas = new[] { (1, 0), (1, 1), (0, 1), (-1, 1) };
             buffer.Clear();
-
-            foreach (var myGridKey in m_Grids.Keys)
+            var keys = m_Grids.GetKeyArray(Allocator.Temp);
+            foreach (var myGridKey in keys)
             {
                 if (m_Grids.TryGetValue(myGridKey, out var myGridContent))
                 {
@@ -239,28 +240,29 @@ namespace SpacialIndexing
                     {
                         for (int j = 0; j < i; j++)
                         {
-                            buffer.Add((myGridContent.GetItems()[i], myGridContent.GetItems()[j]));
+                            buffer.Add(new MyPair<T>(myGridContent.GetItems()[i], myGridContent.GetItems()[j]));
                         }
                     }
 
                     foreach (var (i, j) in neighbourDeltas)
                     {
-                        var neighbourGridKey = (myGridKey.Item1 + i, myGridKey.Item2 + j);
+                        var neighbourGridKey = new int2(myGridKey.x + i, myGridKey.y + j);
                         if (m_Grids.TryGetValue(neighbourGridKey, out var neighbourGridContent))
                         {
                             foreach (var myElement in myGridContent.GetItems())
                             {
                                 foreach (var neighbourElement in neighbourGridContent.GetItems())
                                 {
-                                    buffer.Add((myElement, neighbourElement));
+                                    buffer.Add(new MyPair<T>(myElement, neighbourElement));
                                 }
                             }
                         }
                     }
                 }
             }
+
+            keys.Dispose();
         }
-        */
 
         public void Clear()
         {

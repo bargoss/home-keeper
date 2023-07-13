@@ -15,24 +15,25 @@ namespace HomeKeeper.Systems
     {
         NativeList<Entity> m_Neighbours;
         NativeHashMap<Entity, float3> m_VelocityCache;
+        NativeList<MyPair<Entity>> m_NeighboursCache;
 
         public void OnCreate(ref SystemState state)
         {
             m_Neighbours = new NativeList<Entity>(Allocator.Persistent);
             m_VelocityCache = new NativeHashMap<Entity, float3>(0, Allocator.Persistent);
+            m_NeighboursCache = new NativeList<MyPair<Entity>>(Allocator.Persistent);
         }
         public void OnDestroy(ref SystemState state)
         {
             m_Neighbours.Dispose();
             m_VelocityCache.Dispose();
+            m_NeighboursCache.Dispose();
         }
 
         public void OnUpdate(ref SystemState state)
         {
             var partitioning = SystemAPI.GetSingletonRW<SpacialPartitioningSingleton>().ValueRO.Partitioning;
             var config = SystemAPI.GetSingleton<WaterGameConfig>();
-            //const float outerRadius = 3f;
-            //const float innerRadius = 2.5f;
 
             var physicsVelocityLookup = SystemAPI.GetComponentLookup<PhysicsVelocity>();
             var localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>();
@@ -42,9 +43,49 @@ namespace HomeKeeper.Systems
             {
                 m_VelocityCache.TryAdd(entity, physicsVelocity.Linear);
             }
-            
+
+            m_NeighboursCache.Clear();
+            partitioning.GetAllNeighbours(ref m_NeighboursCache);
+            foreach (var pair in m_NeighboursCache)
+            {
+                var particleA =pair.A;
+                var particleB =pair.B;
+                
+                var physicsVelocityRwA = physicsVelocityLookup.GetRefRW(particleA);
+                var physicsVelocityRwB = physicsVelocityLookup.GetRefRW(particleB);
+                
+                var posA = localToWorldLookup.GetRefRO(particleA).ValueRO.Position;
+                var posB = localToWorldLookup.GetRefRO(particleB).ValueRO.Position;
+                
+                var velA = m_VelocityCache[particleA];
+                var velB = m_VelocityCache[particleB];
+                
+                var force = CalculateCollisionForce(
+                    new ForcePoint()
+                    {
+                        Position = posA,
+                        Velocity = velA,
+                        OuterRadius = config.OuterRadius,
+                        InnerRadius = config.InnerRadius
+                    },
+                    new ForcePoint()
+                    {
+                        Position = posB,
+                        Velocity = velB,
+                        OuterRadius = config.OuterRadius,
+                        InnerRadius = config.InnerRadius
+                    },
+                    SystemAPI.Time.DeltaTime,
+                    config.PushForce,
+                    config.Viscosity
+                );
+                
+                physicsVelocityRwA.ValueRW.Linear += force;
+                physicsVelocityRwB.ValueRW.Linear -= force;
+            }
 
 
+            /*
             foreach (var (physicsVelocityRw, localToWorld, particle, entity) in SystemAPI.Query<RefRW<PhysicsVelocity>, LocalToWorld, Particle>().WithEntityAccess())
             {
                 var physicsVelocityLinear = m_VelocityCache[entity];
@@ -89,6 +130,7 @@ namespace HomeKeeper.Systems
                 physicsVelocity.Linear = physicsVelocityLinear;
                 physicsVelocityRw.ValueRW = physicsVelocity;
             }
+            */
         }
         
         public struct ForcePoint
