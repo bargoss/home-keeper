@@ -23,7 +23,10 @@ namespace HomeKeeper.Systems
                 {
                     enemySpawner.LastSpawnTime = (float)SystemAPI.Time.ElapsedTime;
                     var seed = (uint)SystemAPI.Time.ElapsedTime + (uint)spawnerEntity.Index * 7;
-                    var spawnPosition = CalculateEnemySpawnPosition(enemySpawner, localToWorld.Position, seed);
+                    var offset = new float3(-2.5f,0,0) + new float3(5,0,0) * ((float)SystemAPI.Time.ElapsedTime % 1);
+                    
+                    var spawnPosition = localToWorld.Position + offset;
+
                     var enemy = commandBuffer.Instantiate(SystemAPI.GetSingleton<GameResourcesUnmanaged>().EnemyPrefab);
                     commandBuffer.SetLocalPositionRotation(enemy, spawnPosition, quaternion.identity);
 

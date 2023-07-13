@@ -5,17 +5,30 @@ using Unity.Assertions;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEditor;
+using UnityEngine;
 
 namespace SpacialIndexing
 {
     
     public struct GridContent<T> where T : unmanaged, IEquatable<T>
     {
-        private FixedList512Bytes<T> m_Elements;
+        //private FixedList4096Bytes<T>  m_Elements;
+        private FixedList64Bytes<T> m_Elements;
 
         public void Add(T item)
         {
-            m_Elements.Add(item);
+            
+            if (m_Elements.Length < m_Elements.Capacity)
+            {
+                m_Elements.Add(item);
+            }
+            else
+            {
+#if UNITY_EDITOR
+                Debug.Log("GridContent is full");
+#endif
+            }
+            
         }
 
         public void Remove(T item)
@@ -30,7 +43,7 @@ namespace SpacialIndexing
             }
         }
 
-        public FixedList512Bytes<T> GetItems()
+        public FixedList64Bytes<T> GetItems()
         {
             return m_Elements;
         }
@@ -58,8 +71,8 @@ namespace SpacialIndexing
         public SpacialPartitioning(float gridSze, Allocator allocator = Allocator.Temp)
         {
             m_GridSize = gridSze;
-            m_Grids = new NativeHashMap<int2, GridContent<T>>(250, allocator);
-            m_ObjectGridBoundingBoxes = new NativeHashMap<T, GridBoundingBox>(1000, allocator);
+            m_Grids = new NativeHashMap<int2, GridContent<T>>(50, allocator);
+            m_ObjectGridBoundingBoxes = new NativeHashMap<T, GridBoundingBox>(100, allocator);
         }
         
         public void GetGrids(ref NativeList<GridContent<T>> list)
@@ -371,6 +384,5 @@ namespace SpacialIndexing
             Assert.AreEqual(1, GetGrids(spacialPartitioning)[^1].GetItems().Length);
         }
     }
-
-}
 #endif
+}

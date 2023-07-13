@@ -39,8 +39,11 @@ namespace HomeKeeper.Systems
                     commandBuffer.SetComponent(dyingEnemy, physicsVelocity);
                 }                
             }
-            
-            commandBuffer.Playback(state.EntityManager);
+
+            if (!commandBuffer.IsEmpty)
+            {
+                commandBuffer.Playback(state.EntityManager);
+            }
             commandBuffer.Dispose();
         }
     }

@@ -15,6 +15,7 @@ namespace Systems
     {
         public void OnUpdate(ref SystemState state)
         {
+            return;
             var domePosition = new float3(0, 0, 0);
 
             var vectorFieldConfig = VectorFieldConfig.Default;

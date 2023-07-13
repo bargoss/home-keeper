@@ -24,8 +24,12 @@ namespace Systems
                 
                 lifeSpanRw.ValueRW = lifeSpan;
             }
-            
-            commandBuffer.Playback(state.EntityManager);
+
+            if (!commandBuffer.IsEmpty)
+            {
+                commandBuffer.Playback(state.EntityManager);
+            }
+            commandBuffer.Dispose();
         }        
     }
 }
