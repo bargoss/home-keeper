@@ -26,7 +26,7 @@ namespace SpacialIndexing
             else
             {
 #if UNITY_EDITOR
-                Debug.Log("GridContent is full");
+                //Debug.Log("GridContent is full");
 #endif
             }
             
@@ -229,7 +229,17 @@ namespace SpacialIndexing
 
         public void GetAllNeighbours(ref NativeList<MyPair<T>> buffer)
         {
-            var neighbourDeltas = new[] { (1, 0), (1, 1), (0, 1), (-1, 1) };
+            
+            //var neighbourDeltas = new[] { (1, 0), (1, 1), (0, 1), (-1, 1) };
+            //var neighbourDeltas = new NativeArray<MyPair<int>>(new MyPair<int>[] { new(1, 0), new(1, 1), new(0, 1), new(-1, 1) }, Allocator.Temp);
+            var neighbourDeltas = new FixedList512Bytes<MyPair<int>>
+            {
+                new(1, 0),
+                new(1, 1),
+                new(0, 1),
+                new(-1, 1)
+            };
+
             buffer.Clear();
             var keys = m_Grids.GetKeyArray(Allocator.Temp);
             foreach (var myGridKey in keys)
@@ -244,8 +254,11 @@ namespace SpacialIndexing
                         }
                     }
 
-                    foreach (var (i, j) in neighbourDeltas)
+                    foreach (var pair in neighbourDeltas)
                     {
+                        var i = pair.A;
+                        var j = pair.B;
+                        
                         var neighbourGridKey = new int2(myGridKey.x + i, myGridKey.y + j);
                         if (m_Grids.TryGetValue(neighbourGridKey, out var neighbourGridContent))
                         {

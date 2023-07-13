@@ -1,5 +1,6 @@
 ﻿using Components;
 using HomeKeeper.Components;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 
@@ -8,6 +9,7 @@ namespace Systems
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     public partial struct LifeSpanSystem : ISystem
     {
+        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             var commandBuffer = new EntityCommandBuffer(Allocator.Temp);

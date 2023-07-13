@@ -2,6 +2,7 @@
 using DefaultNamespace;
 using HomeKeeper.Components;
 using Systems;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -22,6 +23,7 @@ namespace HomeKeeper.Systems
     [RequireMatchingQueriesForUpdate]
     public partial struct EnemyDeathSystem : ISystem
     {
+        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
