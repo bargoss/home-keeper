@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using HomeKeeper.Systems;
 using Unity.Assertions;
 using Unity.Collections;
+using Unity.Entities;
+using Unity.Jobs;
 using Unity.Mathematics;
+using Unity.Physics;
+using Unity.Transforms;
 using UnityEditor;
 using UnityEngine;
 using WaterGame.Components;
@@ -48,6 +53,16 @@ namespace SpacialIndexing
         {
             return m_Elements;
         }
+        
+        public int Length()
+        {
+            return m_Elements.Length;
+        }
+        
+        public T Get(int index)
+        {
+            return m_Elements[index];
+        }
     }
 
     public struct GridBoundingBox
@@ -61,11 +76,11 @@ namespace SpacialIndexing
             EndCorner = endCorner;
         }
     }
-    
+
     public struct SpacialPartitioning<T> : IDisposable where T : unmanaged, IEquatable<T>, IComparable<T>
     {
         private readonly float m_GridSize;
-        
+
         private NativeHashMap<int2, GridContent<T>> m_Grids;
         private NativeHashMap<T, GridBoundingBox> m_ObjectGridBoundingBoxes;
 
@@ -75,7 +90,7 @@ namespace SpacialIndexing
             m_Grids = new NativeHashMap<int2, GridContent<T>>(50, allocator);
             m_ObjectGridBoundingBoxes = new NativeHashMap<T, GridBoundingBox>(100, allocator);
         }
-        
+
         public void GetGrids(ref NativeList<GridContent<T>> list)
         {
             foreach (var grid in m_Grids)
@@ -100,7 +115,7 @@ namespace SpacialIndexing
             {
                 RemoveWithId(item);
             }
-            
+
             var g0 = GetGrid(startCorner);
             var g1 = GetGrid(endCorner);
 
@@ -117,7 +132,7 @@ namespace SpacialIndexing
                     m_Grids[gridKey] = gridContent;
                 }
             }
-            
+
             //m_ObjectGridBoundingBoxes.Add(item, new GridBoundingBox((x0, y0), (x1, y1)));
             m_ObjectGridBoundingBoxes.Add(item, new GridBoundingBox(new int2(g0.x, g0.y), new int2(g1.x, g1.y)));
         }
@@ -161,7 +176,7 @@ namespace SpacialIndexing
             AddBox(item, boxStartCorner, boxEndCorner);
         }
 
-        
+
         public IEnumerable<T> GetNeighbours(float3 position)
         {
             //var (x, y) = GetGrid(position);
@@ -226,12 +241,21 @@ namespace SpacialIndexing
             buffer.Sort();
         }
 
+        public int GetGridCount()
+        {
+            return m_Grids.Count();
+        }
+
+        public NativeArray<int2> GetGridKeyArray(Allocator allocator)
+        {
+            var keys = m_Grids.GetKeyArray(allocator);
+            return keys;
+        }
+
+
 
         public void GetAllNeighbours(ref NativeList<MyPair<T>> buffer)
         {
-            
-            //var neighbourDeltas = new[] { (1, 0), (1, 1), (0, 1), (-1, 1) };
-            //var neighbourDeltas = new NativeArray<MyPair<int>>(new MyPair<int>[] { new(1, 0), new(1, 1), new(0, 1), new(-1, 1) }, Allocator.Temp);
             var neighbourDeltas = new FixedList512Bytes<MyPair<int>>
             {
                 new(1, 0),
@@ -258,7 +282,7 @@ namespace SpacialIndexing
                     {
                         var i = pair.A;
                         var j = pair.B;
-                        
+
                         var neighbourGridKey = new int2(myGridKey.x + i, myGridKey.y + j);
                         if (m_Grids.TryGetValue(neighbourGridKey, out var neighbourGridContent))
                         {
@@ -295,7 +319,141 @@ namespace SpacialIndexing
             m_Grids.Dispose();
             m_ObjectGridBoundingBoxes.Dispose();
         }
+
+        public void GetNeighboursFromGridRange(int startGridIndex, int endGridIndex, ref NativeList<MyPair<T>> buffer,
+            ref NativeArray<int2> gridKeys)
+        {
+            var neighbourDeltas = new FixedList512Bytes<MyPair<int>>
+            {
+                new(1, 0),
+                new(1, 1),
+                new(0, 1),
+                new(-1, 1)
+            };
+
+            foreach (var myGridKey in gridKeys)
+            {
+                if (m_Grids.TryGetValue(myGridKey, out var myGridContent))
+                {
+                    for (int i = 0; i < myGridContent.GetItems().Length; i++)
+                    {
+                        for (int j = 0; j < i; j++)
+                        {
+                            buffer.Add(new MyPair<T>(myGridContent.GetItems()[i], myGridContent.GetItems()[j]));
+                        }
+                    }
+
+                    foreach (var pair in neighbourDeltas)
+                    {
+                        var i = pair.A;
+                        var j = pair.B;
+
+                        var neighbourGridKey = new int2(myGridKey.x + i, myGridKey.y + j);
+                        if (m_Grids.TryGetValue(neighbourGridKey, out var neighbourGridContent))
+                        {
+                            foreach (var myElement in myGridContent.GetItems())
+                            {
+                                foreach (var neighbourElement in neighbourGridContent.GetItems())
+                                {
+                                    buffer.Add(new MyPair<T>(myElement, neighbourElement));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public struct SolveCollisionsJob : IJobParallelFor
+        {
+            [WriteOnly] public NativeParallelMultiHashMap<Entity, float3>.ParallelWriter Forces;
+            [ReadOnly] public NativeArray<int2> GridKeys;
+            [ReadOnly] public int GridKeysCount;
+            [ReadOnly] public SpacialPartitioning<Entity> SpacialPartitioning;
+            [ReadOnly] public ComponentLookup<PhysicsVelocity> PhysicsVelocityLookup;
+            [ReadOnly] public ComponentLookup<LocalToWorld> LocalToWorldLookup;
+            [ReadOnly] public WaterGameConfig Config;
+            [ReadOnly] public float DeltaTime;
+
+            private void SolveCollision(MyPair<Entity> pair)
+            {
+                var posA = LocalToWorldLookup[pair.A].Position;
+                var velA = PhysicsVelocityLookup[pair.A].Linear;
+                var posB = LocalToWorldLookup[pair.B].Position;
+                var velB = PhysicsVelocityLookup[pair.B].Linear;
+
+                var force = ParticleCollisionSolverSystem.CalculateCollisionForce(
+                    new ParticleCollisionSolverSystem.ForcePoint()
+                    {
+                        Position = posA,
+                        Velocity = velA,
+                        OuterRadius = Config.OuterRadius,
+                        InnerRadius = Config.InnerRadius
+                    },
+                    new ParticleCollisionSolverSystem.ForcePoint()
+                    {
+                        Position = posB,
+                        Velocity = velB,
+                        OuterRadius = Config.OuterRadius,
+                        InnerRadius = Config.InnerRadius
+                    },
+                    DeltaTime,
+                    Config.PushForce,
+                    Config.Viscosity
+                );
+
+                Forces.Add(pair.A, force);
+                Forces.Add(pair.B, -force);
+            }
+
+            public void Execute(int index)
+            {
+                var neighbourDeltas = new FixedList512Bytes<MyPair<int>>
+                {
+                    new(1, 0),
+                    new(1, 1),
+                    new(0, 1),
+                    new(-1, 1)
+                };
+
+                var myGridKey = GridKeys[index];
+                var myGridContent = SpacialPartitioning.m_Grids[myGridKey];
+                {
+                    for (int i = 0; i < myGridContent.Length(); i++)
+                    {
+                        for (int j = 0; j < i; j++)
+                        {
+                            SolveCollision(new MyPair<Entity>(myGridContent.Get(i), myGridContent.Get(j)));
+                        }
+                    }
+
+                    foreach (var pair in neighbourDeltas)
+                    {
+                        var i = pair.A;
+                        var j = pair.B;
+
+                        var neighbourGridKey = new int2(myGridKey.x + i, myGridKey.y + j);
+                        if (SpacialPartitioning.m_Grids.TryGetValue(neighbourGridKey, out var neighbourGridContent))
+                        {
+                            for (var myElementIndex = 0; myElementIndex < myGridContent.Length(); myElementIndex++)
+                            {
+                                var myElement = myGridContent.Get(myElementIndex);
+                                for (var neighbourElementIndex = 0;
+                                     neighbourElementIndex < neighbourGridContent.Length();
+                                     neighbourElementIndex++)
+                                {
+                                    var neighbourElement = neighbourGridContent.Get(neighbourElementIndex);
+                                    SolveCollision(new MyPair<Entity>(myElement, neighbourElement));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
+
+
 
 
 #if UNITY_EDITOR

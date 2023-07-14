@@ -70,6 +70,7 @@ namespace DefaultNamespace.SwarmRunner.Systems
         // follow the closest opposing faction member and attack if in range
         public void OnUpdate(ref SystemState state)
         {
+            return;
             var localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>();
             var separateJointsOnCollisionLookup = SystemAPI.GetComponentLookup<BrakeBeamsOnCollision>();
             var ecb = new EntityCommandBuffer(Allocator.Temp);

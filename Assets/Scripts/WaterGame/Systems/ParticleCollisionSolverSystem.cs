@@ -1,6 +1,9 @@
-﻿using Unity.Burst;
+﻿using System.Linq;
+using SpacialIndexing;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
@@ -10,6 +13,21 @@ using WaterGame.Systems;
 
 namespace HomeKeeper.Systems
 {
+    public struct MyJob : IJobParallelFor
+    {
+        public NativeArray<MyPair<Entity>> NeighbourPairs;
+        public ComponentLookup<PhysicsVelocity> PhysicsVelocityLookup;
+        public ComponentLookup<LocalToWorld> LocalToWorld;
+
+        public void Execute(int index)
+        {
+            foreach (var neighbourPair in NeighbourPairs)
+            {
+                
+            }
+        }
+    }
+
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     [UpdateAfter(typeof(SpacialPartitioningSystem))]
     public partial struct ParticleCollisionSolverSystem : ISystem
@@ -17,22 +35,106 @@ namespace HomeKeeper.Systems
         NativeList<Entity> m_Neighbours;
         NativeHashMap<Entity, float3> m_VelocityCache;
         NativeList<MyPair<Entity>> m_NeighboursCache;
+        
+        NativeArray<int2> m_GridKeys;
+        NativeParallelMultiHashMap<Entity, float3> m_Forces;
+
+        
+        
 
         public void OnCreate(ref SystemState state)
         {
             m_Neighbours = new NativeList<Entity>(Allocator.Persistent);
-            m_VelocityCache = new NativeHashMap<Entity, float3>(1000, Allocator.Persistent);
+            m_VelocityCache = new NativeHashMap<Entity, float3>(100000, Allocator.Persistent);
             m_NeighboursCache = new NativeList<MyPair<Entity>>(Allocator.Persistent);
+            m_GridKeys = new NativeArray<int2>(4000, Allocator.Persistent);
+            m_Forces = new NativeParallelMultiHashMap<Entity, float3>(100000, Allocator.Persistent);
         }
         public void OnDestroy(ref SystemState state)
         {
             m_Neighbours.Dispose();
             m_VelocityCache.Dispose();
             m_NeighboursCache.Dispose();
+            m_GridKeys.Dispose();
+            m_Forces.Dispose();
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
+        {
+            var spacialPartitioning = SystemAPI.GetSingletonRW<SpacialPartitioningSingleton>().ValueRO.Partitioning;
+            if (!SystemAPI.TryGetSingleton<WaterGameConfig>(out var config))
+            {
+                config = new WaterGameConfig()
+                {
+                    Viscosity = 0.16f,
+                    PushForce = 193.6f,
+                    InnerRadius = 0.85f,
+                    OuterRadius = 1
+                };
+            }
+            
+            //var myJob = new MyJob()
+            //{
+            //    Data = new NativeArray<int>(100, Allocator.TempJob)
+            //};
+            //myJob.Schedule(64, 1, state.Dependency).Complete();
+
+            var physicsVelocityLookup = SystemAPI.GetComponentLookup<PhysicsVelocity>();
+            var localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>();
+            
+            m_VelocityCache.Clear();
+            foreach (var (physicsVelocity, localToWorld, particle, entity) in SystemAPI.Query<PhysicsVelocity, LocalToWorld, Particle>().WithEntityAccess())
+            {
+                m_VelocityCache.TryAdd(entity, physicsVelocity.Linear);
+            }
+
+            // clear m_GridKeys
+            var gridKeysTemp = spacialPartitioning.GetGridKeyArray(Allocator.Temp);
+            for (var i = 0; i < gridKeysTemp.Length; i++)
+            {
+                var int2 = gridKeysTemp[i];
+                m_GridKeys[i] = int2;
+            }
+            
+            var gridKeyCount = gridKeysTemp.Length;
+            
+            m_Forces.Clear();
+            
+            new SpacialPartitioning<Entity>.SolveCollisionsJob
+            {
+                Config = config,
+                Forces = m_Forces.AsParallelWriter(),
+                DeltaTime = 0.02f,
+                GridKeys = m_GridKeys,
+                GridKeysCount = gridKeyCount,
+                SpacialPartitioning = spacialPartitioning,
+                PhysicsVelocityLookup = physicsVelocityLookup,
+                LocalToWorldLookup = localToWorldLookup
+            }.Schedule(gridKeyCount, 1).Complete();
+            
+            foreach (var (physicsVelocityRw, localToWorld, particle, entity) in SystemAPI.Query<RefRW<PhysicsVelocity>, LocalToWorld, Particle>().WithEntityAccess())
+            {
+                var physicsVelocity = physicsVelocityRw.ValueRO;
+                
+                var totalForceOnEntity = float3.zero;
+                if (m_Forces.ContainsKey(entity))
+                {
+                    foreach (var force in m_Forces.GetValuesForKey(entity))
+                    {
+                        totalForceOnEntity += force;
+                    }
+
+                    if (totalForceOnEntity.Equals(float3.zero)) continue;
+
+                    physicsVelocity.Linear += totalForceOnEntity;
+                    physicsVelocityRw.ValueRW = physicsVelocity;
+                }
+            }
+        }
+        
+        [BurstCompile]
+        public void OnUpdate2(ref SystemState state)
         {
             var partitioning = SystemAPI.GetSingletonRW<SpacialPartitioningSingleton>().ValueRO.Partitioning;
             if (!SystemAPI.TryGetSingleton<WaterGameConfig>(out var config))
@@ -46,6 +148,11 @@ namespace HomeKeeper.Systems
                 };
             }
             
+            //var myJob = new MyJob()
+            //{
+            //    Data = new NativeArray<int>(100, Allocator.TempJob)
+            //};
+            //myJob.Schedule(64, 1, state.Dependency).Complete();
 
             var physicsVelocityLookup = SystemAPI.GetComponentLookup<PhysicsVelocity>();
             var localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>();

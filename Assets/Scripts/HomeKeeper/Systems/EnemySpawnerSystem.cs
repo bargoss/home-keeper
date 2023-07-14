@@ -3,6 +3,7 @@ using HomeKeeper.Components;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Physics;
 using Unity.Transforms;
 
 namespace HomeKeeper.Systems
@@ -28,7 +29,9 @@ namespace HomeKeeper.Systems
                     var spawnPosition = localToWorld.Position + offset;
 
                     var enemy = commandBuffer.Instantiate(SystemAPI.GetSingleton<GameResourcesUnmanaged>().EnemyPrefab);
-                    commandBuffer.SetLocalPositionRotation(enemy, spawnPosition, quaternion.identity);
+                    //commandBuffer.SetLocalPositionRotation(enemy, spawnPosition, quaternion.identity);
+                    commandBuffer.SetLocalPositionRotationScale(enemy, spawnPosition, quaternion.identity, 1);
+                    
 
                     enemySpawnerRw.ValueRW = enemySpawner;
                 }

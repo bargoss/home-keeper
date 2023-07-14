@@ -94,6 +94,21 @@ namespace DefaultNamespace
             });
             
         }
+        public static void SetLocalPositionRotationScale(this ref EntityCommandBuffer commandBuffer, Entity entity, float3 position, quaternion rotation, float scale)
+        {
+            commandBuffer.SetComponent(entity, new LocalTransform()
+            {
+                Position = position,
+                Rotation = rotation,
+                Scale = scale
+            });
+            
+            commandBuffer.SetComponent(entity,new LocalToWorld()
+            {
+                Value = float4x4.TRS(position, rotation, 1)
+            });
+            
+        }
 
         public static float3 GoTowardsWithClampedMag(float3 start, float3 target, float maxMovement)
         {

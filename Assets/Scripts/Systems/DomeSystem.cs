@@ -18,6 +18,8 @@ namespace Systems
             // get the command buffer or whatever we use to spawn entities here
             var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
             
+
+            
             foreach (var (domeRw, localTransform, entity) in SystemAPI.Query<RefRW<Dome>, LocalTransform>().WithEntityAccess())
             {
                 var dome = domeRw.ValueRO;

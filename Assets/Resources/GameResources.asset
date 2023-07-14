@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: GameResources
   m_EditorClassIdentifier: 
   MagazineMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
-  MagazineMaterial: {fileID: 2100002, guid: 717e09a45c980834587d00ab49fc2cf6, type: 3}
+  MagazineMaterial: {fileID: 2100000, guid: 376dc78aee7457546b41509fb355afe6, type: 2}
   shooterGoViewPrefab: {fileID: 3396015738664773049, guid: b65b251491836b9428c58265cd640af1,
     type: 3}
