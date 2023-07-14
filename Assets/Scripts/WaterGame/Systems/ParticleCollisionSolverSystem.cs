@@ -21,7 +21,7 @@ namespace HomeKeeper.Systems
         public void OnCreate(ref SystemState state)
         {
             m_Neighbours = new NativeList<Entity>(Allocator.Persistent);
-            m_VelocityCache = new NativeHashMap<Entity, float3>(0, Allocator.Persistent);
+            m_VelocityCache = new NativeHashMap<Entity, float3>(1000, Allocator.Persistent);
             m_NeighboursCache = new NativeList<MyPair<Entity>>(Allocator.Persistent);
         }
         public void OnDestroy(ref SystemState state)
@@ -35,7 +35,17 @@ namespace HomeKeeper.Systems
         public void OnUpdate(ref SystemState state)
         {
             var partitioning = SystemAPI.GetSingletonRW<SpacialPartitioningSingleton>().ValueRO.Partitioning;
-            var config = SystemAPI.GetSingleton<WaterGameConfig>();
+            if (!SystemAPI.TryGetSingleton<WaterGameConfig>(out var config))
+            {
+                config = new WaterGameConfig()
+                {
+                    Viscosity = 0.16f,
+                    PushForce = 83.6f,
+                    InnerRadius = 0.85f,
+                    OuterRadius = 1
+                };
+            }
+            
 
             var physicsVelocityLookup = SystemAPI.GetComponentLookup<PhysicsVelocity>();
             var localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>();
