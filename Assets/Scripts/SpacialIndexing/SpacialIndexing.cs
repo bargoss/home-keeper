@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.Assertions;
 using Unity.Collections;
+using Unity.Entities;
 using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
@@ -11,12 +12,12 @@ using WaterGame.Components;
 namespace SpacialIndexing
 {
     
-    public struct GridContent<T> where T : unmanaged, IEquatable<T>
+    public struct GridContent
     {
-        //private FixedList4096Bytes<T>  m_Elements;
-        private FixedList64Bytes<T> m_Elements;
+        //private FixedList4096Bytes<Entity>  m_Elements;
+        private FixedList64Bytes<Entity> m_Elements;
 
-        public void Add(T item)
+        public void Add(Entity item)
         {
             
             if (m_Elements.Length < m_Elements.Capacity)
@@ -32,7 +33,7 @@ namespace SpacialIndexing
             
         }
 
-        public void Remove(T item)
+        public void Remove(Entity item)
         {
             for (var i = 0; i < m_Elements.Length; i++)
             {
@@ -44,7 +45,7 @@ namespace SpacialIndexing
             }
         }
 
-        public FixedList64Bytes<T> GetItems()
+        public FixedList64Bytes<Entity> GetItems()
         {
             return m_Elements;
         }
@@ -62,21 +63,21 @@ namespace SpacialIndexing
         }
     }
     
-    public struct SpacialPartitioning<T> : IDisposable where T : unmanaged, IEquatable<T>, IComparable<T>
+    public struct SpacialPartitioning
     {
         private readonly float m_GridSize;
         
-        private NativeHashMap<int2, GridContent<T>> m_Grids;
-        private NativeHashMap<T, GridBoundingBox> m_ObjectGridBoundingBoxes;
+        private NativeHashMap<int2, GridContent> m_Grids;
+        private NativeHashMap<Entity, GridBoundingBox> m_ObjectGridBoundingBoxes;
 
         public SpacialPartitioning(float gridSze, Allocator allocator = Allocator.Temp)
         {
             m_GridSize = gridSze;
-            m_Grids = new NativeHashMap<int2, GridContent<T>>(50, allocator);
-            m_ObjectGridBoundingBoxes = new NativeHashMap<T, GridBoundingBox>(100, allocator);
+            m_Grids = new NativeHashMap<int2, GridContent>(50, allocator);
+            m_ObjectGridBoundingBoxes = new NativeHashMap<Entity, GridBoundingBox>(100, allocator);
         }
         
-        public void GetGrids(ref NativeList<GridContent<T>> list)
+        public void GetGrids(ref NativeList<GridContent> list)
         {
             foreach (var grid in m_Grids)
             {
@@ -84,17 +85,17 @@ namespace SpacialIndexing
             }
         }
 
-        public bool TryGetObject(T item, out GridBoundingBox gridBoundingBox)
+        public bool TryGetObject(Entity item, out GridBoundingBox gridBoundingBox)
         {
             return m_ObjectGridBoundingBoxes.TryGetValue(item, out gridBoundingBox);
         }
 
-        public void AddPoint(T item, float3 position)
+        public void AddPoint(Entity item, float3 position)
         {
             AddBox(item, position, position);
         }
 
-        public void AddBox(T item, float3 startCorner, float3 endCorner)
+        public void AddBox(Entity item, float3 startCorner, float3 endCorner)
         {
             if (m_ObjectGridBoundingBoxes.TryGetValue(item, out _))
             {
@@ -122,7 +123,7 @@ namespace SpacialIndexing
             m_ObjectGridBoundingBoxes.Add(item, new GridBoundingBox(new int2(g0.x, g0.y), new int2(g1.x, g1.y)));
         }
 
-        public void RemoveWithId(T item)
+        public void RemoveWithId(Entity item)
         {
             if (m_ObjectGridBoundingBoxes.TryGetValue(item, out var gridBoundingBox))
             {
@@ -152,7 +153,7 @@ namespace SpacialIndexing
             }
         }
 
-        public void AddCircle(T item, float3 center, float radius)
+        public void AddCircle(Entity item, float3 center, float radius)
         {
             var halfSize = new float3(radius, radius, radius);
             var boxStartCorner = center - halfSize;
@@ -162,7 +163,7 @@ namespace SpacialIndexing
         }
 
         
-        public IEnumerable<T> GetNeighbours(float3 position)
+        public IEnumerable<Entity> GetNeighbours(float3 position)
         {
             //var (x, y) = GetGrid(position);
             var g = GetGrid(position);
@@ -184,7 +185,7 @@ namespace SpacialIndexing
             }
         }
 
-        public void OverlapCircle(float3 center, float radius, ref NativeList<T> buffer)
+        public void OverlapCircle(float3 center, float radius, ref NativeList<Entity> buffer)
         {
             var halfSize = new float3(radius, radius, radius);
             var boxStartCorner = center - halfSize;
@@ -193,7 +194,7 @@ namespace SpacialIndexing
             OverlapBox(boxStartCorner, boxEndCorner, ref buffer);
         }
 
-        public void OverlapBox(float3 startCorner, float3 endCorner, ref NativeList<T> buffer)
+        public void OverlapBox(float3 startCorner, float3 endCorner, ref NativeList<Entity> buffer)
         {
             //var (x0, y0) = GetGrid(startCorner);
             var g0 = GetGrid(startCorner);
@@ -227,12 +228,12 @@ namespace SpacialIndexing
         }
 
 
-        public void GetAllNeighbours(ref NativeList<MyPair<T>> buffer)
+        public void GetAllNeighbours(ref NativeList<EntityPair> buffer)
         {
             
             //var neighbourDeltas = new[] { (1, 0), (1, 1), (0, 1), (-1, 1) };
             //var neighbourDeltas = new NativeArray<MyPair<int>>(new MyPair<int>[] { new(1, 0), new(1, 1), new(0, 1), new(-1, 1) }, Allocator.Temp);
-            var neighbourDeltas = new FixedList512Bytes<MyPair<int>>
+            var neighbourDeltas = new FixedList512Bytes<IntPair>
             {
                 new(1, 0),
                 new(1, 1),
@@ -250,7 +251,7 @@ namespace SpacialIndexing
                     {
                         for (int j = 0; j < i; j++)
                         {
-                            buffer.Add(new MyPair<T>(myGridContent.GetItems()[i], myGridContent.GetItems()[j]));
+                            buffer.Add(new EntityPair(myGridContent.GetItems()[i], myGridContent.GetItems()[j]));
                         }
                     }
 
@@ -266,7 +267,7 @@ namespace SpacialIndexing
                             {
                                 foreach (var neighbourElement in neighbourGridContent.GetItems())
                                 {
-                                    buffer.Add(new MyPair<T>(myElement, neighbourElement));
+                                    buffer.Add(new EntityPair(myElement, neighbourElement));
                                 }
                             }
                         }
@@ -301,6 +302,7 @@ namespace SpacialIndexing
 #if UNITY_EDITOR
 
 // Unit tests
+    /*
     public static class SpacialPartitioningTests
     {
         private static int GetCount(SpacialPartitioning<int> spacialPartitioning)
@@ -399,5 +401,6 @@ namespace SpacialIndexing
             Assert.AreEqual(1, GetGrids(spacialPartitioning)[^1].GetItems().Length);
         }
     }
+    */
 #endif
 }

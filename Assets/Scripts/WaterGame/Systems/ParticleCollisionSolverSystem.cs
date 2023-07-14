@@ -16,13 +16,14 @@ namespace HomeKeeper.Systems
     {
         NativeList<Entity> m_Neighbours;
         NativeHashMap<Entity, float3> m_VelocityCache;
-        NativeList<MyPair<Entity>> m_NeighboursCache;
+        //NativeList<MyPair<Entity>> m_NeighboursCache;
+        NativeList<EntityPair> m_NeighboursCache;
 
         public void OnCreate(ref SystemState state)
         {
             m_Neighbours = new NativeList<Entity>(Allocator.Persistent);
             m_VelocityCache = new NativeHashMap<Entity, float3>(0, Allocator.Persistent);
-            m_NeighboursCache = new NativeList<MyPair<Entity>>(Allocator.Persistent);
+            m_NeighboursCache = new NativeList<EntityPair>(Allocator.Persistent);
         }
         public void OnDestroy(ref SystemState state)
         {
@@ -47,8 +48,8 @@ namespace HomeKeeper.Systems
             }
 
             m_NeighboursCache.Clear();
-            partitioning.GetAllNeighbours(ref m_NeighboursCache);
-            foreach (var pair in m_NeighboursCache)
+            //partitioning.GetAllNeighbours(ref m_NeighboursCache);
+            /*foreach (var pair in m_NeighboursCache)
             {
                 var particleA =pair.A;
                 var particleB =pair.B;
@@ -84,7 +85,7 @@ namespace HomeKeeper.Systems
                 
                 physicsVelocityRwA.ValueRW.Linear += force;
                 physicsVelocityRwB.ValueRW.Linear -= force;
-            }
+            }*/
         }
         
         public struct ForcePoint
