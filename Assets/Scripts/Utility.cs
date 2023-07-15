@@ -10,6 +10,10 @@ namespace DefaultNamespace
 {
     public static class Utility
     {
+        public static float3 Up => new float3(0, 1, 0);
+        public static float3 Right => new float3(1, 0, 0);
+        public static float3 Forward => new float3(0, 0, 1);
+        
         public static bool TryGetRw<T>(this ComponentLookup<T> lookup, Entity entity, out RefRW<T> rw) where T : unmanaged, IComponentData
         {
             rw = lookup.GetRefRWOptional(entity);
