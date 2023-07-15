@@ -13,6 +13,7 @@ using Unity.Transforms;
 using UnityEditor;
 using WaterGame.Authoring;
 using WaterGame.Components;
+using ParticleCollisionSolverSystem = WaterGame.Systems.ParticleCollisionSolverSystem;
 
 namespace SpacialIndexing
 {

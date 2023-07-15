@@ -10,6 +10,12 @@ namespace DefaultNamespace
 {
     public static class Utility
     {
+        public static bool TryGetRw<T>(this ComponentLookup<T> lookup, Entity entity, out RefRW<T> rw) where T : unmanaged, IComponentData
+        {
+            rw = lookup.GetRefRWOptional(entity);
+            return rw.IsValid;
+        }
+        
         // public static bool TryGetComponent<T>(this EntityManager entityManager, Entity entity, out T componentData) where T : unmanaged, IComponentData
         // {
         //     componentData = default;

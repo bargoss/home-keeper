@@ -1,6 +1,5 @@
-﻿using System.Linq;
+﻿using RunnerGame.Scripts.ECS.Components;
 using SpacialIndexing;
-using SwarmRunner.Components;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -11,9 +10,8 @@ using Unity.Transforms;
 using UnityEngine;
 using WaterGame.Authoring;
 using WaterGame.Components;
-using WaterGame.Systems;
 
-namespace HomeKeeper.Systems
+namespace WaterGame.Systems
 {
     public struct MyJob : IJobParallelFor
     {

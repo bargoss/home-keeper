@@ -8,7 +8,6 @@ namespace WaterGame.Components
         public SpacialPartitioning<Entity> Partitioning;
     }
     public struct SpacialPartitioningEntry : IComponentData { }
-    public struct Particle : IComponentData { }
     
     
     

@@ -13,7 +13,18 @@ namespace RunnerGame.Scripts.ECS.Components
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
                 AddComponent<SpacialPartitioningEntry>(entity);
                 AddComponent<Particle>(entity);
+                AddComponent<ParticleView>(entity);
             }
         }
+    }
+
+    public struct Particle : IComponentData
+    {
+        public float LastGateInteractionTime;
+    }
+
+    public struct ParticleView : IComponentData
+    {
+        public bool PositiveEffect;
     }
 }
