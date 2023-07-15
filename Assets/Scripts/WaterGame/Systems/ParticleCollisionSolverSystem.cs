@@ -242,12 +242,12 @@ namespace WaterGame.Systems
                 //a.Velocity += force;
                 //b.Velocity -= force;
 
-                Debug.DrawLine(a.Position, b.Position, Color.green);
+                //Debug.DrawLine(a.Position, b.Position, Color.green);
                 return force;
             }
             else
             {
-                Debug.DrawLine(a.Position, b.Position, Color.magenta);
+                //Debug.DrawLine(a.Position, b.Position, Color.magenta);
                 return float3.zero;
             }
         }

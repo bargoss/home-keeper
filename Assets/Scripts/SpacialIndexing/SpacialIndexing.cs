@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DefaultNamespace;
 using HomeKeeper.Systems;
 using SwarmRunner.Components;
 using Unity.Assertions;
@@ -104,6 +105,15 @@ namespace SpacialIndexing
         public bool TryGetObject(T item, out GridBoundingBox gridBoundingBox)
         {
             return m_ObjectGridBoundingBoxes.TryGetValue(item, out gridBoundingBox);
+        }
+        
+        private float GetAxis0(float3 position)
+        {
+            return position.x;
+        }
+        private float GetAxis1(float3 position)
+        {
+            return position.z;
         }
 
         public void AddPoint(T item, float3 position)
@@ -311,8 +321,11 @@ namespace SpacialIndexing
 
         private int2 GetGrid(float3 position)
         {
-            int x = (int)math.floor(position.x / m_GridSize);
-            int y = (int)math.floor(position.y / m_GridSize);
+            //int x = (int)math.floor(position.x / m_GridSize);
+            int x = (int)math.floor(GetAxis0(position) / m_GridSize);
+            //int y = (int)math.floor(position.y / m_GridSize);
+            int y = (int)math.floor(GetAxis1(position) / m_GridSize);
+            
             return new int2(x, y);
         }
 
@@ -403,6 +416,8 @@ namespace SpacialIndexing
                     Config.PushForce,
                     Config.Viscosity
                 );
+                
+                force = force.ClampMagnitude(10);
 
                 Forces.Add(pair.A, force);
                 Forces.Add(pair.B, -force);

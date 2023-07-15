@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 3002371277437535232}
   - component: {fileID: 7150572987995644157}
   - component: {fileID: 5264802498255394119}
+  - component: {fileID: 4806457316924125171}
+  - component: {fileID: -5665292594238516449}
   m_Layer: 0
   m_Name: Particle
   m_TagString: Untagged
@@ -60,7 +62,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_MotionType: 0
   m_Smoothing: 0
-  m_Mass: 1
+  m_Mass: 0.33
   m_LinearDamping: 0.01
   m_AngularDamping: 0.05
   m_InitialLinearVelocity:
@@ -115,9 +117,9 @@ MonoBehaviour:
     y: 0
     z: 0
   m_PrimitiveSize:
-    x: 2
-    y: 2
-    z: 2
+    x: 0.74
+    y: 0.74
+    z: 0.74
   m_PrimitiveOrientation:
     Value:
       x: 0
@@ -125,15 +127,15 @@ MonoBehaviour:
       z: 0
     RotationOrder: 4
   m_Capsule:
-    Height: 2
-    Radius: 1
+    Height: 0.74
+    Radius: 0.37
     Axis: 2
   m_Cylinder:
-    Height: 2
-    Radius: 1
+    Height: 0.74
+    Radius: 0.37
     Axis: 2
   m_CylinderSideCount: 20
-  m_SphereRadius: 1
+  m_SphereRadius: 0.37
   m_MinimumSkinnedVertexWeight: 0.1
   m_ConvexHullGenerationParameters:
     m_SimplificationTolerance: 0.015
@@ -240,3 +242,53 @@ MonoBehaviour:
         Tag07: 0
     m_SerializedVersion: 1
   m_SerializedVersion: 1
+--- !u!23 &4806457316924125171
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4605886574962999898}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: b73a5c7bbdb07484ab4b7b6cbc81670b, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &-5665292594238516449
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4605886574962999898}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}

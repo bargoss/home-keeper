@@ -73,9 +73,15 @@ namespace DefaultNamespace
         public static float3 ClampMagnitude(this float3 vector, float maxLength)
         {
             var length = math.length(vector);
+            
+            if (float.IsNaN(length))
+            {
+                return float3.zero;
+            }
+            
             if (length > maxLength)
             {
-                return vector / length * maxLength;
+                return (vector / length) * maxLength;
             }
             return vector;
         }

@@ -5,10 +5,11 @@ namespace WaterGame.Authoring
 {
     public class WaterGameConfigAuthoring : MonoBehaviour
     {
-        public float PushForce = 10;
-        public float Viscosity = 1;
-        public float InnerRadius = 2.5f;
-        public float OuterRadius = 3f;
+        public float PushForce = 193.6f;
+        public float Viscosity = 0.16f;
+        public float InnerRadius = 0.85f;
+        public float OuterRadius = 1.0f;
+        public float MaxForcePerFrame = 100.0f;
         
         
         class WaterGameConfigBaker : Baker<WaterGameConfigAuthoring>
@@ -21,7 +22,8 @@ namespace WaterGame.Authoring
                     PushForce = authoring.PushForce,
                     Viscosity = authoring.Viscosity,
                     InnerRadius = authoring.InnerRadius,
-                    OuterRadius = authoring.OuterRadius
+                    OuterRadius = authoring.OuterRadius,
+                    MaxForcePerFrame = authoring.MaxForcePerFrame
                 });
             }
         }
@@ -33,6 +35,7 @@ namespace WaterGame.Authoring
         public float Viscosity;
         public float InnerRadius;
         public float OuterRadius;
+        public float MaxForcePerFrame;
     }
     
 }

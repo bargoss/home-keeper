@@ -1,11 +1,13 @@
 ﻿using DefaultNamespace;
 using RunnerGame.Scripts.ECS.Components;
 using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
 using UnityEngine;
+using Random = Unity.Mathematics.Random;
 
 namespace RunnerGame.Scripts.ECS.Systems
 {
@@ -18,6 +20,9 @@ namespace RunnerGame.Scripts.ECS.Systems
             {
                 return;
             }
+
+            var ecb = new EntityCommandBuffer(Allocator.Temp);
+            
             var camera = gameManager.MainCamera;
             
             var playerHorizontalInput = Input.GetAxis("Horizontal");
@@ -62,7 +67,22 @@ namespace RunnerGame.Scripts.ECS.Systems
 
                 camera.position = (Vector3)localTransform.Position + new Vector3(0, 8, -15);
                 camera.LookAt(localTransform.Position);
+                
+                
+                // handle spawning of particles:
+                if (Input.GetKey(KeyCode.Space))
+                {
+                    var spawnPosition = localTransform.Position + Utility.Forward * 16 + Utility.Up * 3;
+                    var randomness = Random.CreateFromIndex((uint)(localTransform.Position.z * 1000)).NextFloat3Direction() * 3.25f;
+                    
+                    var particle = ecb.Instantiate(gameManager.ParticlePrefab);
+                    ecb.SetLocalPositionRotation(particle, spawnPosition + randomness, quaternion.identity);
+                }
+                
             }).WithoutBurst().Run();
+            
+            ecb.Playback(EntityManager);
+            ecb.Dispose();
         }
     }
 }

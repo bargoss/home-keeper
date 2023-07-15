@@ -29,10 +29,15 @@ namespace RunnerGame.Scripts.ECS.Systems
             var random = Random.CreateFromIndex((uint)(SystemAPI.Time.ElapsedTime * 3223.2323f));
             
             var ecb = new EntityCommandBuffer(Allocator.Temp);
-            foreach (var (statefulCollisionEvents, gate, localToWorld, gateEntity) in SystemAPI.Query<DynamicBuffer<StatefulCollisionEvent>, Gate, LocalToWorld>().WithEntityAccess())
+            foreach (var (statefulCollisionEvents, gate, localToWorld, gateEntity) in SystemAPI.Query<DynamicBuffer<StatefulTriggerEvent>, Gate, LocalToWorld>().WithEntityAccess())
             {
                 foreach (var statefulCollisionEvent in statefulCollisionEvents)
                 {
+                    if (statefulCollisionEvent.State != StatefulEventState.Enter)
+                    {
+                        continue;
+                    } 
+                        
                     var otherEntity = statefulCollisionEvent.GetOtherEntity(gateEntity);
                     if (
                         particleLookup.TryGetRw(otherEntity, out var particleRw))
