@@ -2,7 +2,7 @@
 using UnityEngine;
 using WaterGame.Components;
 
-namespace WaterGame.Authoring
+namespace RunnerGame.Scripts.ECS.Components
 {
     public class ParticleAuthoring : MonoBehaviour
     {

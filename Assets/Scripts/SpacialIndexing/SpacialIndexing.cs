@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using HomeKeeper.Systems;
+using SwarmRunner.Components;
 using Unity.Assertions;
 using Unity.Collections;
 using Unity.Entities;
@@ -10,7 +11,6 @@ using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
 using UnityEditor;
-using UnityEngine;
 using WaterGame.Authoring;
 using WaterGame.Components;
 

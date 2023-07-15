@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using SpacialIndexing;
+using SwarmRunner.Components;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;

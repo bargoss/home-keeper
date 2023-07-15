@@ -1,6 +1,5 @@
 ﻿using Unity.Entities;
 using UnityEngine;
-using WaterGame.Components;
 
 namespace WaterGame.Authoring
 {
