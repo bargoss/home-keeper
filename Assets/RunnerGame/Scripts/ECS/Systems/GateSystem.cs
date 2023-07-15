@@ -54,8 +54,9 @@ namespace RunnerGame.Scripts.ECS.Systems
                                 {
                                     var pos = otherPos + random.NextFloat3Direction();
                                     
-                                    var clone = ecb.Instantiate(otherEntity);
-                                    ecb.SetLocalPositionRotation(clone, pos, quaternion.identity);
+                                    // doesn't work, need to do it from a prefab
+                                    //var clone = ecb.Instantiate(otherEntity);
+                                    //ecb.SetLocalPositionRotation(clone, pos, quaternion.identity);
                                 }
                                 
                                 ecb.DestroyEntity(otherEntity);
