@@ -8,6 +8,7 @@ using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
 using UnityEngine;
+using WaterGame.Authoring;
 using WaterGame.Components;
 using WaterGame.Systems;
 

@@ -10,13 +10,7 @@ namespace WaterGame.Components
     public struct SpacialPartitioningEntry : IComponentData { }
     public struct Particle : IComponentData { }
     
-    public struct WaterGameConfig : IComponentData
-    {
-        public float PushForce;
-        public float Viscosity;
-        public float InnerRadius;
-        public float OuterRadius;
-    }
+    
     
     public struct MyPair<T> where T: unmanaged
     {

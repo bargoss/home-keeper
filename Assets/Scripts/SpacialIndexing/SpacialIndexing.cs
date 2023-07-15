@@ -11,11 +11,12 @@ using Unity.Physics;
 using Unity.Transforms;
 using UnityEditor;
 using UnityEngine;
+using WaterGame.Authoring;
 using WaterGame.Components;
 
 namespace SpacialIndexing
 {
-    
+
     public struct GridContent<T> where T : unmanaged, IEquatable<T>
     {
         //private FixedList4096Bytes<T>  m_Elements;
@@ -23,7 +24,7 @@ namespace SpacialIndexing
 
         public void Add(T item)
         {
-            
+
             if (m_Elements.Length < m_Elements.Capacity)
             {
                 m_Elements.Add(item);
@@ -34,7 +35,7 @@ namespace SpacialIndexing
                 //Debug.Log("GridContent is full");
 #endif
             }
-            
+
         }
 
         public void Remove(T item)
@@ -53,12 +54,12 @@ namespace SpacialIndexing
         {
             return m_Elements;
         }
-        
+
         public int Length()
         {
             return m_Elements.Length;
         }
-        
+
         public T Get(int index)
         {
             return m_Elements[index];
@@ -465,38 +466,40 @@ namespace SpacialIndexing
         {
             var list = new NativeList<GridContent<int>>(Allocator.Temp);
             spacialPartitioning.GetGrids(ref list);
-            
+
             var len = list.Length;
             list.Dispose();
             return len;
         }
+
         private static List<GridContent<int>> GetGrids(SpacialPartitioning<int> spacialPartitioning)
         {
             var nativeList = new NativeList<GridContent<int>>(Allocator.Temp);
             spacialPartitioning.GetGrids(ref nativeList);
-            
+
             var list = new List<GridContent<int>>();
             for (int i = 0; i < nativeList.Length; i++)
             {
                 list.Add(nativeList[i]);
             }
+
             nativeList.Dispose();
             return list;
         }
-        
-        
+
+
         [MenuItem("Tests/23151231")]
         public static void TestAdd()
         {
             var spacialPartitioning = new SpacialPartitioning<int>(10.0f);
-            spacialPartitioning.AddPoint(1, new float3(0.0f, 0.0f,0.0f));
-            spacialPartitioning.AddPoint(2, new float3(0.0f, 0.0f,0.0f));
-            spacialPartitioning.AddPoint(2, new float3(9.9f, 0.0f,0.0f));
+            spacialPartitioning.AddPoint(1, new float3(0.0f, 0.0f, 0.0f));
+            spacialPartitioning.AddPoint(2, new float3(0.0f, 0.0f, 0.0f));
+            spacialPartitioning.AddPoint(2, new float3(9.9f, 0.0f, 0.0f));
 
             Assert.AreEqual(1, GetGrids(spacialPartitioning).Count);
             Assert.AreEqual(2, GetGrids(spacialPartitioning)[0].GetItems().Length);
 
-            spacialPartitioning.AddPoint(3, new float3(10.0f, 0.0f,0.0f));
+            spacialPartitioning.AddPoint(3, new float3(10.0f, 0.0f, 0.0f));
             Assert.AreEqual(2, GetGrids(spacialPartitioning).Count);
             Assert.AreEqual(2, GetGrids(spacialPartitioning)[0].GetItems().Length);
             Assert.AreEqual(1, GetGrids(spacialPartitioning)[^1].GetItems().Length);
@@ -506,17 +509,17 @@ namespace SpacialIndexing
         public static void TestSpacialPartitioning()
         {
             var partitioning = new SpacialPartitioning<int>(10.0f);
-            partitioning.AddPoint(1, new float3(5.0f, 5.0f,0.0f));
-            partitioning.AddPoint(2, new float3(25.0f, 25.0f,0.0f));
-            partitioning.AddPoint(3, new float3(-5.0f, -5.0f,0.0f));
-            partitioning.AddPoint(4, new float3(-25.0f, -25.0f,0.0f));
+            partitioning.AddPoint(1, new float3(5.0f, 5.0f, 0.0f));
+            partitioning.AddPoint(2, new float3(25.0f, 25.0f, 0.0f));
+            partitioning.AddPoint(3, new float3(-5.0f, -5.0f, 0.0f));
+            partitioning.AddPoint(4, new float3(-25.0f, -25.0f, 0.0f));
 
             var buffer = new NativeList<int>();
-            partitioning.OverlapBox(new float3(0.0f, 0.0f,0.0f), new float3(11.0f, 11.0f,0.0f), ref buffer);
+            partitioning.OverlapBox(new float3(0.0f, 0.0f, 0.0f), new float3(11.0f, 11.0f, 0.0f), ref buffer);
             Assert.AreEqual(1, buffer.Length);
             Assert.AreEqual(1, buffer[0]);
 
-            partitioning.OverlapBox(new float3(-11.0f, -11.0f,0.0f), new float3(11.0f, 11.0f,0.0f), ref buffer);
+            partitioning.OverlapBox(new float3(-11.0f, -11.0f, 0.0f), new float3(11.0f, 11.0f, 0.0f), ref buffer);
             Assert.AreEqual(2, buffer.Length);
 
             buffer.Sort();
@@ -528,13 +531,13 @@ namespace SpacialIndexing
         public static void TestAddBox()
         {
             var partitioning = new SpacialPartitioning<int>(10.0f);
-            partitioning.AddBox(1, new float3(9.0f, 23.0f,0.0f), new float3(21.0f, 25.0f,0.0f));
+            partitioning.AddBox(1, new float3(9.0f, 23.0f, 0.0f), new float3(21.0f, 25.0f, 0.0f));
 
             var buffer = new NativeList<int>();
-            partitioning.OverlapBox(new float3(0.0f, 0.0f,0.0f), new float3(11.0f, 11.0f,0.0f), ref buffer);
+            partitioning.OverlapBox(new float3(0.0f, 0.0f, 0.0f), new float3(11.0f, 11.0f, 0.0f), ref buffer);
             Assert.AreEqual(0, buffer.Length);
 
-            partitioning.OverlapBox(new float3(0.0f, 0.0f,0.0f), new float3(21.0f, 25.0f,0.0f), ref buffer);
+            partitioning.OverlapBox(new float3(0.0f, 0.0f, 0.0f), new float3(21.0f, 25.0f, 0.0f), ref buffer);
             Assert.AreEqual(1, buffer.Length);
             Assert.AreEqual(1, buffer[0]);
         }
@@ -557,5 +560,6 @@ namespace SpacialIndexing
             Assert.AreEqual(1, GetGrids(spacialPartitioning)[^1].GetItems().Length);
         }
     }
+    
 #endif
 }

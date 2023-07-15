@@ -4,15 +4,16 @@ using WaterGame.Components;
 
 namespace WaterGame.Authoring
 {
-    public class ParticleAuthoring : MonoBehaviour {}
-    
-    public class ParticleBaker : Baker<ParticleAuthoring>
+    public class ParticleAuthoring : MonoBehaviour
     {
-        public override void Bake(ParticleAuthoring authoring)
+        class ParticleBaker : Baker<ParticleAuthoring>
         {
-            var entity = GetEntity(TransformUsageFlags.Dynamic);
-            AddComponent<SpacialPartitioningEntry>(entity);
-            AddComponent<Particle>(entity);
+            public override void Bake(ParticleAuthoring authoring)
+            {
+                var entity = GetEntity(TransformUsageFlags.Dynamic);
+                AddComponent<SpacialPartitioningEntry>(entity);
+                AddComponent<Particle>(entity);
+            }
         }
     }
 }

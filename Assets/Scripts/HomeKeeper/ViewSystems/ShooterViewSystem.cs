@@ -16,7 +16,6 @@ namespace HomeKeeper.ViewSystems
         
         protected override void OnUpdate()
         {
-            return;
             var shooterPrefab = GameResources.Instance.shooterGoViewPrefab;
             
             var commandBuffer = new EntityCommandBuffer(Allocator.Temp);

@@ -8,11 +8,6 @@ using Unity.Transforms;
 
 namespace DefaultNamespace.SwarmRunner
 {
-    public struct SwarmUnit : IComponentData
-    {
-        
-    }
-
     /*
      * SoftJoint will be on a separate entity and it will have its own trigger collider
      */
@@ -73,18 +68,4 @@ namespace DefaultNamespace.SwarmRunner
     /*
      * This will trigger the SoftJoint entities
      */
-    public struct BrakeBeamsOnCollision : IComponentData
-    {
-        
-    }
-    
-    public struct FormBeamsOnCollision : IComponentData
-    {
-        
-    }
-
-    public struct GameManagerSwarmRunnerState
-    {
-        
-    }
 }
