@@ -12,12 +12,21 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
         private Mesh m_Mesh;
         private List<Vector3> m_Vertices = new List<Vector3>();
         private List<int> m_Triangles = new List<int>();
+        private List<Vector3> m_Normals = new List<Vector3>();
         private void DrawTriangle(Vector3 a, Vector3 b, Vector3 c)
+        {
+            var normal = Vector3.Cross(b - a, c - a).normalized;
+            DrawTriangle(a, b, c, normal, normal, normal);
+        }
+        private void DrawTriangle(Vector3 a, Vector3 b, Vector3 c, Vector3 normalA, Vector3 normalB, Vector3 normalC)
         {
             var index = m_Vertices.Count;
             m_Vertices.Add(a);
             m_Vertices.Add(b);
             m_Vertices.Add(c);
+            m_Normals.Add(normalA);
+            m_Normals.Add(normalB);
+            m_Normals.Add(normalC);
             m_Triangles.Add(index);
             m_Triangles.Add(index + 1);
             m_Triangles.Add(index + 2);
@@ -96,6 +105,7 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
         {
             m_Vertices.Clear();
             m_Triangles.Clear();
+            m_Normals.Clear();
 
             var cam = Camera.main;
             if (cam != null)
@@ -125,7 +135,7 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
             
             m_Mesh.SetVertices(m_Vertices);
             m_Mesh.SetTriangles(m_Triangles, 0);
-            m_Mesh.RecalculateNormals();
+            m_Mesh.SetNormals(m_Normals);
             
             var material = GameResources.Instance.MagazineMaterial;
             Graphics.DrawMesh(m_Mesh, Matrix4x4.identity, material, 0);
