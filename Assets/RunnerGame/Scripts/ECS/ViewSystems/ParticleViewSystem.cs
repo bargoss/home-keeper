@@ -87,7 +87,7 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
                     //var normal = ((Vector3)localToWorld.Position - camPos).normalized;
                     if (((Vector3)localToWorld.Position - Vector3.zero).sqrMagnitude < 1000)
                     {
-                        DrawQuad(localToWorld.Position, 1.1f, Quaternion.LookRotation(-camForward));
+                        DrawQuad(localToWorld.Position, 0.8f, Quaternion.LookRotation(-camForward));
                         //DrawQuad(localToWorld.Position, 1.1f, Quaternion.LookRotation(-normal));
                         //Draw4FacedPyramid(localToWorld.Position, 1f);
                     }
