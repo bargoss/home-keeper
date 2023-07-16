@@ -1338,7 +1338,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1490115094}
   m_LocalRotation: {x: 0.24253564, y: 0, z: 0, w: 0.97014254}
-  m_LocalPosition: {x: 0.39407435, y: 8, z: 142.13551}
+  m_LocalPosition: {x: 0.5737053, y: 8, z: 51.067123}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1565,7 +1565,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PushForce: 73.2
-  Viscosity: 0.1
+  Viscosity: 0.22
   InnerRadius: 0.56
   OuterRadius: 0.64
   MaxForcePerFrame: 0
