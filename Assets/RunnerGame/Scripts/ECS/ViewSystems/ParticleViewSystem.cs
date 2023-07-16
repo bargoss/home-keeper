@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using RunnerGame.Scripts.ECS.Components;
 using Unity.Entities;
+using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 
@@ -13,6 +15,10 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
         private List<Vector3> m_Vertices = new List<Vector3>();
         private List<int> m_Triangles = new List<int>();
         private List<Vector3> m_Normals = new List<Vector3>();
+        
+        private List<Vector3>  m_ChunkVertices = new List<Vector3>();
+        private List<int>  m_ChunkTriangles = new List<int>();
+        private List<Vector3>  m_ChunkNormals = new List<Vector3>();
         private void DrawTriangle(Vector3 a, Vector3 b, Vector3 c)
         {
             var normal = Vector3.Cross(b - a, c - a).normalized;
@@ -106,8 +112,85 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
                 DrawTriangle(v0, v1, v2, n0, n1, n2);
             }
         }
-        
-        
+
+        private void Draw()
+        {
+            int maxVerticesPerMesh = 65535;
+            int maxTrianglesPerMesh = maxVerticesPerMesh / 3;
+            
+            int triangleCount = 0;
+            int vertexIndexOffset = 0;
+
+
+            m_Mesh.Clear();
+            while (triangleCount < m_Triangles.Count/3)
+            {
+                int triangleCountInThisMesh = Mathf.Min(maxTrianglesPerMesh, m_Triangles.Count/3 - triangleCount);
+                m_ChunkVertices.Clear();
+                m_ChunkTriangles.Clear();
+                m_ChunkNormals.Clear();
+                for (int i = 0; i < triangleCountInThisMesh; i += 1)
+                {
+                    m_ChunkVertices.Add(m_Vertices[triangleCount + i * 3]);
+                    m_ChunkVertices.Add(m_Vertices[triangleCount + i * 3 + 1]);
+                    m_ChunkVertices.Add(m_Vertices[triangleCount + i * 3 + 2]);
+                    m_ChunkTriangles.Add(i * 3);
+                    m_ChunkTriangles.Add(i * 3 + 1);
+                    m_ChunkTriangles.Add(i * 3 + 2);
+                    m_ChunkNormals.Add(m_Normals[triangleCount + i * 3]);
+                    m_ChunkNormals.Add(m_Normals[triangleCount + i * 3 + 1]);
+                    m_ChunkNormals.Add(m_Normals[triangleCount + i * 3 + 2]);
+                }
+                
+                //var posSum = vertices.Aggregate(Vector3.zero, (current, vertex) => current + vertex);
+                //var center = posSum / vertices.Count;
+                var center = Camera.main.transform.position;
+                for (var i = 0; i < m_ChunkVertices.Count; i++)
+                {
+                    m_ChunkVertices[i] -= center;
+                }
+                
+                m_Mesh.SetVertices(m_ChunkVertices);
+                //for (var i = 0; i < vertices.Count / 3; i++)
+                //{
+                //    Debug.DrawLine(vertices[i * 3], vertices[i * 3 + 1], Color.red);
+                //    Debug.DrawLine(vertices[i * 3 + 1], vertices[i * 3 + 2], Color.red);
+                //    Debug.DrawLine(vertices[i * 3 + 2], vertices[i * 3], Color.red);
+                //}
+                m_Mesh.SetTriangles(m_ChunkTriangles, 0);
+                m_Mesh.SetNormals(m_ChunkNormals);
+                m_Mesh.RecalculateBounds();
+                Graphics.DrawMesh(m_Mesh, Matrix4x4.TRS(center, quaternion.identity, Vector3.one), GameResources.Instance.MagazineMaterial, 0);
+                
+                triangleCount += triangleCountInThisMesh;
+            }
+            
+            //for (int i = 0; i < m_Triangles.Count; i += 3)
+            //{
+            //    vertices.Add(m_Vertices[m_Triangles[i]]);
+            //    vertices.Add(m_Vertices[m_Triangles[i + 1]]);
+            //    vertices.Add(m_Vertices[m_Triangles[i + 2]]);
+            //    triangles.Add(vertexIndexOffset);
+            //    triangles.Add(vertexIndexOffset + 1);
+            //    triangles.Add(vertexIndexOffset + 2);
+            //    normals.Add(m_Normals[m_Triangles[i]]);
+            //    normals.Add(m_Normals[m_Triangles[i + 1]]);
+            //    normals.Add(m_Normals[m_Triangles[i + 2]]);
+            //    triangleCount++;
+            //    vertexIndexOffset += 3;
+            //}
+            //
+            //m_Mesh.SetVertices(vertices);
+            //m_Mesh.SetTriangles(triangles, 0);
+            //m_Mesh.SetNormals(normals);
+            //Graphics.DrawMesh(m_Mesh, Matrix4x4.identity, GameResources.Instance.MagazineMaterial, 0);
+        }
+
+        protected override void OnCreate()
+        {
+            m_Mesh = new Mesh();
+        }
+
         protected override void OnUpdate()
         {
             m_Vertices.Clear();
@@ -123,32 +206,15 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
                 Entities.ForEach((in ParticleView particleView, in LocalToWorld localToWorld) =>
                 {
                     var normal = ((Vector3)localToWorld.Position - camPos).normalized;
-                    if (((Vector3)localToWorld.Position - Vector3.zero).sqrMagnitude < 1000)
+                    if (((Vector3)localToWorld.Position - Vector3.zero).sqrMagnitude < 10000 * 10000)
                     {
                         //DrawQuad(localToWorld.Position, 0.8f, Quaternion.LookRotation(-camForward));
-                        DrawCone((Vector3)localToWorld.Position + normal * 0.8f * 1.5f, -normal * 0.8f *3f, 0.8f, 10);
+                        DrawCone((Vector3)localToWorld.Position + normal * 0.8f * 1.5f, -normal * 0.8f *3f, 0.8f, 4);
                     }
                 }).WithoutBurst().Run();
             }
 
-            if (m_Mesh == null)
-            {
-                m_Mesh = new Mesh();
-            }
-            else
-            {
-                m_Mesh.Clear();
-            }
-            
-            m_Mesh.SetVertices(m_Vertices);
-            m_Mesh.SetTriangles(m_Triangles, 0);
-            m_Mesh.SetNormals(m_Normals);
-            //m_Mesh.RecalculateBounds();
-            // set the bounds infinite
-            m_Mesh.bounds = new Bounds(Vector3.zero, Vector3.one * 1000000);
-            
-            var material = GameResources.Instance.MagazineMaterial;
-            Graphics.DrawMesh(m_Mesh, Matrix4x4.identity, material, 0);
+            Draw();
         }
     }
 }

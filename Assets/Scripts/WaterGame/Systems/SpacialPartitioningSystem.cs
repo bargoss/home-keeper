@@ -17,7 +17,7 @@ namespace WaterGame.Systems
             var e = commandBuffer.CreateEntity();
             commandBuffer.AddComponent(e, new SpacialPartitioningSingleton()
             {
-                Partitioning = new SpacialPartitioning<Entity>(1f, Allocator.Persistent)
+                Partitioning = new SpacialPartitioning<Entity>(0.65f, Allocator.Persistent)
             });
             commandBuffer.Playback(state.EntityManager);
             commandBuffer.Dispose();

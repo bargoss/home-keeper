@@ -26,7 +26,7 @@ namespace DefaultNamespace
         {
             //GUI.Label(new Rect(0, 0, 200, 200), "FPS: " + _fps);
             // like that but scale according to screen size
-            GUI.Label(new Rect(0, 0, Screen.width * 0.1f, Screen.height * 0.1f), "FPS: " + _fps);
+            GUI.Label(new Rect(0, 0, Screen.width * 0.2f, Screen.height * 0.2f), "FPS: " + _fps);
         }
     }
 }

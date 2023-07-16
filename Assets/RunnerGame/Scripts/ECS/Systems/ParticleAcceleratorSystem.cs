@@ -21,7 +21,9 @@ namespace RunnerGame.Scripts.ECS.Systems
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            state.CompleteDependency();
+            state.CompleteDependency(); // we get errors without this
+            
+            //foreach (var (particleAccelerator, localToWorld, entity) in SystemAPI.Query<ParticleAccelerator, LocalToWorld>().WithEntityAccess())
             foreach (var (particleAccelerator, localToWorld, statefulTriggerEvents, entity) in SystemAPI.Query<ParticleAccelerator, LocalToWorld, DynamicBuffer<StatefulTriggerEvent>>().WithEntityAccess())
             {
                 foreach (var statefulTriggerEvent in statefulTriggerEvents)

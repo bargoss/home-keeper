@@ -14,6 +14,7 @@ namespace RunnerGame.Scripts.ECS.Systems
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     public partial class GameManagerSystem : SystemBase
     {
+        private int m_SpawnedCount = 0;
         protected override void OnUpdate()
         {
             if (!SystemAPI.ManagedAPI.TryGetSingleton<RgGameManager>(out var gameManager))
@@ -74,13 +75,15 @@ namespace RunnerGame.Scripts.ECS.Systems
 
 
                 // handle spawning of particles:
-                if (Input.GetKey(KeyCode.Space))
+                if (Input.GetKey(KeyCode.Space) || m_SpawnedCount < 500)
                 {
                     var spawnPosition = localTransform.Position + Utility.Forward * 16 + Utility.Up * 3;
                     var randomness = Random.CreateFromIndex((uint)(localTransform.Position.z * 1000)).NextFloat3Direction() * 3.25f;
                     
                     var particle = ecb.Instantiate(gameManager.ParticlePrefab);
                     ecb.SetLocalPositionRotation(particle, spawnPosition + randomness, quaternion.identity);
+
+                    m_SpawnedCount++;
                 }
                 
             }).WithoutBurst().Run();
