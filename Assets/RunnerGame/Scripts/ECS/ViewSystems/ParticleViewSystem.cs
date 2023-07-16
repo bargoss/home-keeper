@@ -96,7 +96,14 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
             // Draw triangles connecting the tip to the base circle vertices
             for (int i = 0; i < baseCircleVertices.Count; i++)
             {
-                DrawTriangle(baseCircleVertices[i], tipPosition, baseCircleVertices[(i + 1) % baseCircleVertices.Count]);
+                var v0 = baseCircleVertices[i];
+                var v1 = tipPosition;
+                var v2 = baseCircleVertices[(i + 1) % baseCircleVertices.Count];
+                var n0 = (v0 - center).normalized;
+                var n1 = (v1 - center).normalized;
+                var n2 = (v2 - center).normalized;
+                
+                DrawTriangle(v0, v1, v2, n0, n1, n2);
             }
         }
         
@@ -119,7 +126,7 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
                     if (((Vector3)localToWorld.Position - Vector3.zero).sqrMagnitude < 1000)
                     {
                         //DrawQuad(localToWorld.Position, 0.8f, Quaternion.LookRotation(-camForward));
-                        DrawCone(localToWorld.Position, -normal * 0.8f, 0.8f, 4);
+                        DrawCone((Vector3)localToWorld.Position + normal * 0.8f * 1.5f, -normal * 0.8f *3f, 0.8f, 10);
                     }
                 }).WithoutBurst().Run();
             }
@@ -136,6 +143,9 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
             m_Mesh.SetVertices(m_Vertices);
             m_Mesh.SetTriangles(m_Triangles, 0);
             m_Mesh.SetNormals(m_Normals);
+            //m_Mesh.RecalculateBounds();
+            // set the bounds infinite
+            m_Mesh.bounds = new Bounds(Vector3.zero, Vector3.one * 1000000);
             
             var material = GameResources.Instance.MagazineMaterial;
             Graphics.DrawMesh(m_Mesh, Matrix4x4.identity, material, 0);
