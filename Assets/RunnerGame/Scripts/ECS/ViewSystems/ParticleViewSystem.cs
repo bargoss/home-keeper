@@ -55,14 +55,13 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
             m_Triangles.Add(index + 2);
         }
 
-        private void DrawQuad(Vector3 center, float edgeLen, Vector3 normal)
+        private void DrawQuad(Vector3 center, float edgeLen, Quaternion rotation)
         {
-            normal *= -1;
             var index = m_Vertices.Count;
-            m_Vertices.Add(center + new Vector3(-edgeLen, -edgeLen, 0));
-            m_Vertices.Add(center + new Vector3(edgeLen, -edgeLen, 0));
-            m_Vertices.Add(center + new Vector3(edgeLen, edgeLen, 0));
-            m_Vertices.Add(center + new Vector3(-edgeLen, edgeLen, 0));
+            m_Vertices.Add(center + rotation * new Vector3(-edgeLen, -edgeLen, 0));
+            m_Vertices.Add(center + rotation * new Vector3(edgeLen, -edgeLen, 0));
+            m_Vertices.Add(center + rotation * new Vector3(edgeLen, edgeLen, 0));
+            m_Vertices.Add(center + rotation * new Vector3(-edgeLen, edgeLen, 0));
             m_Triangles.Add(index);
             m_Triangles.Add(index + 1);
             m_Triangles.Add(index + 2);
@@ -81,14 +80,16 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
             if (cam != null)
             {
                 var camPos = cam.transform.position;
+                var camForward = cam.transform.forward;
 
                 Entities.ForEach((in ParticleView particleView, in LocalToWorld localToWorld) =>
                 {
-                    var normal = ((Vector3)localToWorld.Position - camPos).normalized;
+                    //var normal = ((Vector3)localToWorld.Position - camPos).normalized;
                     if (((Vector3)localToWorld.Position - Vector3.zero).sqrMagnitude < 1000)
                     {
-                        DrawQuad(localToWorld.Position, 2, normal);
-                        Draw4FacedPyramid(localToWorld.Position, 1f);
+                        DrawQuad(localToWorld.Position, 1.1f, Quaternion.LookRotation(-camForward));
+                        //DrawQuad(localToWorld.Position, 1.1f, Quaternion.LookRotation(-normal));
+                        //Draw4FacedPyramid(localToWorld.Position, 1f);
                     }
                 }).WithoutBurst().Run();
             }
