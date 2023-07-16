@@ -78,18 +78,21 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
             m_Triangles.Clear();
 
             var cam = Camera.main;
-            var camPos = cam.transform.position;
-
-            Entities.ForEach((in ParticleView particleView, in LocalToWorld localToWorld) =>
+            if (cam != null)
             {
-                var normal = ((Vector3)localToWorld.Position - camPos).normalized;
-                if (((Vector3)localToWorld.Position - Vector3.zero).sqrMagnitude < 1000)
+                var camPos = cam.transform.position;
+
+                Entities.ForEach((in ParticleView particleView, in LocalToWorld localToWorld) =>
                 {
-                    DrawQuad(localToWorld.Position, 2, normal);
-                    Draw4FacedPyramid(localToWorld.Position, 1f);
-                }
-            }).WithoutBurst().Run();
-            
+                    var normal = ((Vector3)localToWorld.Position - camPos).normalized;
+                    if (((Vector3)localToWorld.Position - Vector3.zero).sqrMagnitude < 1000)
+                    {
+                        DrawQuad(localToWorld.Position, 2, normal);
+                        Draw4FacedPyramid(localToWorld.Position, 1f);
+                    }
+                }).WithoutBurst().Run();
+            }
+
             if (m_Mesh == null)
             {
                 m_Mesh = new Mesh();

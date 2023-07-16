@@ -23,7 +23,8 @@ namespace RunnerGame.Scripts.ECS.Systems
 
             var ecb = new EntityCommandBuffer(Allocator.Temp);
             
-            var camera = gameManager.MainCamera;
+            var camera = Camera.main;
+            
             
             var playerHorizontalInput = Input.GetAxis("Horizontal");
             
@@ -63,12 +64,15 @@ namespace RunnerGame.Scripts.ECS.Systems
                 physicsVelocity.Linear = velocity;
                 physicsVelocity.Angular = angularVelocity;
                 localTransform.Rotation = quaternion.LookRotation(Utility.Forward, Utility.Up);
-                
 
-                camera.position = (Vector3)localTransform.Position + new Vector3(0, 8, -15);
-                camera.LookAt(localTransform.Position);
-                
-                
+
+                if (camera != null)
+                {
+                    camera.transform.position = (Vector3)localTransform.Position + new Vector3(0, 8, -15);
+                    camera.transform.LookAt(localTransform.Position);
+                }
+
+
                 // handle spawning of particles:
                 if (Input.GetKey(KeyCode.Space))
                 {

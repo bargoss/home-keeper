@@ -9,7 +9,6 @@ namespace RunnerGame.Scripts.ECS.Components
         public float PlayerForwardSpeed = 1;
         public float PlayerSidewaysP = 1;
         public float PlayerSidewaysD = 0.1f;
-        public Transform MainCamera;
         public float RoadWidth = 10;
         
         // prefabs
@@ -28,7 +27,6 @@ namespace RunnerGame.Scripts.ECS.Components
                         PlayerForwardSpeed = authoring.PlayerForwardSpeed,
                         PlayerSidewaysP = authoring.PlayerSidewaysP,
                         PlayerSidewaysD = authoring.PlayerSidewaysD,
-                        MainCamera = authoring.MainCamera,
                         PlayerPrefab = GetEntity(authoring.PlayerPrefab, TransformUsageFlags.Dynamic),
                         ParticlePrefab = GetEntity(authoring.ParticlePrefab, TransformUsageFlags.Dynamic),
                         RoadWidth = authoring.RoadWidth,
@@ -43,7 +41,6 @@ namespace RunnerGame.Scripts.ECS.Components
         public float PlayerForwardSpeed;
         public float PlayerSidewaysP;
         public float PlayerSidewaysD;
-        public Transform MainCamera;
         public Entity PlayerPrefab;
         public Entity ParticlePrefab;
 
