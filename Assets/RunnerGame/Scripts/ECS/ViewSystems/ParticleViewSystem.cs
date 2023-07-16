@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using HomeKeeper.Components;
 using RunnerGame.Scripts.ECS.Components;
 using Unity.Entities;
 using Unity.Transforms;
@@ -10,7 +9,6 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
     [UpdateInGroup(typeof(LateSimulationSystemGroup))]
     public partial class ItemViewSystem : SystemBase
     {
-        //private readonly List<Matrix4x4> m_MagazineMatrices = new();
         private Mesh m_Mesh;
         private List<Vector3> m_Vertices = new List<Vector3>();
         private List<int> m_Triangles = new List<int>();
@@ -70,6 +68,29 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
             m_Triangles.Add(index + 3);
         }
         
+        private void DrawCone(Vector3 center, Vector3 tipOffset, float baseRadius, int baseEdgeCount)
+        {
+            var direction = (center - (center + tipOffset)).normalized;
+            var rotation = Quaternion.LookRotation(direction);
+            var baseCircleVertices = new List<Vector3>();
+            var tipPosition = center + tipOffset;
+
+            // Calculate the vertices of the base circle
+            for (int i = 0; i < baseEdgeCount; i++)
+            {
+                float angle = 2 * Mathf.PI * i / baseEdgeCount;
+                float x = baseRadius * Mathf.Cos(angle);
+                float y = baseRadius * Mathf.Sin(angle);
+                baseCircleVertices.Add(center + rotation * new Vector3(x, y, 0));
+            }
+
+            // Draw triangles connecting the tip to the base circle vertices
+            for (int i = 0; i < baseCircleVertices.Count; i++)
+            {
+                DrawTriangle(baseCircleVertices[i], tipPosition, baseCircleVertices[(i + 1) % baseCircleVertices.Count]);
+            }
+        }
+        
         
         protected override void OnUpdate()
         {
@@ -84,12 +105,11 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
 
                 Entities.ForEach((in ParticleView particleView, in LocalToWorld localToWorld) =>
                 {
-                    //var normal = ((Vector3)localToWorld.Position - camPos).normalized;
+                    var normal = ((Vector3)localToWorld.Position - camPos).normalized;
                     if (((Vector3)localToWorld.Position - Vector3.zero).sqrMagnitude < 1000)
                     {
-                        DrawQuad(localToWorld.Position, 0.8f, Quaternion.LookRotation(-camForward));
-                        //DrawQuad(localToWorld.Position, 1.1f, Quaternion.LookRotation(-normal));
-                        //Draw4FacedPyramid(localToWorld.Position, 1f);
+                        //DrawQuad(localToWorld.Position, 0.8f, Quaternion.LookRotation(-camForward));
+                        DrawCone(localToWorld.Position, -normal * 0.8f, 0.8f, 4);
                     }
                 }).WithoutBurst().Run();
             }
@@ -107,14 +127,8 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
             m_Mesh.SetTriangles(m_Triangles, 0);
             m_Mesh.RecalculateNormals();
             
-            //var mesh = GameResources.Instance.MagazineMesh;
             var material = GameResources.Instance.MagazineMaterial;
-            //material.enableInstancing = true;
-            
             Graphics.DrawMesh(m_Mesh, Matrix4x4.identity, material, 0);
-            //Graphics.DrawMeshInstanced(mesh, 0, material, m_MagazineMatrices);
-            
-            //m_MagazineMatrices.Clear();
         }
     }
 }
