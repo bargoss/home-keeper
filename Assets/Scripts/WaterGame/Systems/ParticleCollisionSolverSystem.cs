@@ -13,50 +13,34 @@ using WaterGame.Components;
 
 namespace WaterGame.Systems
 {
-    public struct MyJob : IJobParallelFor
-    {
-        public NativeArray<MyPair<Entity>> NeighbourPairs;
-        public ComponentLookup<PhysicsVelocity> PhysicsVelocityLookup;
-        public ComponentLookup<LocalToWorld> LocalToWorld;
-
-        public void Execute(int index)
-        {
-            foreach (var neighbourPair in NeighbourPairs)
-            {
-                
-            }
-        }
-    }
-
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     [UpdateAfter(typeof(SpacialPartitioningSystem))]
     public partial struct ParticleCollisionSolverSystem : ISystem
     {
-        NativeList<Entity> m_Neighbours;
         NativeHashMap<Entity, float3> m_VelocityCache;
-        NativeList<MyPair<Entity>> m_NeighboursCache;
+        NativeHashMap<Entity, float3> m_PositionsCache;
+        NativeList<NativeList<Entity>> m_ListPool;
         
-        NativeArray<int2> m_GridKeys;
-        NativeParallelMultiHashMap<Entity, float3> m_Forces;
-
-        
-        
-
         public void OnCreate(ref SystemState state)
         {
-            m_Neighbours = new NativeList<Entity>(Allocator.Persistent);
             m_VelocityCache = new NativeHashMap<Entity, float3>(100000, Allocator.Persistent);
-            m_NeighboursCache = new NativeList<MyPair<Entity>>(Allocator.Persistent);
-            m_GridKeys = new NativeArray<int2>(4000, Allocator.Persistent);
-            m_Forces = new NativeParallelMultiHashMap<Entity, float3>(100000, Allocator.Persistent);
+            m_PositionsCache = new NativeHashMap<Entity, float3>(100000, Allocator.Persistent);
+            m_ListPool = new NativeList<NativeList<Entity>>(64, Allocator.Persistent);
+            
+            for (int i = 0; i < 64; i++)
+            {
+                m_ListPool.Add(new NativeList<Entity>(50, Allocator.Persistent));
+            }
         }
         public void OnDestroy(ref SystemState state)
         {
-            m_Neighbours.Dispose();
             m_VelocityCache.Dispose();
-            m_NeighboursCache.Dispose();
-            m_GridKeys.Dispose();
-            m_Forces.Dispose();
+            m_PositionsCache.Dispose();
+            foreach (var list in m_ListPool)
+            {
+                list.Dispose();
+            }
+            m_ListPool.Dispose();
         }
 
         [BurstCompile]
@@ -71,138 +55,31 @@ namespace WaterGame.Systems
                     PushForce = 73.2f,
                     InnerRadius = 0.56f,
                     OuterRadius = 0.64f,
+                    MaxForcePerFrame = 100f,
                 };
             }
             
-            //var myJob = new MyJob()
-            //{
-            //    Data = new NativeArray<int>(100, Allocator.TempJob)
-            //};
-            //myJob.Schedule(64, 1, state.Dependency).Complete();
-
-            var physicsVelocityLookup = SystemAPI.GetComponentLookup<PhysicsVelocity>();
-            var localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>();
-            
             m_VelocityCache.Clear();
+            m_PositionsCache.Clear();
+            
             foreach (var (physicsVelocity, localToWorld, particle, entity) in SystemAPI.Query<PhysicsVelocity, LocalToWorld, Particle>().WithEntityAccess())
             {
                 m_VelocityCache.TryAdd(entity, physicsVelocity.Linear);
-            }
-
-            // clear m_GridKeys
-            var gridKeysTemp = spacialPartitioning.GetGridKeyArray(Allocator.Temp);
-            for (var i = 0; i < gridKeysTemp.Length; i++)
-            {
-                var int2 = gridKeysTemp[i];
-                m_GridKeys[i] = int2;
+                m_PositionsCache.TryAdd(entity, localToWorld.Position);
             }
             
-            var gridKeyCount = gridKeysTemp.Length;
-            
-            m_Forces.Clear();
-            
-            new SpacialPartitioning<Entity>.SolveCollisionsJob
+            state.Dependency = new SolveCollisionsJob()
             {
-                Config = config,
-                Forces = m_Forces.AsParallelWriter(),
-                DeltaTime = 0.02f,
-                GridKeys = m_GridKeys,
-                GridKeysCount = gridKeyCount,
                 SpacialPartitioning = spacialPartitioning,
-                PhysicsVelocityLookup = physicsVelocityLookup,
-                LocalToWorldLookup = localToWorldLookup
-            }.Schedule(gridKeyCount, 1).Complete();
-            
-            foreach (var (physicsVelocityRw, localToWorld, particle, entity) in SystemAPI.Query<RefRW<PhysicsVelocity>, LocalToWorld, Particle>().WithEntityAccess())
-            {
-                var physicsVelocity = physicsVelocityRw.ValueRO;
-                
-                var totalForceOnEntity = float3.zero;
-                if (m_Forces.ContainsKey(entity))
-                {
-                    foreach (var force in m_Forces.GetValuesForKey(entity))
-                    {
-                        totalForceOnEntity += force;
-                    }
-
-                    if (totalForceOnEntity.Equals(float3.zero)) continue;
-
-                    physicsVelocity.Linear += totalForceOnEntity;
-                    physicsVelocityRw.ValueRW = physicsVelocity;
-                }
-            }
+                Config = config,
+                Positions = m_PositionsCache,
+                Velocities = m_VelocityCache,
+                DeltaTime = 0.02f,
+                ListPool = m_ListPool,
+            }.ScheduleParallel(state.Dependency);
         }
         
-        [BurstCompile]
-        public void OnUpdate2(ref SystemState state)
-        {
-            var partitioning = SystemAPI.GetSingletonRW<SpacialPartitioningSingleton>().ValueRO.Partitioning;
-            if (!SystemAPI.TryGetSingleton<WaterGameConfig>(out var config))
-            {
-                config = new WaterGameConfig()
-                {
-                    Viscosity = 0.16f,
-                    PushForce = 83.6f,
-                    InnerRadius = 0.85f,
-                    OuterRadius = 1
-                };
-            }
-            
-            //var myJob = new MyJob()
-            //{
-            //    Data = new NativeArray<int>(100, Allocator.TempJob)
-            //};
-            //myJob.Schedule(64, 1, state.Dependency).Complete();
-
-            var physicsVelocityLookup = SystemAPI.GetComponentLookup<PhysicsVelocity>();
-            var localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>();
-            
-            m_VelocityCache.Clear();
-            foreach (var (physicsVelocity, localToWorld, particle, entity) in SystemAPI.Query<PhysicsVelocity, LocalToWorld, Particle>().WithEntityAccess())
-            {
-                m_VelocityCache.TryAdd(entity, physicsVelocity.Linear);
-            }
-
-            m_NeighboursCache.Clear();
-            partitioning.GetAllNeighbours(ref m_NeighboursCache);
-            foreach (var pair in m_NeighboursCache)
-            {
-                var particleA =pair.A;
-                var particleB =pair.B;
-                
-                var physicsVelocityRwA = physicsVelocityLookup.GetRefRW(particleA);
-                var physicsVelocityRwB = physicsVelocityLookup.GetRefRW(particleB);
-                
-                var posA = localToWorldLookup.GetRefRO(particleA).ValueRO.Position;
-                var posB = localToWorldLookup.GetRefRO(particleB).ValueRO.Position;
-                
-                var velA = m_VelocityCache[particleA];
-                var velB = m_VelocityCache[particleB];
-                
-                var force = CalculateCollisionForce(
-                    new ForcePoint()
-                    {
-                        Position = posA,
-                        Velocity = velA,
-                        OuterRadius = config.OuterRadius,
-                        InnerRadius = config.InnerRadius
-                    },
-                    new ForcePoint()
-                    {
-                        Position = posB,
-                        Velocity = velB,
-                        OuterRadius = config.OuterRadius,
-                        InnerRadius = config.InnerRadius
-                    },
-                    SystemAPI.Time.DeltaTime,
-                    config.PushForce,
-                    config.Viscosity
-                );
-                
-                physicsVelocityRwA.ValueRW.Linear += force;
-                physicsVelocityRwB.ValueRW.Linear -= force;
-            }
-        }
+        
         
         public struct ForcePoint
         {
@@ -252,50 +129,27 @@ namespace WaterGame.Systems
             }
         }
     }
-}
-/*
-            foreach (var (physicsVelocityRw, localToWorld, particle, entity) in SystemAPI.Query<RefRW<PhysicsVelocity>, LocalToWorld, Particle>().WithEntityAccess())
+    
+    [BurstCompile]
+    public partial struct ApplyForcesJob : IJobEntity
+    {
+        [ReadOnly] public NativeParallelMultiHashMap<Entity, float3> Forces;
+        
+        public void Execute(Entity entity, ref PhysicsVelocity physicsVelocity)
+        {
+            if (!Forces.ContainsKey(entity))
+                return;
+        
+            var totalForce = float3.zero;
+            foreach (var force in Forces.GetValuesForKey(entity))
             {
-                var physicsVelocityLinear = m_VelocityCache[entity];
-                // public void OverlapCircle(float3 center, float radius, ref NativeList<T> buffer)
-                
-                m_Neighbours.Clear();
-                partitioning.OverlapCircle(localToWorld.Position, config.OuterRadius, ref m_Neighbours);
-                
-                foreach (var neighbour in m_Neighbours)
-                {
-                    if (neighbour == entity) continue;
-
-                    if (
-                        localToWorldLookup.TryGetComponent(neighbour, out var neighbourLocalToWorld) &&
-                        m_VelocityCache.TryGetValue(neighbour, out var neighbourPhysicsVelocityLinear)
-                    )
-                    {
-                        var force = CalculateCollisionForce(
-                            new ForcePoint()
-                            {
-                                Position = localToWorld.Position,
-                                Velocity = physicsVelocityLinear,
-                                OuterRadius = config.OuterRadius,
-                                InnerRadius = config.InnerRadius
-                            },
-                            new ForcePoint()
-                            {
-                                Position = neighbourLocalToWorld.Position,
-                                Velocity = neighbourPhysicsVelocityLinear,
-                                OuterRadius = config.OuterRadius,
-                                InnerRadius = config.InnerRadius
-                            },
-                            SystemAPI.Time.DeltaTime,
-                            config.PushForce,
-                            config.Viscosity
-                        );
-                        physicsVelocityLinear += force;
-                    }
-                }
-
-                var physicsVelocity = physicsVelocityRw.ValueRO;
-                physicsVelocity.Linear = physicsVelocityLinear;
-                physicsVelocityRw.ValueRW = physicsVelocity;
+                totalForce += force;
             }
-            */
+
+            if (totalForce.Equals(float3.zero)) 
+                return;
+        
+            physicsVelocity.Linear += totalForce;
+        }
+    }
+}

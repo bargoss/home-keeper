@@ -2,16 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using DefaultNamespace;
-using HomeKeeper.Systems;
-using SwarmRunner.Components;
-using Unity.Assertions;
+using RunnerGame.Scripts.ECS.Components;
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
-using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
-using UnityEditor;
 using WaterGame.Authoring;
 using WaterGame.Components;
 using ParticleCollisionSolverSystem = WaterGame.Systems.ParticleCollisionSolverSystem;
@@ -378,204 +375,66 @@ namespace SpacialIndexing
                 }
             }
         }
-
-        public struct SolveCollisionsJob : IJobParallelFor
-        {
-            [WriteOnly] public NativeParallelMultiHashMap<Entity, float3>.ParallelWriter Forces;
-            [ReadOnly] public NativeArray<int2> GridKeys;
-            [ReadOnly] public int GridKeysCount;
-            [ReadOnly] public SpacialPartitioning<Entity> SpacialPartitioning;
-            [ReadOnly] public ComponentLookup<PhysicsVelocity> PhysicsVelocityLookup;
-            [ReadOnly] public ComponentLookup<LocalToWorld> LocalToWorldLookup;
-            [ReadOnly] public WaterGameConfig Config;
-            [ReadOnly] public float DeltaTime;
-
-            private void SolveCollision(MyPair<Entity> pair)
-            {
-                var posA = LocalToWorldLookup[pair.A].Position;
-                var velA = PhysicsVelocityLookup[pair.A].Linear;
-                var posB = LocalToWorldLookup[pair.B].Position;
-                var velB = PhysicsVelocityLookup[pair.B].Linear;
-
-                var force = ParticleCollisionSolverSystem.CalculateCollisionForce(
-                    new ParticleCollisionSolverSystem.ForcePoint()
-                    {
-                        Position = posA,
-                        Velocity = velA,
-                        OuterRadius = Config.OuterRadius,
-                        InnerRadius = Config.InnerRadius
-                    },
-                    new ParticleCollisionSolverSystem.ForcePoint()
-                    {
-                        Position = posB,
-                        Velocity = velB,
-                        OuterRadius = Config.OuterRadius,
-                        InnerRadius = Config.InnerRadius
-                    },
-                    DeltaTime,
-                    Config.PushForce,
-                    Config.Viscosity
-                );
-                
-                force = force.ClampMagnitude(10);
-
-                Forces.Add(pair.A, force);
-                Forces.Add(pair.B, -force);
-            }
-
-            public void Execute(int index)
-            {
-                var neighbourDeltas = new FixedList512Bytes<MyPair<int>>
-                {
-                    new(1, 0),
-                    new(1, 1),
-                    new(0, 1),
-                    new(-1, 1)
-                };
-
-                var myGridKey = GridKeys[index];
-                var myGridContent = SpacialPartitioning.m_Grids[myGridKey];
-                {
-                    for (int i = 0; i < myGridContent.Length(); i++)
-                    {
-                        for (int j = 0; j < i; j++)
-                        {
-                            SolveCollision(new MyPair<Entity>(myGridContent.Get(i), myGridContent.Get(j)));
-                        }
-                    }
-
-                    foreach (var pair in neighbourDeltas)
-                    {
-                        var i = pair.A;
-                        var j = pair.B;
-
-                        var neighbourGridKey = new int2(myGridKey.x + i, myGridKey.y + j);
-                        if (SpacialPartitioning.m_Grids.TryGetValue(neighbourGridKey, out var neighbourGridContent))
-                        {
-                            for (var myElementIndex = 0; myElementIndex < myGridContent.Length(); myElementIndex++)
-                            {
-                                var myElement = myGridContent.Get(myElementIndex);
-                                for (var neighbourElementIndex = 0;
-                                     neighbourElementIndex < neighbourGridContent.Length();
-                                     neighbourElementIndex++)
-                                {
-                                    var neighbourElement = neighbourGridContent.Get(neighbourElementIndex);
-                                    SolveCollision(new MyPair<Entity>(myElement, neighbourElement));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 
-
-
-
-#if UNITY_EDITOR
-
-// Unit tests
-    public static class SpacialPartitioningTests
+    public partial struct SolveCollisionsJob : IJobEntity
     {
-        private static int GetCount(SpacialPartitioning<int> spacialPartitioning)
-        {
-            var list = new NativeList<GridContent<int>>(Allocator.Temp);
-            spacialPartitioning.GetGrids(ref list);
+        [NativeDisableParallelForRestriction] public NativeList<NativeList<Entity>> ListPool;
+        
+        [ReadOnly] public NativeHashMap<Entity, float3> Positions;
+        [ReadOnly] public NativeHashMap<Entity, float3> Velocities;
+        
+        [ReadOnly] public WaterGameConfig Config;
+        [ReadOnly] public float DeltaTime;
 
-            var len = list.Length;
-            list.Dispose();
-            return len;
+        [ReadOnly] public SpacialPartitioning<Entity> SpacialPartitioning;
+        
+        [NativeSetThreadIndex]
+        private int m_ThreadIndex;
+
+        private float3 SolveCollision(MyPair<Entity> pair)
+        {
+            var posA = Positions[pair.A];
+            var velA = Velocities[pair.A];
+            var posB = Positions[pair.B];
+            var velB = Velocities[pair.B];
+
+            var force = ParticleCollisionSolverSystem.CalculateCollisionForce(
+                new ParticleCollisionSolverSystem.ForcePoint()
+                {
+                    Position = posA,
+                    Velocity = velA,
+                    OuterRadius = Config.OuterRadius,
+                    InnerRadius = Config.InnerRadius
+                },
+                new ParticleCollisionSolverSystem.ForcePoint()
+                {
+                    Position = posB,
+                    Velocity = velB,
+                    OuterRadius = Config.OuterRadius,
+                    InnerRadius = Config.InnerRadius
+                },
+                DeltaTime,
+                Config.PushForce,
+                Config.Viscosity
+            );
+
+            force = force.ClampMagnitude(10);
+            return force;
         }
 
-        private static List<GridContent<int>> GetGrids(SpacialPartitioning<int> spacialPartitioning)
+        public void Execute(Entity entity, ref PhysicsVelocity physicsVelocity, in LocalToWorld localToWorld, in Particle particle)
         {
-            var nativeList = new NativeList<GridContent<int>>(Allocator.Temp);
-            spacialPartitioning.GetGrids(ref nativeList);
+            //var overlapCircleBuffer = new NativeList<Entity>(Allocator.Temp);
+            var overlapCircleBuffer = ListPool[m_ThreadIndex];
+            overlapCircleBuffer.Clear();
 
-            var list = new List<GridContent<int>>();
-            for (int i = 0; i < nativeList.Length; i++)
+            SpacialPartitioning.OverlapCircle(localToWorld.Position, Config.OuterRadius, ref overlapCircleBuffer);
+            foreach (var other in overlapCircleBuffer)
             {
-                list.Add(nativeList[i]);
+                var force = SolveCollision(new MyPair<Entity>(entity, other));
+                physicsVelocity.Linear += force;
             }
-
-            nativeList.Dispose();
-            return list;
-        }
-
-
-        [MenuItem("Tests/23151231")]
-        public static void TestAdd()
-        {
-            var spacialPartitioning = new SpacialPartitioning<int>(10.0f);
-            spacialPartitioning.AddPoint(1, new float3(0.0f, 0.0f, 0.0f));
-            spacialPartitioning.AddPoint(2, new float3(0.0f, 0.0f, 0.0f));
-            spacialPartitioning.AddPoint(2, new float3(9.9f, 0.0f, 0.0f));
-
-            Assert.AreEqual(1, GetGrids(spacialPartitioning).Count);
-            Assert.AreEqual(2, GetGrids(spacialPartitioning)[0].GetItems().Length);
-
-            spacialPartitioning.AddPoint(3, new float3(10.0f, 0.0f, 0.0f));
-            Assert.AreEqual(2, GetGrids(spacialPartitioning).Count);
-            Assert.AreEqual(2, GetGrids(spacialPartitioning)[0].GetItems().Length);
-            Assert.AreEqual(1, GetGrids(spacialPartitioning)[^1].GetItems().Length);
-        }
-
-        [MenuItem("Tests/6345312")]
-        public static void TestSpacialPartitioning()
-        {
-            var partitioning = new SpacialPartitioning<int>(10.0f);
-            partitioning.AddPoint(1, new float3(5.0f, 5.0f, 0.0f));
-            partitioning.AddPoint(2, new float3(25.0f, 25.0f, 0.0f));
-            partitioning.AddPoint(3, new float3(-5.0f, -5.0f, 0.0f));
-            partitioning.AddPoint(4, new float3(-25.0f, -25.0f, 0.0f));
-
-            var buffer = new NativeList<int>();
-            partitioning.OverlapBox(new float3(0.0f, 0.0f, 0.0f), new float3(11.0f, 11.0f, 0.0f), ref buffer);
-            Assert.AreEqual(1, buffer.Length);
-            Assert.AreEqual(1, buffer[0]);
-
-            partitioning.OverlapBox(new float3(-11.0f, -11.0f, 0.0f), new float3(11.0f, 11.0f, 0.0f), ref buffer);
-            Assert.AreEqual(2, buffer.Length);
-
-            buffer.Sort();
-            Assert.AreEqual(1, buffer[0]);
-            Assert.AreEqual(3, buffer[1]);
-        }
-
-        [MenuItem("Tests/72334532")]
-        public static void TestAddBox()
-        {
-            var partitioning = new SpacialPartitioning<int>(10.0f);
-            partitioning.AddBox(1, new float3(9.0f, 23.0f, 0.0f), new float3(21.0f, 25.0f, 0.0f));
-
-            var buffer = new NativeList<int>();
-            partitioning.OverlapBox(new float3(0.0f, 0.0f, 0.0f), new float3(11.0f, 11.0f, 0.0f), ref buffer);
-            Assert.AreEqual(0, buffer.Length);
-
-            partitioning.OverlapBox(new float3(0.0f, 0.0f, 0.0f), new float3(21.0f, 25.0f, 0.0f), ref buffer);
-            Assert.AreEqual(1, buffer.Length);
-            Assert.AreEqual(1, buffer[0]);
-        }
-
-        [MenuItem("Tests/8324674")]
-        public static void TestAddSameKeyDifferentPosition()
-        {
-            var spacialPartitioning = new SpacialPartitioning<int>(10.0f);
-            spacialPartitioning.AddPoint(1, new float3(0.0f, 0.0f, 0.0f));
-            spacialPartitioning.AddPoint(2, new float3(0.0f, 0.0f, 0.0f));
-
-            spacialPartitioning.AddPoint(2, new float3(9.9f, 0.0f, 0));
-
-            Assert.AreEqual(1, GetGrids(spacialPartitioning).Count);
-            Assert.AreEqual(2, GetGrids(spacialPartitioning)[0].GetItems().Length);
-
-            spacialPartitioning.AddPoint(3, new float3(10.0f, 0.0f, 0));
-            Assert.AreEqual(2, GetGrids(spacialPartitioning).Count);
-            Assert.AreEqual(2, GetGrids(spacialPartitioning)[0].GetItems().Length);
-            Assert.AreEqual(1, GetGrids(spacialPartitioning)[^1].GetItems().Length);
         }
     }
-    
-#endif
 }

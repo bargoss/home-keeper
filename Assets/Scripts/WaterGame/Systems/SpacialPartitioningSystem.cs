@@ -29,7 +29,8 @@ namespace WaterGame.Systems
             spacialPartitioningRw.ValueRW.Partitioning.Clear();
             foreach (var (localToWorld, spacialPartitioningEntry, entity) in SystemAPI.Query<LocalToWorld, SpacialPartitioningEntry>().WithEntityAccess())
             {
-                spacialPartitioningRw.ValueRW.Partitioning.AddPoint(entity, localToWorld.Position);
+                //spacialPartitioningRw.ValueRW.Partitioning.AddPoint(entity, localToWorld.Position);
+                spacialPartitioningRw.ValueRW.Partitioning.AddCircle(entity, localToWorld.Position, 0.65f);
             }
         }
         public void OnDestroy(ref SystemState state)
