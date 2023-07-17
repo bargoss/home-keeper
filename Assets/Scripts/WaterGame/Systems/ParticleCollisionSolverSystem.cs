@@ -56,14 +56,14 @@ namespace WaterGame.Systems
                 m_PositionsCache.TryAdd(entity, localToWorld.Position);
             }
             
-            state.Dependency = new SolveCollisionsJob()
+            new SolveCollisionsJob()
             {
                 SpacialPartitioning = spacialPartitioning,
                 Config = config,
                 Positions = m_PositionsCache,
                 Velocities = m_VelocityCache,
                 DeltaTime = 0.02f,
-            }.ScheduleParallel(state.Dependency);
+            }.ScheduleParallel(state.Dependency).Complete();
         }
         
         

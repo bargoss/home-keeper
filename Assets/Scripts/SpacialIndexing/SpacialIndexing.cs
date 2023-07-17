@@ -235,20 +235,21 @@ namespace SpacialIndexing
                     //if (m_Grids.TryGetValue((i, j), out var gridContent))
                     if (m_Grids.TryGetValue(new int2(i, j), out var gridContent))
                     {
-                        foreach (var item in gridContent.GetItems())
+                        var items = gridContent.GetItems();
+                        for (var index = 0; index < items.Length; index++)
                         {
-                            var buf = new FixedList4096Bytes<Entity>();
-                            
+                            var item = items[index];
                             var contains = false;
-                            foreach (var e in buffer)
-                            {
-                                if (e.Equals(item))
-                                {
-                                    contains = true;
-                                    break;
-                                }
-                            }
-                            
+                            //for (var index1 = 0; index1 < buffer.Length; index1++)
+                            //{
+                            //    var e = buffer[index1];
+                            //    if (e.Equals(item))
+                            //    {
+                            //        contains = true;
+                            //        break;
+                            //    }
+                            //}
+
                             if (!contains)
                             {
                                 buffer.Add(item);
@@ -258,7 +259,7 @@ namespace SpacialIndexing
                 }
             }
 
-            buffer.Sort();
+            //buffer.Sort();
         }
 
         public int GetGridCount()
@@ -434,11 +435,11 @@ namespace SpacialIndexing
             var overlapCircleBuffer = new FixedList4096Bytes<Entity>();
             
             SpacialPartitioning.OverlapCircle(localToWorld.Position, Config.OuterRadius, ref overlapCircleBuffer);
-            foreach (var other in overlapCircleBuffer)
-            {
-                var force = SolveCollision(new MyPair<Entity>(entity, other));
-                physicsVelocity.Linear += force;
-            }
+            //foreach (var other in overlapCircleBuffer)
+            //{
+            //    var force = SolveCollision(new MyPair<Entity>(entity, other));
+            //    physicsVelocity.Linear += force;
+            //}
         }
     }
 }
