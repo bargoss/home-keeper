@@ -19,16 +19,19 @@ namespace WaterGame.Systems
     {
         NativeHashMap<Entity, float3> m_VelocityCache;
         NativeHashMap<Entity, float3> m_PositionsCache;
+        NativeArray<Entity> m_EntityBuffer;
         
         public void OnCreate(ref SystemState state)
         {
             m_VelocityCache = new NativeHashMap<Entity, float3>(100000, Allocator.Persistent);
             m_PositionsCache = new NativeHashMap<Entity, float3>(100000, Allocator.Persistent);
+            m_EntityBuffer = new NativeArray<Entity>(100000, Allocator.Persistent);
         }
         public void OnDestroy(ref SystemState state)
         {
             m_VelocityCache.Dispose();
             m_PositionsCache.Dispose();
+            m_EntityBuffer.Dispose();
         }
 
         [BurstCompile]
@@ -50,6 +53,7 @@ namespace WaterGame.Systems
             m_VelocityCache.Clear();
             m_PositionsCache.Clear();
             
+            
             foreach (var (physicsVelocity, localToWorld, particle, entity) in SystemAPI.Query<PhysicsVelocity, LocalToWorld, Particle>().WithEntityAccess())
             {
                 m_VelocityCache.TryAdd(entity, physicsVelocity.Linear);
@@ -63,6 +67,7 @@ namespace WaterGame.Systems
                 Positions = m_PositionsCache,
                 Velocities = m_VelocityCache,
                 DeltaTime = 0.02f,
+                EntityBuffer = m_EntityBuffer 
             }.ScheduleParallel(state.Dependency).Complete();
         }
         

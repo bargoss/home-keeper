@@ -4,6 +4,7 @@ using System.Linq;
 using DefaultNamespace;
 using RunnerGame.Scripts.ECS.Components;
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
@@ -207,7 +208,8 @@ namespace SpacialIndexing
             }
         }
 
-        public void OverlapCircle(float3 center, float radius, ref FixedList4096Bytes<T> buffer)
+        //public void OverlapCircle(float3 center, float radius, ref FixedList4096Bytes<T> buffer)
+        public void OverlapCircle(float3 center, float radius, ref NativeArraySlice<T> buffer)
         {
             var halfSize = new float3(radius, radius, radius);
             var boxStartCorner = center - halfSize;
@@ -216,7 +218,7 @@ namespace SpacialIndexing
             OverlapBox(boxStartCorner, boxEndCorner, ref buffer);
         }
 
-        public void OverlapBox(float3 startCorner, float3 endCorner, ref FixedList4096Bytes<T> buffer)
+        public void OverlapBox(float3 startCorner, float3 endCorner, ref NativeArraySlice<T> buffer)
         {
             //var (x0, y0) = GetGrid(startCorner);
             var g0 = GetGrid(startCorner);
@@ -239,27 +241,28 @@ namespace SpacialIndexing
                         for (var index = 0; index < items.Length; index++)
                         {
                             var item = items[index];
-                            var contains = false;
-                            //for (var index1 = 0; index1 < buffer.Length; index1++)
-                            //{
-                            //    var e = buffer[index1];
-                            //    if (e.Equals(item))
-                            //    {
-                            //        contains = true;
-                            //        break;
-                            //    }
-                            //}
-
-                            if (!contains)
-                            {
-                                buffer.Add(item);
-                            }
+                            buffer.Add(item);
                         }
                     }
                 }
             }
 
-            //buffer.Sort();
+            // remove duplicate items with for loop
+            for (int i = 0; i < buffer.Length; i++)
+            {
+                var item = buffer[i];
+                for (int j = i + 1; j < buffer.Length; j++)
+                {
+                    if (buffer[j].Equals(item))
+                    {
+                        buffer.RemoveAtSwapBack(j);
+                        j--;
+                    }
+                }
+            }
+            
+            
+            
         }
 
         public int GetGridCount()
@@ -389,15 +392,62 @@ namespace SpacialIndexing
         }
     }
 
+    public struct NativeArraySlice<T> where T : unmanaged
+    {
+        private int m_Start;
+        public int Capacity { get; private set; }
+        public int Length { get; private set; }
+        private NativeArray<T> m_Array;
+        
+        public NativeArraySlice(NativeArray<T> array, int start, int capacity)
+        {
+            m_Start = start;
+            Length = 0;
+            Capacity = capacity;
+            m_Array = array;
+        }
+        
+        public T this[int index]
+        {
+            get => m_Array[m_Start + index];
+            set => m_Array[m_Start + index] = value;
+        }
+        
+        public void Add(T item)
+        {
+            m_Array[m_Start + Length] = item;
+            Length++;
+        }
+        
+        public void Clear()
+        {
+            Length = 0;
+        }
+        
+        //RemoveAtSwapBack
+        public void RemoveAtSwapBack(int index)
+        {
+            m_Array[m_Start + index] = m_Array[m_Start + Length - 1];
+            Length--;
+        }
+    }
+    
     public partial struct SolveCollisionsJob : IJobEntity
     {
         [ReadOnly] public NativeHashMap<Entity, float3> Positions;
         [ReadOnly] public NativeHashMap<Entity, float3> Velocities;
-        
         [ReadOnly] public WaterGameConfig Config;
         [ReadOnly] public float DeltaTime;
-
         [ReadOnly] public SpacialPartitioning<Entity> SpacialPartitioning;
+        
+        
+        [NativeSetThreadIndex] public int ThreadIndex;
+        
+        [NativeDisableContainerSafetyRestriction] 
+        [NativeDisableParallelForRestriction] 
+        [NativeDisableUnsafePtrRestriction] 
+        public NativeArray<Entity> EntityBuffer;
+        
         private float3 SolveCollision(MyPair<Entity> pair)
         {
             var posA = Positions[pair.A];
@@ -432,14 +482,19 @@ namespace SpacialIndexing
         public void Execute(Entity entity, ref PhysicsVelocity physicsVelocity, in LocalToWorld localToWorld, in Particle particle)
         {
             //var overlapCircleBuffer = new NativeList<Entity>(Allocator.Temp);
-            var overlapCircleBuffer = new FixedList4096Bytes<Entity>();
+            var overlapCircleBuffer = new NativeArraySlice<Entity>(EntityBuffer, ThreadIndex * 1024, 1024);
+            overlapCircleBuffer.Clear();
             
             SpacialPartitioning.OverlapCircle(localToWorld.Position, Config.OuterRadius, ref overlapCircleBuffer);
-            //foreach (var other in overlapCircleBuffer)
-            //{
-            //    var force = SolveCollision(new MyPair<Entity>(entity, other));
-            //    physicsVelocity.Linear += force;
-            //}
+            for (int i = 0; i < overlapCircleBuffer.Length; i++)
+            {
+                var other = overlapCircleBuffer[i];
+                if (other != entity)
+                {
+                    var force = SolveCollision(new MyPair<Entity>(entity, other));
+                    physicsVelocity.Linear += force;    
+                }
+            }
         }
     }
 }
