@@ -19,28 +19,16 @@ namespace WaterGame.Systems
     {
         NativeHashMap<Entity, float3> m_VelocityCache;
         NativeHashMap<Entity, float3> m_PositionsCache;
-        NativeList<NativeList<Entity>> m_ListPool;
         
         public void OnCreate(ref SystemState state)
         {
             m_VelocityCache = new NativeHashMap<Entity, float3>(100000, Allocator.Persistent);
             m_PositionsCache = new NativeHashMap<Entity, float3>(100000, Allocator.Persistent);
-            m_ListPool = new NativeList<NativeList<Entity>>(64, Allocator.Persistent);
-            
-            for (int i = 0; i < 64; i++)
-            {
-                m_ListPool.Add(new NativeList<Entity>(50, Allocator.Persistent));
-            }
         }
         public void OnDestroy(ref SystemState state)
         {
             m_VelocityCache.Dispose();
             m_PositionsCache.Dispose();
-            foreach (var list in m_ListPool)
-            {
-                list.Dispose();
-            }
-            m_ListPool.Dispose();
         }
 
         [BurstCompile]
@@ -75,7 +63,6 @@ namespace WaterGame.Systems
                 Positions = m_PositionsCache,
                 Velocities = m_VelocityCache,
                 DeltaTime = 0.02f,
-                ListPool = m_ListPool,
             }.ScheduleParallel(state.Dependency);
         }
         

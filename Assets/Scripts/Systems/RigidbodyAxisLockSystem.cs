@@ -14,6 +14,7 @@ namespace Systems
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
+            return;
             foreach (var (physicsVelocityRw, localTransformRw, rigidbodyAxisLock) in SystemAPI.Query<RefRW<PhysicsVelocity>, RefRW<LocalTransform>, RigidbodyAxisLock>())
             {
                 var physicsVelocity = physicsVelocityRw.ValueRO;

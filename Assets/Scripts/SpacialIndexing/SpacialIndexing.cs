@@ -4,7 +4,6 @@ using System.Linq;
 using DefaultNamespace;
 using RunnerGame.Scripts.ECS.Components;
 using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
@@ -208,7 +207,7 @@ namespace SpacialIndexing
             }
         }
 
-        public void OverlapCircle(float3 center, float radius, ref NativeList<T> buffer)
+        public void OverlapCircle(float3 center, float radius, ref FixedList4096Bytes<T> buffer)
         {
             var halfSize = new float3(radius, radius, radius);
             var boxStartCorner = center - halfSize;
@@ -217,7 +216,7 @@ namespace SpacialIndexing
             OverlapBox(boxStartCorner, boxEndCorner, ref buffer);
         }
 
-        public void OverlapBox(float3 startCorner, float3 endCorner, ref NativeList<T> buffer)
+        public void OverlapBox(float3 startCorner, float3 endCorner, ref FixedList4096Bytes<T> buffer)
         {
             //var (x0, y0) = GetGrid(startCorner);
             var g0 = GetGrid(startCorner);
@@ -238,7 +237,19 @@ namespace SpacialIndexing
                     {
                         foreach (var item in gridContent.GetItems())
                         {
-                            if (!buffer.Contains(item))
+                            var buf = new FixedList4096Bytes<Entity>();
+                            
+                            var contains = false;
+                            foreach (var e in buffer)
+                            {
+                                if (e.Equals(item))
+                                {
+                                    contains = true;
+                                    break;
+                                }
+                            }
+                            
+                            if (!contains)
                             {
                                 buffer.Add(item);
                             }
@@ -379,8 +390,6 @@ namespace SpacialIndexing
 
     public partial struct SolveCollisionsJob : IJobEntity
     {
-        [NativeDisableParallelForRestriction] public NativeList<NativeList<Entity>> ListPool;
-        
         [ReadOnly] public NativeHashMap<Entity, float3> Positions;
         [ReadOnly] public NativeHashMap<Entity, float3> Velocities;
         
@@ -388,10 +397,6 @@ namespace SpacialIndexing
         [ReadOnly] public float DeltaTime;
 
         [ReadOnly] public SpacialPartitioning<Entity> SpacialPartitioning;
-        
-        [NativeSetThreadIndex]
-        private int m_ThreadIndex;
-
         private float3 SolveCollision(MyPair<Entity> pair)
         {
             var posA = Positions[pair.A];
@@ -426,9 +431,8 @@ namespace SpacialIndexing
         public void Execute(Entity entity, ref PhysicsVelocity physicsVelocity, in LocalToWorld localToWorld, in Particle particle)
         {
             //var overlapCircleBuffer = new NativeList<Entity>(Allocator.Temp);
-            var overlapCircleBuffer = ListPool[m_ThreadIndex];
-            overlapCircleBuffer.Clear();
-
+            var overlapCircleBuffer = new FixedList4096Bytes<Entity>();
+            
             SpacialPartitioning.OverlapCircle(localToWorld.Position, Config.OuterRadius, ref overlapCircleBuffer);
             foreach (var other in overlapCircleBuffer)
             {

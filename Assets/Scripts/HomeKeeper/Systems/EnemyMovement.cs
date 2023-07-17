@@ -12,6 +12,7 @@ namespace HomeKeeper.Systems
     {
         public void OnUpdate(ref SystemState state)
         {
+            return;
             foreach (var (characterMovement, localToWorld, physicsVelocityRw, entity) in SystemAPI.Query<CharacterMovement, LocalToWorld, RefRW<PhysicsVelocity>>().WithEntityAccess())
             {
                 var physicsVelocity = physicsVelocityRw.ValueRO;

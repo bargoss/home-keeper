@@ -16,6 +16,8 @@ namespace Systems
     {
         public void OnUpdate(ref SystemState state)
         {
+            return;
+            
             var ecb = new EntityCommandBuffer(Allocator.Temp);
             foreach (var (statefulCollisionEvents, projectile, projectilePhysicsVelocity, entity) in SystemAPI.Query<DynamicBuffer<StatefulCollisionEvent>, Projectile, PhysicsVelocity>().WithEntityAccess())
             {

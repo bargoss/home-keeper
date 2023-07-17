@@ -15,6 +15,7 @@ namespace HomeKeeper.Systems
     {
         public void OnUpdate(ref SystemState state)
         {
+            return;
             var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
             foreach (var (shooterRw, localToWorld, localTransformRw,entity) in SystemAPI.Query<RefRW<Shooter>, LocalToWorld, RefRW<LocalTransform>>().WithEntityAccess())
             {
