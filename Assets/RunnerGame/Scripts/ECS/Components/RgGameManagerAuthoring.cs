@@ -21,8 +21,8 @@ namespace RunnerGame.Scripts.ECS.Components
             public override void Bake(RgGameManagerAuthoring authoring)
             {
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
-                AddComponentObject(entity,
-                    new RgGameManager
+                AddComponent(entity,
+                    new RgGameManagerData
                     {
                         PlayerForwardSpeed = authoring.PlayerForwardSpeed,
                         PlayerSidewaysP = authoring.PlayerSidewaysP,
@@ -36,7 +36,7 @@ namespace RunnerGame.Scripts.ECS.Components
         }
     }
 
-    public class RgGameManager : IComponentData
+    public struct RgGameManagerData : IComponentData
     {
         public float PlayerForwardSpeed;
         public float PlayerSidewaysP;
@@ -46,5 +46,12 @@ namespace RunnerGame.Scripts.ECS.Components
 
         public float RoadWidth;
 
+        public EnGameState GameState;
+
+        public enum EnGameState
+        {
+            Running,
+            MiniGame,
+        }
     }
 }

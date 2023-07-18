@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 5264802498255394119}
   - component: {fileID: 4806457316924125171}
   - component: {fileID: -5665292594238516449}
+  - component: {fileID: 5681172825282838440}
   m_Layer: 0
   m_Name: Particle
   m_TagString: Untagged
@@ -63,7 +64,7 @@ MonoBehaviour:
   m_MotionType: 0
   m_Smoothing: 0
   m_Mass: 0.33
-  m_LinearDamping: 0.01
+  m_LinearDamping: 0.16
   m_AngularDamping: 0.05
   m_InitialLinearVelocity:
     x: 0
@@ -73,7 +74,7 @@ MonoBehaviour:
     x: 0
     y: 0
     z: 0
-  m_GravityFactor: 0.27
+  m_GravityFactor: 0.16
   m_OverrideDefaultMassDistribution: 0
   m_CenterOfMass:
     x: 0
@@ -292,3 +293,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4605886574962999898}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &5681172825282838440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4605886574962999898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fde2d55ad4324d56acaaef74680db640, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  LockLinearX: 0
+  LockLinearY: 0
+  LockLinearZ: 0
+  LockRotation: 1

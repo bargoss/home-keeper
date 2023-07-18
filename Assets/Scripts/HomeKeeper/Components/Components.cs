@@ -65,6 +65,8 @@ namespace HomeKeeper.Components
         public bool LockLinearX;
         public bool LockLinearY;
         public bool LockLinearZ;
+        
+        public bool LockRotation;
     }
 
     public struct Shooter : IComponentData

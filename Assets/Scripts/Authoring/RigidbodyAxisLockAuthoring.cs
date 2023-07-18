@@ -10,6 +10,8 @@ namespace Authoring
         public bool LockLinearX = false;
         public bool LockLinearY = false;
         public bool LockLinearZ = true;
+
+        public bool LockRotation = false;
     }
     
     public class RigidbodyAxisLockBaker : Baker<RigidbodyAxisLockAuthoring>
@@ -22,6 +24,7 @@ namespace Authoring
                 LockLinearX = authoring.LockLinearX,
                 LockLinearY = authoring.LockLinearY,
                 LockLinearZ = authoring.LockLinearZ,
+                LockRotation = authoring.LockRotation,
             });
         }
     }

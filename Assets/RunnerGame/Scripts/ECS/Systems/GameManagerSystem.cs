@@ -17,7 +17,7 @@ namespace RunnerGame.Scripts.ECS.Systems
         private int m_SpawnedCount = 0;
         protected override void OnUpdate()
         {
-            if (!SystemAPI.ManagedAPI.TryGetSingleton<RgGameManager>(out var gameManager))
+            if (!SystemAPI.TryGetSingleton<RgGameManagerData>(out var gameManager))
             {
                 return;
             }
@@ -32,50 +32,18 @@ namespace RunnerGame.Scripts.ECS.Systems
             // move player and camera
             Entities.ForEach((Entity entity, ref PhysicsVelocity physicsVelocity, ref LocalTransform localTransform, in RgPlayer rgPlayer) =>
             {
-                var velocity = physicsVelocity.Linear;
-                var angularVelocity = physicsVelocity.Angular;
-
-                var targetVelocity = Utility.Forward * gameManager.PlayerForwardSpeed + Utility.Right * playerHorizontalInput * gameManager.PlayerSidewaysP;
-                velocity = math.lerp(velocity, targetVelocity, SystemAPI.Time.DeltaTime * 2);
-                velocity.y = 0;
-                
-                // remain inside the road bounds
-                var pos = localTransform.Position;
-                pos.y = 0;
-                if(pos.x > gameManager.RoadWidth * 0.5f)
-                {
-                    pos.x = gameManager.RoadWidth * 0.5f;
-                    if (velocity.x > 0)
-                    {
-                        velocity.x = 0;
-                    }
-                }
-                else if(pos.x < -gameManager.RoadWidth * 0.5f)
-                {
-                    pos.x = -gameManager.RoadWidth * 0.5f;
-                    if (velocity.x < 0)
-                    {
-                        velocity.x = 0;
-                    }
-                }
-                localTransform.Position = pos;
-
-                angularVelocity = 0;
-
-                physicsVelocity.Linear = velocity;
-                physicsVelocity.Angular = angularVelocity;
-                localTransform.Rotation = quaternion.LookRotation(Utility.Forward, Utility.Up);
+                localTransform = HandlePlayerMovement(ref physicsVelocity, gameManager, playerHorizontalInput, ref localTransform, World.Time.DeltaTime);
 
 
                 if (camera != null)
                 {
-                    camera.transform.position = (Vector3)localTransform.Position + new Vector3(0, 8, -15);
-                    camera.transform.LookAt(localTransform.Position);
+                    camera.transform.position = (Vector3)localTransform.Position + new Vector3(0, 20, -15) * 2;
+                    camera.transform.LookAt((Vector3)localTransform.Position + Vector3.forward * 4 * 2);
                 }
 
 
                 // handle spawning of particles:
-                if (Input.GetKey(KeyCode.Space) || m_SpawnedCount < 2000)
+                if (Input.GetKey(KeyCode.Space) || m_SpawnedCount < 50) // 2000
                 {
                     var spawnPosition = localTransform.Position + Utility.Forward * 16 + Utility.Up * 3;
                     var randomness = Random.CreateFromIndex((uint)(localTransform.Position.z * 1000)).NextFloat3Direction() * 3.25f;
@@ -90,6 +58,47 @@ namespace RunnerGame.Scripts.ECS.Systems
             
             ecb.Playback(EntityManager);
             ecb.Dispose();
+        }
+
+        private static LocalTransform HandlePlayerMovement(ref PhysicsVelocity physicsVelocity, RgGameManagerData gameManagerData,
+            float playerHorizontalInput, ref LocalTransform localTransform, float deltaTime)
+        {
+            var velocity = physicsVelocity.Linear;
+            var angularVelocity = physicsVelocity.Angular;
+
+            var targetVelocity = Utility.Forward * gameManagerData.PlayerForwardSpeed +
+                                 Utility.Right * playerHorizontalInput * gameManagerData.PlayerSidewaysP;
+            velocity = math.lerp(velocity, targetVelocity, deltaTime * 2);
+            velocity.y = 0;
+
+            // remain inside the road bounds
+            var pos = localTransform.Position;
+            pos.y = 0;
+            if (pos.x > gameManagerData.RoadWidth * 0.5f)
+            {
+                pos.x = gameManagerData.RoadWidth * 0.5f;
+                if (velocity.x > 0)
+                {
+                    velocity.x = 0;
+                }
+            }
+            else if (pos.x < -gameManagerData.RoadWidth * 0.5f)
+            {
+                pos.x = -gameManagerData.RoadWidth * 0.5f;
+                if (velocity.x < 0)
+                {
+                    velocity.x = 0;
+                }
+            }
+
+            localTransform.Position = pos;
+
+            angularVelocity = 0;
+
+            physicsVelocity.Linear = velocity;
+            physicsVelocity.Angular = angularVelocity;
+            localTransform.Rotation = quaternion.LookRotation(Utility.Forward, Utility.Up);
+            return localTransform;
         }
     }
 }

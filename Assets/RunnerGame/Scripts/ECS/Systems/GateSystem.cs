@@ -1,4 +1,5 @@
 ﻿using DefaultNamespace;
+using HomeKeeper.Components;
 using RunnerGame.Scripts.ECS.Components;
 using Unity.Burst;
 using Unity.Collections;
@@ -27,6 +28,13 @@ namespace RunnerGame.Scripts.ECS.Systems
             var localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>();
             var physicsVelocityLookup = SystemAPI.GetComponentLookup<PhysicsVelocity>();
             var random = Random.CreateFromIndex((uint)(SystemAPI.Time.ElapsedTime * 3223.2323f));
+
+            if (!SystemAPI.TryGetSingleton<RgGameManagerData>(out var gameManagerData))
+            {
+                Debug.LogError("No game manager state");
+                return;
+            }
+            
             
             var ecb = new EntityCommandBuffer(Allocator.Temp);
             foreach (var (statefulCollisionEvents, gate, localToWorld, gateEntity) in SystemAPI.Query<DynamicBuffer<StatefulTriggerEvent>, Gate, LocalToWorld>().WithEntityAccess())
@@ -40,7 +48,11 @@ namespace RunnerGame.Scripts.ECS.Systems
                         
                     var otherEntity = statefulCollisionEvent.GetOtherEntity(gateEntity);
                     if (
-                        particleLookup.TryGetRw(otherEntity, out var particleRw))
+                        particleLookup.TryGetRw(otherEntity, out var particleRw) &&
+                        SystemAPI.Time.ElapsedTime > particleRw.ValueRO.LastGateInteractionTime + 2f &&
+                        physicsVelocityLookup.TryGetComponent(otherEntity, out var physicsVelocityRw)
+                        
+                    )
                     {
                         var otherPos = localToWorldLookup[otherEntity].Position;
                         var particle = particleRw.ValueRW;
@@ -52,11 +64,17 @@ namespace RunnerGame.Scripts.ECS.Systems
                             case GateType.Multiply:
                                 for (int i = 0; i < (int)gate.Value; i++)
                                 {
-                                    var pos = otherPos + random.NextFloat3Direction();
+                                    //var pos = otherPos + random.NextFloat3Direction() * 0.1f + new float3(0,0.8f,0.1f) + new float3(0,0,0.2f) * i;
+                                    var pos = otherPos + random.NextFloat3Direction() * 0.05f;
                                     
                                     // doesn't work, need to do it from a prefab
-                                    //var clone = ecb.Instantiate(otherEntity);
-                                    //ecb.SetLocalPositionRotation(clone, pos, quaternion.identity);
+                                    var clone = ecb.Instantiate(gameManagerData.ParticlePrefab);
+                                    ecb.SetLocalPositionRotation(clone, pos, quaternion.identity);
+                                    ecb.SetVelocity(clone, physicsVelocityRw.Linear);
+                                    ecb.SetComponent(clone, new Particle
+                                    {
+                                        LastGateInteractionTime = (float)SystemAPI.Time.ElapsedTime
+                                    });
                                 }
                                 
                                 ecb.DestroyEntity(otherEntity);

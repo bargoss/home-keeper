@@ -11,17 +11,30 @@ namespace Systems
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     public partial struct RigidbodyAxisLockSystem : ISystem
     {
+
+        [BurstCompile]
+        public void OnCreate(ref SystemState state)
+        {
+            
+        }
+        
+        [BurstCompile]
+        public void OnDestroy(ref SystemState state)
+        {
+            
+        }
+        
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            return;
-            foreach (var (physicsVelocityRw, localTransformRw, rigidbodyAxisLock) in SystemAPI.Query<RefRW<PhysicsVelocity>, RefRW<LocalTransform>, RigidbodyAxisLock>())
+            foreach (var (physicsVelocityRw, localTransformRw, localToWorldRw,rigidbodyAxisLock) in SystemAPI.Query<RefRW<PhysicsVelocity>, RefRW<LocalTransform>, RefRW<LocalToWorld>, RigidbodyAxisLock>())
             {
                 var physicsVelocity = physicsVelocityRw.ValueRO;
                 var localTransform = localTransformRw.ValueRO;
 
 
                 var linearVelocity = physicsVelocity.Linear;
+                var angularVelocity = physicsVelocity.Angular;
                 var position = localTransform.Position;
                 
                 if (rigidbodyAxisLock.LockLinearX)
@@ -39,8 +52,19 @@ namespace Systems
                     linearVelocity.z = 0;
                     position.z = 0;
                 }
+
+                if (rigidbodyAxisLock.LockRotation)
+                {
+                    angularVelocity = float3.zero;
+                    localTransform.Rotation = quaternion.identity;
+                    //localToWorldRw.ValueRW = new LocalToWorld()
+                    //{
+                    //    Value = float4x4.TRS(localToWorldRw.ValueRO.Position, quaternion.identity, localTransform.Scale)
+                    //};
+                }
                 
                 physicsVelocity.Linear = linearVelocity;
+                physicsVelocity.Angular = angularVelocity;
                 localTransform.Position = position;
                 
                 physicsVelocityRw.ValueRW = physicsVelocity;
