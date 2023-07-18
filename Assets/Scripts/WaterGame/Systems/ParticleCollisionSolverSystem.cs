@@ -15,6 +15,7 @@ namespace WaterGame.Systems
 {
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     [UpdateAfter(typeof(SpacialPartitioningSystem))]
+    [BurstCompile]
     public partial struct ParticleCollisionSolverSystem : ISystem
     {
         NativeHashMap<Entity, float3> m_VelocityCache;

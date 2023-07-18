@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DefaultNamespace;
 using RunnerGame.Scripts.ECS.Components;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
@@ -77,6 +78,7 @@ namespace SpacialIndexing
         }
     }
 
+    [BurstCompile]
     public struct SpacialPartitioning<T> : IDisposable where T : unmanaged, IEquatable<T>, IComparable<T>
     {
         private readonly float m_GridSize;
@@ -432,6 +434,7 @@ namespace SpacialIndexing
         }
     }
     
+    [BurstCompile]
     public partial struct SolveCollisionsJob : IJobEntity
     {
         [ReadOnly] public NativeHashMap<Entity, float3> Positions;
