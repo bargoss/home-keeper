@@ -20,7 +20,7 @@ namespace SpacialIndexing
     public struct GridContent<T> where T : unmanaged, IEquatable<T>
     {
         //private FixedList4096Bytes<T>  m_Elements;
-        private FixedList64Bytes<T> m_Elements;
+        private FixedList128Bytes<T> m_Elements;
 
         public void Add(T item)
         {
@@ -50,7 +50,7 @@ namespace SpacialIndexing
             }
         }
 
-        public FixedList64Bytes<T> GetItems()
+        public FixedList128Bytes<T> GetItems()
         {
             return m_Elements;
         }

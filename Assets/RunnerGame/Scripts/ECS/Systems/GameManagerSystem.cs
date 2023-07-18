@@ -75,7 +75,7 @@ namespace RunnerGame.Scripts.ECS.Systems
 
 
                 // handle spawning of particles:
-                if (Input.GetKey(KeyCode.Space) || m_SpawnedCount < 1000)
+                if (Input.GetKey(KeyCode.Space) || m_SpawnedCount < 2000)
                 {
                     var spawnPosition = localTransform.Position + Utility.Forward * 16 + Utility.Up * 3;
                     var randomness = Random.CreateFromIndex((uint)(localTransform.Position.z * 1000)).NextFloat3Direction() * 3.25f;
