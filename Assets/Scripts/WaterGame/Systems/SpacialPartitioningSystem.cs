@@ -9,8 +9,10 @@ using WaterGame.Components;
 namespace WaterGame.Systems
 {
     [UpdateInGroup(typeof(SimulationSystemGroup))]
+    [BurstCompile]
     public partial struct SpacialPartitioningSystem : ISystem
     {
+        [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
@@ -22,6 +24,7 @@ namespace WaterGame.Systems
             commandBuffer.Playback(state.EntityManager);
             commandBuffer.Dispose();
         }
+        
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
@@ -33,6 +36,8 @@ namespace WaterGame.Systems
                 spacialPartitioningRw.ValueRW.Partitioning.AddCircle(entity, localToWorld.Position, 0.65f);
             }
         }
+        
+        [BurstCompile]
         public void OnDestroy(ref SystemState state)
         {
             var spacialPartitioningRw = SystemAPI.GetSingletonRW<SpacialPartitioningSingleton>();
