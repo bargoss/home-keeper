@@ -69,7 +69,7 @@ namespace RunnerGame.Scripts.ECS.Systems
                                     
                                     // doesn't work, need to do it from a prefab
                                     var clone = ecb.Instantiate(gameManagerData.ParticlePrefab);
-                                    ecb.SetLocalPositionRotation(clone, pos, quaternion.identity);
+                                    ecb.SetLocalPositionRotationScale(clone, pos, quaternion.identity, 0.45f);
                                     ecb.SetVelocity(clone, physicsVelocityRw.Linear);
                                     ecb.SetComponent(clone, new Particle
                                     {

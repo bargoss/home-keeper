@@ -121,7 +121,7 @@ namespace DefaultNamespace
             
             commandBuffer.SetComponent(entity,new LocalToWorld()
             {
-                Value = float4x4.TRS(position, rotation, 1)
+                Value = float4x4.TRS(position, rotation, scale)
             });
             
         }
