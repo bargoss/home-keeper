@@ -1,16 +1,21 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using RunnerGame.Scripts.ECS.Components;
+using SpacialIndexing;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
+using WaterGame.Components;
 
 namespace RunnerGame.Scripts.ECS.ViewSystems
 {
     [UpdateInGroup(typeof(LateSimulationSystemGroup))]
     public partial class ItemViewSystem : SystemBase
     {
+        private NativeArray<Entity> m_NeighboursBuffer;
+
         private Mesh m_Mesh;
         private List<Vector3> m_Vertices = new List<Vector3>();
         private List<int> m_Triangles = new List<int>();
@@ -195,13 +200,28 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
         protected override void OnCreate()
         {
             m_Mesh = new Mesh();
+            m_NeighboursBuffer = new NativeArray<Entity>(4000,Allocator.Persistent);
+        }
+        
+        protected override void OnDestroy()
+        {
+            m_NeighboursBuffer.Dispose();
         }
 
         protected override void OnUpdate()
         {
+            if (!SystemAPI.TryGetSingleton<SpacialPartitioningSingleton>(out var spacialIndexing))
+            {
+                Debug.Log("SpacialPartitioningSingleton not found");
+                return;
+            }
+            
             m_Vertices.Clear();
             m_Triangles.Clear();
             m_Normals.Clear();
+            m_Colors.Clear();
+            
+            var slice = new NativeArraySlice<Entity>(m_NeighboursBuffer, 0, m_NeighboursBuffer.Length);
 
             var cam = Camera.main;
             if (cam != null)
@@ -209,14 +229,40 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
                 var camPos = cam.transform.position;
                 var camForward = cam.transform.forward;
 
-                Entities.ForEach((in ParticleView particleView, in LocalToWorld localToWorld) =>
+                Entities.ForEach((Entity entity, ref ParticleView particleView, in LocalToWorld localToWorld) =>
                 {
                     var normal = ((Vector3)localToWorld.Position - camPos).normalized;
                     if (((Vector3)localToWorld.Position - Vector3.zero).sqrMagnitude < 10000 * 10000)
                     {
-                        DrawQuad(localToWorld.Position, 0.8f, Quaternion.LookRotation(-camForward), normal, Color.cyan);
-                        //DrawCone((Vector3)localToWorld.Position + normal * 0.8f * 1.5f, -normal * 0.8f *3f, 0.8f, 4);
+                        //DrawQuad(localToWorld.Position, 0.8f, Quaternion.LookRotation(-camForward), normal, Color.cyan);
+                        spacialIndexing.Partitioning.OverlapCircle(localToWorld.Position, 0.5f, ref slice);
                         
+                        var positionsSum = new float3(0,0,0);
+                        var count = 0;
+                        for (int i = 0; i < slice.Length; i++)
+                        {
+                            var neighbour = slice[i];
+                            if (entity != neighbour)
+                            {
+                                var neighbourPosition = SystemAPI.GetComponent<LocalToWorld>(neighbour).Position;
+                                var delta = neighbourPosition - localToWorld.Position + new float3(0, 0.0f, 0);
+                                var deltaNormalized = math.normalizesafe(delta);
+                                positionsSum += deltaNormalized;
+                                count++;
+                            }
+                        }
+
+                        var mix = 0.05f;
+                        var targetNormal = math.normalizesafe(-positionsSum * mix + new float3(0,1,0) * (1-mix));
+                        
+                        var targetNormalSmooth = particleView.Normal * 0.9f + targetNormal * 0.1f;
+                        particleView.Normal = targetNormalSmooth;
+
+
+                        DrawQuad(localToWorld.Position, 0.35f, Quaternion.LookRotation(-camForward), targetNormalSmooth, Color.red);
+
+                        //DrawCone((Vector3)localToWorld.Position + normal * 0.8f * 1.5f, -normal * 0.8f *3f, 0.8f, 4);
+
                     }
                 }).WithoutBurst().Run();
             }

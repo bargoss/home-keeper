@@ -1,4 +1,5 @@
 ﻿using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 using WaterGame.Components;
 
@@ -26,5 +27,6 @@ namespace RunnerGame.Scripts.ECS.Components
     public struct ParticleView : IComponentData
     {
         public bool PositiveEffect;
+        public float3 Normal;
     }
 }

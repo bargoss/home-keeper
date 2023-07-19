@@ -147,7 +147,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_MotionType: 0
   m_Smoothing: 0
-  m_Mass: 0.24
+  m_Mass: 0.12
   m_LinearDamping: 0.16
   m_AngularDamping: 0.05
   m_InitialLinearVelocity:
@@ -158,7 +158,7 @@ MonoBehaviour:
     x: 0
     y: 0
     z: 0
-  m_GravityFactor: 0.16
+  m_GravityFactor: 0.07
   m_OverrideDefaultMassDistribution: 0
   m_CenterOfMass:
     x: 0

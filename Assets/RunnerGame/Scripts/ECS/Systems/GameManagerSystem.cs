@@ -37,13 +37,13 @@ namespace RunnerGame.Scripts.ECS.Systems
 
                 if (camera != null)
                 {
-                    camera.transform.position = (Vector3)localTransform.Position + new Vector3(0, 20, -15) * 0.8f;
+                    camera.transform.position = (Vector3)localTransform.Position + new Vector3(0, 10, -15) * 0.6f;
                     camera.transform.LookAt((Vector3)localTransform.Position + Vector3.forward * 4);
                 }
 
 
                 // handle spawning of particles:
-                if (Input.GetKey(KeyCode.Space) || m_SpawnedCount < 500) // 2000
+                if (Input.GetKey(KeyCode.Space) || m_SpawnedCount < 150) // 2000
                 {
                     var spawnPosition = localTransform.Position + Utility.Forward * 16 + Utility.Up * 3;
                     var randomness = Random.CreateFromIndex((uint)(localTransform.Position.z * 1000)).NextFloat3Direction() * 3.25f;
