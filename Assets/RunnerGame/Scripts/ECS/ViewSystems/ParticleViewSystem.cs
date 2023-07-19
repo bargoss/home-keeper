@@ -15,16 +15,18 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
         private List<Vector3> m_Vertices = new List<Vector3>();
         private List<int> m_Triangles = new List<int>();
         private List<Vector3> m_Normals = new List<Vector3>();
+        private List<Color> m_Colors = new List<Color>();
         
         private List<Vector3>  m_ChunkVertices = new List<Vector3>();
         private List<int>  m_ChunkTriangles = new List<int>();
         private List<Vector3>  m_ChunkNormals = new List<Vector3>();
+        private List<Color>  m_ChunkColors = new List<Color>();
         private void DrawTriangle(Vector3 a, Vector3 b, Vector3 c)
         {
             var normal = Vector3.Cross(b - a, c - a).normalized;
-            DrawTriangle(a, b, c, normal, normal, normal);
+            DrawTriangle(a, b, c, normal, normal, normal, Color.white);
         }
-        private void DrawTriangle(Vector3 a, Vector3 b, Vector3 c, Vector3 normalA, Vector3 normalB, Vector3 normalC)
+        private void DrawTriangle(Vector3 a, Vector3 b, Vector3 c, Vector3 normalA, Vector3 normalB, Vector3 normalC, Color color)
         {
             var index = m_Vertices.Count;
             m_Vertices.Add(a);
@@ -36,6 +38,13 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
             m_Triangles.Add(index);
             m_Triangles.Add(index + 1);
             m_Triangles.Add(index + 2);
+            m_Colors.Add(color);
+            m_Colors.Add(color);
+            m_Colors.Add(color);
+        }
+        private void DrawTriangle(Vector3 a, Vector3 b, Vector3 c, Vector3 normalA, Vector3 normalB, Vector3 normalC)
+        {
+            DrawTriangle(a, b, c, normalA, normalB, normalC, Color.white);
         }
         private void Draw4FacedPyramid(Vector3 center, float size)
         {
@@ -68,19 +77,10 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
             m_Triangles.Add(index + 2);
         }
 
-        private void DrawQuad(Vector3 center, float edgeLen, Quaternion rotation)
+        private void DrawQuad(Vector3 center, float edgeLen, Quaternion rotation, Vector3 normal, Color color)
         {
-            var index = m_Vertices.Count;
-            m_Vertices.Add(center + rotation * new Vector3(-edgeLen, -edgeLen, 0));
-            m_Vertices.Add(center + rotation * new Vector3(edgeLen, -edgeLen, 0));
-            m_Vertices.Add(center + rotation * new Vector3(edgeLen, edgeLen, 0));
-            m_Vertices.Add(center + rotation * new Vector3(-edgeLen, edgeLen, 0));
-            m_Triangles.Add(index);
-            m_Triangles.Add(index + 1);
-            m_Triangles.Add(index + 2);
-            m_Triangles.Add(index);
-            m_Triangles.Add(index + 2);
-            m_Triangles.Add(index + 3);
+            DrawTriangle(center + rotation * new Vector3(-edgeLen, -edgeLen, 0),center + rotation * new Vector3(edgeLen, -edgeLen, 0),center + rotation * new Vector3(edgeLen, edgeLen, 0), normal, normal, normal, color);
+            DrawTriangle(center + rotation * new Vector3(-edgeLen, -edgeLen, 0),center + rotation * new Vector3(edgeLen, edgeLen, 0),center + rotation * new Vector3(-edgeLen, edgeLen, 0), normal, normal, normal, color);
         }
         
         private void DrawCone(Vector3 center, Vector3 tipOffset, float baseRadius, int baseEdgeCount)
@@ -129,6 +129,7 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
                 m_ChunkVertices.Clear();
                 m_ChunkTriangles.Clear();
                 m_ChunkNormals.Clear();
+                m_ChunkColors.Clear();
                 for (int i = 0; i < triangleCountInThisMesh; i += 1)
                 {
                     m_ChunkVertices.Add(m_Vertices[triangleCount + i * 3]);
@@ -140,6 +141,9 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
                     m_ChunkNormals.Add(m_Normals[triangleCount + i * 3]);
                     m_ChunkNormals.Add(m_Normals[triangleCount + i * 3 + 1]);
                     m_ChunkNormals.Add(m_Normals[triangleCount + i * 3 + 2]);
+                    m_ChunkColors.Add(m_Colors[triangleCount + i * 3]);
+                    m_ChunkColors.Add(m_Colors[triangleCount + i * 3 + 1]);
+                    m_ChunkColors.Add(m_Colors[triangleCount + i * 3 + 2]);
                 }
                 
                 //var posSum = vertices.Aggregate(Vector3.zero, (current, vertex) => current + vertex);
@@ -159,7 +163,9 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
                 //}
                 m_Mesh.SetTriangles(m_ChunkTriangles, 0);
                 m_Mesh.SetNormals(m_ChunkNormals);
+                m_Mesh.SetColors(m_ChunkColors);
                 m_Mesh.RecalculateBounds();
+                
                 Graphics.DrawMesh(m_Mesh, Matrix4x4.TRS(center, quaternion.identity, Vector3.one), GameResources.Instance.MagazineMaterial, 0);
                 
                 triangleCount += triangleCountInThisMesh;
@@ -208,8 +214,9 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
                     var normal = ((Vector3)localToWorld.Position - camPos).normalized;
                     if (((Vector3)localToWorld.Position - Vector3.zero).sqrMagnitude < 10000 * 10000)
                     {
-                        //DrawQuad(localToWorld.Position, 0.8f, Quaternion.LookRotation(-camForward));
-                        DrawCone((Vector3)localToWorld.Position + normal * 0.8f * 1.5f, -normal * 0.8f *3f, 0.8f, 4);
+                        DrawQuad(localToWorld.Position, 0.8f, Quaternion.LookRotation(-camForward), normal, Color.cyan);
+                        //DrawCone((Vector3)localToWorld.Position + normal * 0.8f * 1.5f, -normal * 0.8f *3f, 0.8f, 4);
+                        
                     }
                 }).WithoutBurst().Run();
             }
