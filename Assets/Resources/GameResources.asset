@@ -16,3 +16,4 @@ MonoBehaviour:
   MagazineMaterial: {fileID: 2100000, guid: 376dc78aee7457546b41509fb355afe6, type: 2}
   shooterGoViewPrefab: {fileID: 3396015738664773049, guid: b65b251491836b9428c58265cd640af1,
     type: 3}
+  ObiParticleMaterial: {fileID: 2100000, guid: 4ca77f03d0ef0b0479d24a02249116c6, type: 2}

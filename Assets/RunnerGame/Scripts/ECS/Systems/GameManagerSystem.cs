@@ -19,6 +19,7 @@ namespace RunnerGame.Scripts.ECS.Systems
         {
             if (!SystemAPI.TryGetSingleton<RgGameManagerData>(out var gameManager))
             {
+                Debug.LogError("GameManagerSystem: GameManagerData not found!");
                 return;
             }
 

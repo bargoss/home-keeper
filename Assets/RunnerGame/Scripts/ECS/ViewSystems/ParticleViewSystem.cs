@@ -210,8 +210,9 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
 
         protected override void OnUpdate()
         {
+            return;
             if (!SystemAPI.TryGetSingleton<SpacialPartitioningSingleton>(out var spacialIndexing))
-            {
+            { 
                 Debug.Log("SpacialPartitioningSingleton not found");
                 return;
             }

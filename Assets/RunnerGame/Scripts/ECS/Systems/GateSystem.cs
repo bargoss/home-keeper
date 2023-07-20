@@ -31,7 +31,7 @@ namespace RunnerGame.Scripts.ECS.Systems
 
             if (!SystemAPI.TryGetSingleton<RgGameManagerData>(out var gameManagerData))
             {
-                Debug.LogError("No game manager state");
+                //Debug.LogError("No game manager state");
                 return;
             }
             
