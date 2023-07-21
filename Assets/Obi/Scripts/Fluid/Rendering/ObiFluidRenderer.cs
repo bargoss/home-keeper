@@ -21,6 +21,7 @@ namespace Obi
 		private Material thickness_Material;
         private Material color_Material;
         private Material fluid_Material;
+        public Material Fluid_Material => fluid_Material;
         private FluidRenderingUtils.FluidRenderTargets renderTargets;
 
         protected override void Setup()

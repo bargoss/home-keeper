@@ -11,7 +11,7 @@ using Random = UnityEngine.Random;
 
 namespace RunnerGame.Scripts.ECS.ViewSystems
 {
-    [UpdateInGroup(typeof(LateSimulationSystemGroup))]
+    [UpdateInGroup(typeof(SimulationSystemGroup))]
     public partial class ObiParticleRenderFixedUpdateSystem : SystemBase
     {
         protected override void OnCreate()
@@ -25,26 +25,52 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
         protected override void OnUpdate()
         {
             var customEmitter = Object.FindObjectOfType<ObiCustomEmitter>();
-            //var customUpdater = Object.FindObjectOfType<ObiCustomUpdater>();
+            var customUpdater = Object.FindObjectOfType<ObiCustomUpdater>();
 
 
             //customEmitter.EmitParticle(new Vector3(1,2,0), new Vector3(0,0,0), out var solverIndex);
             
-            Entities.ForEach((ref ParticleView particleView, in LocalToWorld localToWorld, in PhysicsVelocity physicsVelocity) =>
+            customEmitter.KillAll();
+            
+            List<ObiCustomEmitter.ParticleInfo> particleInfos = new();
+            
+            Entities.ForEach((ref ParticleView particleView, ref LocalTransform localTransform, ref PhysicsVelocity physicsVelocity) =>
             {
-                if (!particleView.IsInObiSolver)
-                {
-                    customEmitter.EmitParticle(new Vector3(0,2,0), new Vector3(0,0,0), out var solverIndex);
-                    particleView.ObiSolverIndex = solverIndex;
-                    particleView.IsInObiSolver = true;
-                }
-                //customEmitter.SetPosition(particleView.ObiSolverIndex, localToWorld.Position);
-                //customEmitter.SetVelocity(particleView.ObiSolverIndex, physicsVelocity.Linear);
-                //customEmitter.SetAngularVelocity(particleView.ObiSolverIndex, physicsVelocity.Angular);
+                particleInfos.Add(new ObiCustomEmitter.ParticleInfo(localTransform.Position, physicsVelocity.Linear));
+                
             }).WithoutBurst().Run();
             
-            //customUpdater.HandleFixedUpdate();
-            //customUpdater.HandleUpdate();
+            customEmitter.PushParticles(particleInfos);
+            customUpdater.HandleFixedUpdate();
+            customUpdater.HandleUpdate();
+            customEmitter.PullParticles(particleInfos);
+            
+            int i = 0;
+            Entities.ForEach((ref ParticleView particleView, ref LocalTransform localTransform, ref PhysicsVelocity physicsVelocity) =>
+            {
+                var particleInfo = particleInfos[i];
+                //localTransform.Position = particleInfo.Position;
+                //var positionChange = (float3)particleInfo.Position - localTransform.Position;
+                //physicsVelocity.Linear = (float3)particleInfo.Velocity + (positionChange / SystemAPI.Time.DeltaTime);
+                physicsVelocity.Linear = (float3)particleInfo.Velocity;
+                physicsVelocity.Linear*=0.95f;
+                physicsVelocity.Angular = float3.zero;
+                i++;
+            }).WithoutBurst().Run();
+
+            var particleRenderer = Object.FindObjectOfType<ObiParticleRenderer>();
+            var meshes = particleRenderer.ParticleMeshes;
+
+            var fluidRenderer = Object.FindObjectOfType<ObiFluidRenderer>();
+            var material = fluidRenderer.Fluid_Material;
+            
+            foreach (var mesh in meshes)
+            {
+                Graphics.DrawMesh(mesh, Matrix4x4.Translate(new Vector3(0,3,0)), material, 0);
+            }
+
+
+
         }
     }
 

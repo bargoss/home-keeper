@@ -15,19 +15,22 @@ namespace WaterGame.Systems
 {
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     [UpdateAfter(typeof(SpacialPartitioningSystem))]
-    [BurstCompile]
     public partial struct ParticleCollisionSolverSystem : ISystem
     {
         NativeHashMap<Entity, float3> m_VelocityCache;
         NativeHashMap<Entity, float3> m_PositionsCache;
         NativeArray<Entity> m_EntityBuffer;
         
+        
+        [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             m_VelocityCache = new NativeHashMap<Entity, float3>(100000, Allocator.Persistent);
             m_PositionsCache = new NativeHashMap<Entity, float3>(100000, Allocator.Persistent);
             m_EntityBuffer = new NativeArray<Entity>(100000, Allocator.Persistent);
         }
+        
+        [BurstCompile]
         public void OnDestroy(ref SystemState state)
         {
             m_VelocityCache.Dispose();
@@ -35,9 +38,11 @@ namespace WaterGame.Systems
             m_EntityBuffer.Dispose();
         }
 
+        
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
+            return;
             var spacialPartitioning = SystemAPI.GetSingletonRW<SpacialPartitioningSingleton>().ValueRO.Partitioning;
             if (!SystemAPI.TryGetSingleton<WaterGameConfig>(out var config))
             {
