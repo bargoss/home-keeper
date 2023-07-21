@@ -28,5 +28,7 @@ namespace RunnerGame.Scripts.ECS.Components
     {
         public bool PositiveEffect;
         public float3 Normal;
+        public int ObiSolverIndex;
+        public bool IsInObiSolver;
     }
 }

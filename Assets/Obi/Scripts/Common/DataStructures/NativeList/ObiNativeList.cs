@@ -105,7 +105,8 @@ namespace Obi
                 UnsafeUtility.Free(m_AlignedPtr, Allocator.Persistent);
                 m_AlignedPtr = null;
             }
-#if ENABLE_UNITY_COLLECTIONS_CHECKS
+//#if ENABLE_UNITY_COLLECTIONS_CHECKS
+#if false
             // dispose of atomic safety handle:
             AtomicSafetyHandle.CheckDeallocateAndThrow(m_SafetyHandle);
             AtomicSafetyHandle.Release(m_SafetyHandle);

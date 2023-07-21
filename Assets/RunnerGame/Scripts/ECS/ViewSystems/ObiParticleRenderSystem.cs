@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using Obi;
+using Obi.MyScenes;
 using RunnerGame.Scripts.ECS.Components;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Physics;
 using Unity.Transforms;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -12,44 +14,37 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
     [UpdateInGroup(typeof(LateSimulationSystemGroup))]
     public partial class ObiParticleRenderFixedUpdateSystem : SystemBase
     {
-        private ParticleImpostorRendering m_Impostors;
-        private MyObiParticleCollection m_ParticleCollection;
-        private Material ParticleMaterial => GameResources.Instance.ObiParticleMaterial;
-
         protected override void OnCreate()
         {
-            m_ParticleCollection = new MyObiParticleCollection();
-            m_Impostors = new ParticleImpostorRendering();
+            
         }
         protected override void OnDestroy()
         {
-            m_ParticleCollection = null;
-            m_Impostors = null;
+            
         }
         protected override void OnUpdate()
         {
-            //var particleRenderer = Object.FindObjectOfType<ObiParticleRenderer>();
-            var impostors = m_Impostors;
-            m_ParticleCollection.Positions.Clear();
-            
-            Entities.ForEach((in ParticleView particleView, in LocalToWorld localToWorld) =>
-            {
-                m_ParticleCollection.Positions.Add(localToWorld.Position);
-            }).WithoutBurst().Run();
-            impostors.UpdateMeshes(m_ParticleCollection);
-            DrawParticles(impostors.Meshes);
-        }
+            var customEmitter = Object.FindObjectOfType<ObiCustomEmitter>();
+            //var customUpdater = Object.FindObjectOfType<ObiCustomUpdater>();
 
-        private void DrawParticles(IEnumerable<Mesh> meshes)
-        {
-            //ParticleMaterial.SetFloat("_RadiusScale", 0.45f);
-            //ParticleMaterial.SetColor("_Color", Color.cyan);
+
+            //customEmitter.EmitParticle(new Vector3(1,2,0), new Vector3(0,0,0), out var solverIndex);
             
-            ParticleMaterial.SetFloat("_RadiusScale", 1);
-            ParticleMaterial.SetColor("_Color", Color.white);
+            Entities.ForEach((ref ParticleView particleView, in LocalToWorld localToWorld, in PhysicsVelocity physicsVelocity) =>
+            {
+                if (!particleView.IsInObiSolver)
+                {
+                    customEmitter.EmitParticle(new Vector3(0,2,0), new Vector3(0,0,0), out var solverIndex);
+                    particleView.ObiSolverIndex = solverIndex;
+                    particleView.IsInObiSolver = true;
+                }
+                //customEmitter.SetPosition(particleView.ObiSolverIndex, localToWorld.Position);
+                //customEmitter.SetVelocity(particleView.ObiSolverIndex, physicsVelocity.Linear);
+                //customEmitter.SetAngularVelocity(particleView.ObiSolverIndex, physicsVelocity.Angular);
+            }).WithoutBurst().Run();
             
-            foreach (Mesh mesh in meshes)
-                Graphics.DrawMesh(mesh, Matrix4x4.identity, ParticleMaterial, 0);
+            //customUpdater.HandleFixedUpdate();
+            //customUpdater.HandleUpdate();
         }
     }
 

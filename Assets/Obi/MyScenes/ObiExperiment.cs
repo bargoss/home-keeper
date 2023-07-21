@@ -1,89 +1,99 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using DefaultNamespace;
 using Obi;
+using Obi.MyScenes;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class ObiExperiment : MonoBehaviour
 {
     public ObiEmitter Emitter;
 
     public ObiSolver Solver;
+    public ObiParticleRenderer ObiParticleRenderer;
+    public ObiCustomEmitter ObiCustomEmitter;
+    
+    public ObiCustomUpdater ObiCustomUpdater;
     // Start is called before the first frame update
     void Start()
     {
-        
+        //ObiParticleRenderer.ParticleMaterial = GameResources.Instance.ObiParticleMaterial;
+        //m_ObiCustomUpdater = Solver.gameObject.AddComponent<ObiCustomUpdater>();
     }
 
     // Update is called once per frame
-    void Update()
+
+    private List<int> particleIds = new();
+
+    private List<ObiCustomEmitter.ParticleInfo> ParticleInfos = new();
+    private float SpawnedCount = 0;
+
+    private void Update()
+    {
+        if (Input.GetKey(KeyCode.Q))
+        {
+            //ObiCustomEmitter.EmitParticle(0.2f);
+            ObiCustomEmitter.EmitParticle(Random.insideUnitSphere * 0.01f, Vector3.zero, out var particleId );
+        }
+        
+    }
+
+    void FixedUpdate()
+    {
+        return;
+        //ObiCustomEmitter.PullParticles(ParticleInfos);
+
+        if (Input.GetKey(KeyCode.Space))
+        {
+            //ObiCustomEmitter.EmitParticle(-Vector3.right * 3, Vector3.up * 0, out var particleId );
+            //particleIds.Add(particleId);
+
+            ParticleInfos.Add(new ObiCustomEmitter.ParticleInfo()
+            {
+                Position = -Vector3.right * SpawnedCount * 10.11f + Vector3.up * Time.time * 0.1f,
+                Velocity = Vector3.up * 0,
+            });
+
+            SpawnedCount++;
+        }
+
+        ObiCustomEmitter.PushParticles(ParticleInfos);
+
+        if (ObiCustomUpdater != null)
+        {
+            ObiCustomUpdater.HandleFixedUpdate();
+            ObiCustomUpdater.HandleUpdate();
+        }
+
+        ObiCustomEmitter.PullParticles(ParticleInfos);
+
+        //ObiCustomEmitter.PushParticles(ParticleInfos);
+    }
+
+    void FixedUpdate2()
     {
         if (Input.GetKey(KeyCode.Space))
         {
-            CreateParticle();
+            ObiCustomEmitter.EmitParticle(-Vector3.right * 3, Vector3.up * 0, out var particleId );
+            particleIds.Add(particleId);
         }
-    }
 
-    void CreateParticle()
-    {
-        Emitter.EmitParticle(0.1f);
-    }
-}
-
-public class ObiCustomUpdater : ObiUpdater
-{
-    /// <summary>
-    /// Each FixedUpdate() call will be divided into several substeps. Performing more substeps will greatly improve the accuracy/convergence speed of the simulation. 
-    /// Increasing the amount of substeps is more effective than increasing the amount of constraint iterations.
-    /// </summary>
-    [Tooltip("Amount of substeps performed per FixedUpdate. Increasing the amount of substeps greatly improves accuracy and convergence speed.")]
-    public int substeps = 4;
-
-    [NonSerialized] private float accumulatedTime;
-
-    private void OnValidate()
-    {
-        substeps = Mathf.Max(1, substeps);
-    }
-
-    private void OnEnable()
-    {
-        accumulatedTime = 0;
-    }
-
-    private void OnDisable()
-    {
-        Physics.autoSimulation = true;
-    }
-
-    public void HandleFixedUpdate()
-    {
-        ObiProfiler.EnableProfiler();
-
-        PrepareFrame();
-
-        BeginStep(Time.fixedDeltaTime);
-
-        float substepDelta = Time.fixedDeltaTime / (float)substeps;
-
-        // Divide the step into multiple smaller substeps:
-        for (int i = 0; i < substeps; ++i)
-            Substep(Time.fixedDeltaTime, substepDelta, substeps-i);
-
-        EndStep(substepDelta);
-
-        ObiProfiler.DisableProfiler();
-
-        accumulatedTime -= Time.fixedDeltaTime;
-    }
-
-    public void HandleUpdate()
-    {
-        accumulatedTime += Time.deltaTime;
-
-        ObiProfiler.EnableProfiler();
-        Interpolate(Time.fixedDeltaTime, accumulatedTime);
-        ObiProfiler.DisableProfiler();
+        if (Input.GetKey(KeyCode.A))
+        {
+            for (var i = 0; i < particleIds.Count; i++)
+            {
+                var particleId = particleIds[i];
+                //ObiCustomEmitter.SetPosition(i, (Vector3.up * (Time.time % 3f))  +Vector3.right * ((i * 0.1f) % 2));
+                //ObiCustomEmitter.SetVelocity(i, Vector3.zero);
+                
+                //ObiCustomEmitter.SetVelocity(particleId, Vector3.zero);
+            }
+        }
+            
+        
+        
+        
     }
 }
-
