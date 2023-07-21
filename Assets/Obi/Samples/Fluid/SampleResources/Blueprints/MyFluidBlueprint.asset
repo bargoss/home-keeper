@@ -15057,11 +15057,11 @@ MonoBehaviour:
   resolution: 0.005
   restDensity: 1000
   smoothing: 2
-  viscosity: 0.72
-  surfaceTension: 0.06
-  buoyancy: 0
+  viscosity: 0.08
+  surfaceTension: 0.37
+  buoyancy: 2.45
   atmosphericDrag: 0
   atmosphericPressure: 0
-  vorticity: 0
-  diffusion: 0
+  vorticity: 3.2
+  diffusion: 11.31
   diffusionData: {x: 0, y: 0, z: 0, w: 0}

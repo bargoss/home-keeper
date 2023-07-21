@@ -50,9 +50,11 @@ namespace RunnerGame.Scripts.ECS.ViewSystems
             {
                 var particleInfo = particleInfos[i];
                 //localTransform.Position = particleInfo.Position;
-                //var positionChange = (float3)particleInfo.Position - localTransform.Position;
+                var positionChange = (float3)particleInfo.Position - localTransform.Position;
                 //physicsVelocity.Linear = (float3)particleInfo.Velocity + (positionChange / SystemAPI.Time.DeltaTime);
                 physicsVelocity.Linear = (float3)particleInfo.Velocity;
+                physicsVelocity.Linear += 0.025f * positionChange / SystemAPI.Time.DeltaTime;
+                
                 physicsVelocity.Linear*=0.95f;
                 physicsVelocity.Angular = float3.zero;
                 i++;

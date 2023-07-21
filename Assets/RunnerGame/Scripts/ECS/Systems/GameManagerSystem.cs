@@ -47,8 +47,9 @@ namespace RunnerGame.Scripts.ECS.Systems
                 if (Input.GetKey(KeyCode.Space) || m_SpawnedCount < 1000) // 2000
                 {
                     var spawnPosition = localTransform.Position + Utility.Forward * 16 + Utility.Up * 3;
-                    var randomness = Random.CreateFromIndex((uint)(localTransform.Position.z * 1000)).NextFloat3Direction() * 3.25f;
-                    
+                    var randomness = Random.CreateFromIndex((uint)(localTransform.Position.z * 1000))
+                        .NextFloat3Direction() * 0.0001f; //* 3.25f;
+
                     var particle = ecb.Instantiate(gameManager.ParticlePrefab);
                     ecb.SetLocalPositionRotationScale(particle, spawnPosition + randomness, quaternion.identity, 0.45f);
 
