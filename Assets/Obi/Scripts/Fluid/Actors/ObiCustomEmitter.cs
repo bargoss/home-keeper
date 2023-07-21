@@ -426,6 +426,13 @@ namespace Obi
         {
             public Vector3 Position;
             public Vector3 Velocity;
+
+            //ctor
+            public ParticleInfo(Vector3 position, Vector3 velocity)
+            {
+                Position = position;
+                Velocity = velocity;
+            }
         }
 
         public void PushParticles(IEnumerable<ParticleInfo> particleInfos)
