@@ -34,10 +34,21 @@ public class ObiExperiment : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.Q))
         {
-            //ObiCustomEmitter.EmitParticle(0.2f);
-            ObiCustomEmitter.EmitParticle(Random.insideUnitSphere * 0.01f, Vector3.zero, out var particleId );
+            for (int i = 0; i < 10; i++)
+            {
+                ForeachPointOnUnitCircle(Vector3.zero, Vector3.forward, 10, point =>
+                {
+                    ObiCustomEmitter.EmitParticle(point * 1.0f, Vector3.zero, out var particleId );
+                });
+                //ObiCustomEmitter.EmitParticle(Vector3.right * i * 0.05f, Vector3.zero, out var particleId );
+            }
+            //ObiCustomEmitter.EmitParticle(Random.insideUnitSphere * 0.01f, Vector3.zero, out var particleId );
         }
-        
+
+        if (Input.GetKey(KeyCode.W))
+        {
+            ObiCustomEmitter.KillAll();
+        }
     }
 
     void FixedUpdate()
@@ -70,6 +81,17 @@ public class ObiExperiment : MonoBehaviour
         ObiCustomEmitter.PullParticles(ParticleInfos);
 
         //ObiCustomEmitter.PushParticles(ParticleInfos);
+    }
+    
+    private void ForeachPointOnUnitCircle(Vector3 origin, Vector3 circleAxis, int pointsCount, Action<Vector3> action)
+    {
+        var angleStep = 360f / pointsCount;
+        for (var i = 0; i < pointsCount; i++)
+        {
+            var angle = angleStep * i;
+            var point = Quaternion.AngleAxis(angle, circleAxis) * Vector3.right;
+            action(point);
+        }
     }
 
     void FixedUpdate2()
