@@ -1,4 +1,5 @@
 ﻿using DefaultNamespace;
+using DG.Tweening;
 using HomeKeeper.Components;
 using RunnerGame.Scripts.ECS.Components;
 using Unity.Burst;
@@ -21,7 +22,7 @@ namespace RunnerGame.Scripts.ECS.Systems
             
         }
 
-        [BurstCompile]
+        //[BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             var particleLookup = SystemAPI.GetComponentLookup<Particle>();
@@ -31,6 +32,7 @@ namespace RunnerGame.Scripts.ECS.Systems
 
             if (!SystemAPI.TryGetSingleton<RgGameManagerData>(out var gameManagerData))
             {
+                
                 Debug.LogError("No game manager state");
                 return;
             }
@@ -44,8 +46,10 @@ namespace RunnerGame.Scripts.ECS.Systems
                     if (statefulCollisionEvent.State != StatefulEventState.Enter)
                     {
                         continue;
-                    } 
-                        
+                    }
+
+                    
+
                     var otherEntity = statefulCollisionEvent.GetOtherEntity(gateEntity);
                     if (
                         particleLookup.TryGetRw(otherEntity, out var particleRw) &&
@@ -54,6 +58,28 @@ namespace RunnerGame.Scripts.ECS.Systems
                         
                     )
                     {
+                        if (!DOTween.IsTweening(gateEntity))
+                        {
+                            var world = state.World;
+
+                            DOTween.Sequence(gateEntity)
+                                .Append(
+                                    DOTween.Shake(
+                                        () => world.EntityManager.GetComponentData<LocalTransform>(gateEntity).Position,
+                                        value =>
+                                        {
+                                            var localtr =
+                                                world.EntityManager.GetComponentData<LocalTransform>(gateEntity);
+                                            localtr.Position = value;
+                                            world.EntityManager.SetComponentData(gateEntity, localtr);
+
+                                            Debug.Log("tweening");
+                                        },
+                                        0.5f, 10))
+                                .AppendCallback(() => { Debug.Log("tweening done"); }); //.SetAutoKill(true);
+                        }
+
+
                         var otherPos = localToWorldLookup[otherEntity].Position;
                         var particle = particleRw.ValueRW;
                         particle.LastGateInteractionTime = (float)SystemAPI.Time.ElapsedTime;

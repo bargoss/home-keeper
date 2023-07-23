@@ -332,7 +332,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4599226468345647896}
-  - component: {fileID: 4282107667910234188}
   - component: {fileID: 7213179673375099927}
   m_Layer: 0
   m_Name: EffectArea
@@ -356,18 +355,6 @@ Transform:
   m_Father: {fileID: 4493143738630157856}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4282107667910234188
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6318642079287145911}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 71242163ba188c04b8b904b94ff79242, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &7213179673375099927
 MonoBehaviour:
   m_ObjectHideFlags: 0
