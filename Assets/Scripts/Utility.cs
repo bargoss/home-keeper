@@ -2,6 +2,7 @@
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
+using Unity.Physics.Systems;
 using Unity.Transforms;
 using UnityEngine;
 using Plane = UnityEngine.Plane;
@@ -156,6 +157,44 @@ namespace DefaultNamespace
             return Vector3.zero;
         }
         
+        private static bool TryRaycastGetFirst(this BuildPhysicsWorldData buildPhysicsWorldData, float3 origin, float3 end, CollisionFilter collisionFilter, out Entity entity)
+        {
+            entity = Entity.Null;
+            var collisionWorld = buildPhysicsWorldData.PhysicsData.PhysicsWorld.CollisionWorld;
+            var raycastInput = new RaycastInput
+            {
+                Start = origin,
+                End = end,
+                Filter = collisionFilter
+            };
+            if (collisionWorld.CastRay(raycastInput, out var hit))
+            {
+                entity = hit.Entity;
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool TryRaycastGetDistance(this BuildPhysicsWorldData buildPhysicsWorldData, float3 origin, float3 end, CollisionFilter collisionFilter, out float hitDistance)
+        {
+            hitDistance = 0;
+            var raycastInput = new RaycastInput
+            {
+                Start = origin,
+                End = end,
+                Filter = collisionFilter
+            };
+            var collisionWorld = buildPhysicsWorldData.PhysicsData.PhysicsWorld.CollisionWorld;
+            if (collisionWorld.CastRay(raycastInput, out var hit))
+            {
+                hitDistance = hit.Fraction;
+                return true;
+            }
+            
+            return false;
+        }
+
         public static void TranslateLEG(DynamicBuffer<LinkedEntityGroup> leg, float4x4 translation, ref ComponentLookup<LocalToWorld> localToWorldLookup,ref EntityCommandBuffer entityCommandBuffer)
         {
             foreach (var e in leg)

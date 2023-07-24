@@ -19,7 +19,7 @@ namespace RunnerGame.Scripts.ECS.Systems
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            
+            state.RequireForUpdate<RgGameManagerData>();
         }
 
         //[BurstCompile]
@@ -32,7 +32,6 @@ namespace RunnerGame.Scripts.ECS.Systems
 
             if (!SystemAPI.TryGetSingleton<RgGameManagerData>(out var gameManagerData))
             {
-                
                 Debug.LogError("No game manager state");
                 return;
             }

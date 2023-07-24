@@ -4,11 +4,6 @@ using Unity.Mathematics;
 
 namespace DefenderGame.Scripts.Components
 {
-    public struct DeUnit : IComponentData
-    {
-        
-    }
-
     public struct DeUnitSpawner : IComponentData
     {
         // stats:
@@ -19,11 +14,8 @@ namespace DefenderGame.Scripts.Components
         public float LastSpawn;
         public int UnitCountInside;
         public Faction UnitFactionInside;
+        
+        // input:
+        public float3 TargetPosition;
     }
-
-    public struct DamageOpposingFactionOnCollision : IComponentData
-    {
-        public float DamagePerSecond;
-    }
-
 }
