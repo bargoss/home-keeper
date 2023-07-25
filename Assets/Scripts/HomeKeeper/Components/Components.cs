@@ -97,47 +97,6 @@ namespace HomeKeeper.Components
     {
         
     }
-    public struct ItemSocket : IComponentData
-    {
-        public ItemType AcceptedItemType;
-        public bool DestroyedIfEmpty;
-        
-        // if it has an item, there will be an Item component on the entity as well as this
-    }
-    
-    public struct Item : IComponentData
-    {
-        public ItemType ItemType;
-        public int ItemId;
-    }
-    
-    public readonly partial struct ItemSocketAspect : IAspect
-    {
-        // An Entity field in an Aspect gives access to the Entity itself.
-        // This is required for registering commands in an EntityCommandBuffer for example.
-        public readonly Entity Self;
-        public readonly RefRO<ItemSocket> ItemSocket;
-        [Optional] private readonly RefRO<Item> m_Item;
-        private readonly RefRO<LocalToWorld> LocalToWorld;
-        private readonly RefRW<LocalTransform> LocalTransform;
-        public float3 WorldPosition => LocalToWorld.ValueRO.Position;
-        public bool DestroyedIfEmpty => ItemSocket.ValueRO.DestroyedIfEmpty;
-        
-        public bool TryGetItem(out Item item)
-        {
-            item = default;
-            
-            if (m_Item.IsValid)
-            {
-                item = m_Item.ValueRO;
-                return true;
-            }
-
-            return false;
-        }
-        
-        
-    }
     
     public struct Magazine : IComponentData
     {
@@ -219,7 +178,7 @@ namespace HomeKeeper.Components
         // state
         //public Entity ItemEntityOpt;
         public bool HoldsItem;
-        public Item HeldItem;
+        
         public float GrabDistance;
     }
     

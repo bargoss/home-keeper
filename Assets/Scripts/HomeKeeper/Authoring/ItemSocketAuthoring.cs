@@ -19,19 +19,19 @@ namespace HomeKeeper.Authoring
         public override void Bake(ItemSocketAuthoring authoring)
         {
             var entity = GetEntity(TransformUsageFlags.Dynamic);
-            AddComponent(entity, new ItemSocket
-            {
-                AcceptedItemType = authoring.AcceptedItemType,
-                DestroyedIfEmpty = authoring.DestroyedIfEmpty
-            });
-            if (authoring.HoldsItem)
-            {
-                AddComponent(entity, new Item()
-                {
-                    ItemId = authoring.HeldItemId,
-                    ItemType = authoring.HeldItemType
-                });
-            }
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
         }
     }
 }

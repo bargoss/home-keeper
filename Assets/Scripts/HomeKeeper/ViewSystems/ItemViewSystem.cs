@@ -60,27 +60,11 @@ namespace HomeKeeper.Systems
         
         protected override void OnUpdate()
         {
+            return;
+            
             m_Vertices.Clear();
             m_Triangles.Clear();
-
-            Entities.ForEach((ref Item item, in LocalToWorld localToWorld) =>
-            {
-                switch (item.ItemType)
-                {
-                    case ItemType.Magazine:
-                        //DrawTriangle(
-                        //    localToWorld.Position + new float3(0.5f, -0.5f, 0),
-                        //    localToWorld.Position + new float3(-0.5f, -0.5f, 0),
-                        //    c: localToWorld.Position + new float3(0, 0.5f, 0)
-                        //    );
-                        Draw4FacedPyramid(localToWorld.Position, 1f);
-                        break;
-                    case ItemType.Resource:
-                    case ItemType.All:
-                    default:
-                        break;
-                }
-            }).WithoutBurst().Run();
+            
             
             if (m_Mesh == null)
             {
