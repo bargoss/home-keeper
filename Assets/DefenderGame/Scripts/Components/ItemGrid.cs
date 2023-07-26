@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using DefenderGame.Scripts.GoViews;
 using JetBrains.Annotations;
@@ -35,6 +36,21 @@ namespace DefenderGame.Scripts.Components
         private readonly int m_Width;
         private readonly int m_Height;
         private readonly HashSet<GridItem> m_Items;
+        private readonly Dictionary<GridItem, int2> m_ItemPivots;
+        
+        public int2[] GetOccupyingGrids(GridItem gridItem)
+        {
+            var result = new List<int2>();
+            for (var i = 0; i < m_Occupations.Length; i++)
+            {
+                if (m_Occupations[i] == gridItem)
+                {
+                    result.Add(new int2(i % m_Width, i / m_Width));
+                }
+            }
+
+            return result.ToArray();
+        } 
         
         // with bounds check
         public bool TryGetGridItem(int2 position, out GridItem gridItem)
@@ -52,6 +68,7 @@ namespace DefenderGame.Scripts.Components
         public void RemoveSocketOccupier(GridItem gridItem)
         {
             m_Items.Remove(gridItem);
+            m_ItemPivots.Remove(gridItem);
             for (var i = 0; i < m_Occupations.Length; i++)
             {
                 if (m_Occupations[i] == gridItem)
@@ -94,6 +111,7 @@ namespace DefenderGame.Scripts.Components
                 m_Occupations[position.x + position.y * m_Width] = gridItem;
             }
             m_Items.Add(gridItem);
+            m_ItemPivots.Add(gridItem, pivot);
             return true;
         } 
         
@@ -103,6 +121,7 @@ namespace DefenderGame.Scripts.Components
         {
             m_Occupations = new GridItem[width * height];
             m_Items = new HashSet<GridItem>();
+            m_ItemPivots = new Dictionary<GridItem, int2>();
             m_Width = width;
             m_Height = height;
         }
