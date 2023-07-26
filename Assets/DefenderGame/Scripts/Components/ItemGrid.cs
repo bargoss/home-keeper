@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using DefenderGame.Scripts.GoViews;
 using JetBrains.Annotations;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -15,14 +16,25 @@ namespace DefenderGame.Scripts.Components
             SocketIndex = socketIndex;
         }
     }
+
+    public class DeItemGrid : IComponentData
+    {
+        private ItemGrid m_ItemGrid;
+        private DeItemGridView m_View;
+
+        public DeItemGrid(int width, int height, DeItemGridView view)
+        {
+            m_ItemGrid = new ItemGrid(width, height);
+            m_View = view;
+        }
+    }
     
-    public class ItemGrid : IComponentData
+    public class ItemGrid
     {
         [ItemCanBeNull] private readonly GridItem[] m_Occupations;
         private readonly int m_Width;
         private readonly int m_Height;
         private readonly HashSet<GridItem> m_Items;
-        
         
         // with bounds check
         public bool TryGetGridItem(int2 position, out GridItem gridItem)
