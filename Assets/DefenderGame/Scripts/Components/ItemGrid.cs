@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DefenderGame.Scripts.GoViews;
@@ -20,15 +21,33 @@ namespace DefenderGame.Scripts.Components
 
     public class DeItemGrid : IComponentData
     {
-        private ItemGrid m_ItemGrid;
-        private DeItemGridView m_View;
-
-        public DeItemGrid(int width, int height, DeItemGridView view)
-        {
-            m_ItemGrid = new ItemGrid(width, height);
-            m_View = view;
-        }
+        public ItemGrid ItemGrid { get; }
+        public List<OngoingAction> OngoingActions { get; } = new(); 
     }
+
+    public abstract class OngoingAction
+    {
+        public float StartTime { get; }
+        public float Duration { get; }
+        public float GetProgress(float time) => math.unlerp(StartTime, StartTime + Duration, time);
+    }
+
+    public class TurretLoadingMagazine : OngoingAction
+    {
+        public int2 NewMagazinePositionBeforeLoad { get; } 
+        
+        public Magazine NewMagazine { get; }
+        [CanBeNull] public Magazine PreviousMagazine { get; }
+        public Turret Turret { get; }
+    }
+
+    public class AmmoBoxFillingMagazine : OngoingAction
+    {
+        public AmmoBox AmmoBox { get; }
+        public Magazine Magazine { get; }
+    }
+    
+    
     
     public class ItemGrid
     {
@@ -38,6 +57,14 @@ namespace DefenderGame.Scripts.Components
         private readonly HashSet<GridItem> m_Items;
         private readonly Dictionary<GridItem, int2> m_ItemPivots;
         
+        public void ForEachItem(Action<GridItem, int2> action)
+        {
+            foreach (var item in m_Items)
+            {
+                action(item, m_ItemPivots[item]);
+            }
+        }
+
         public int2[] GetOccupyingGrids(GridItem gridItem)
         {
             var result = new List<int2>();
@@ -130,6 +157,66 @@ namespace DefenderGame.Scripts.Components
     public abstract class GridItem
     {
         public virtual int2[] Occupations => new int2[1]{new int2(0,0)};
+    }
+
+    public class AmmoBox : GridItem
+    {
+        public int AmmoCount { get; private set; }
+        public int AmmoCapacity { get; }
+        public int AmmoTier { get; }
+        public int BoxTier { get; }
+        
+        public float AmmoCountChangedTime { get; private set; }
+        
+        public void SetAmmoCount(int ammoCount, float time)
+        {
+            AmmoCount = ammoCount;
+            AmmoCountChangedTime = time;
+        }
+    }
+
+    public class Magazine : GridItem
+    {
+        public int AmmoCount { get; private set; }
+        public int AmmoCapacity { get; }
+        public int AmmoTier { get; }
+        public int MagazineTier { get; }
+        
+        public float AmmoCountChangedTime { get; private set; }
+        
+        public void SetAmmoCount(int ammoCount, float time)
+        {
+            AmmoCount = ammoCount;
+            AmmoCountChangedTime = time;
+        }
+    }
+
+    public class Turret : GridItem
+    {
+        public float LastShotTime { get; private set; }
+        public Magazine Magazine { get; private set; }
+        public float3 AimDirection { get; set; }
+        public float LastMagazineChangedTime { get; private set; }
+        
+        public float FireRate { get; }
+        
+        public void SetMagazine(Magazine magazine, float time)
+        {
+            Magazine = magazine;
+            LastMagazineChangedTime = time;
+        }
+        
+        public bool TryShoot(float time)
+        {
+            if(time > LastShotTime + FireRate && Magazine.AmmoCount > 0)
+            {
+                Magazine.SetAmmoCount(Magazine.AmmoCount - 1, time);
+                LastShotTime = time;
+                return true;
+            }
+            
+            return false;
+        }
     }
     
 

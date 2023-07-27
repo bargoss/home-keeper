@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using BulletCircle.GoViews;
+using DefenderGame.Scripts.GoViews;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "GameResources", menuName = "GameResources", order = -100)]
@@ -13,6 +14,8 @@ public class GameResources : ScriptableObject
     public Mesh MagazineMesh;
     public Material MagazineMaterial;
     public ShooterGOView shooterGoViewPrefab;
+
+    public DeItemGridView ItemGridViewPrefab;
 
     
 
