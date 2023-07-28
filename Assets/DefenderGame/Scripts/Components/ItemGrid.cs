@@ -22,29 +22,48 @@ namespace DefenderGame.Scripts.Components
     public class DeItemGrid : IComponentData
     {
         public ItemGrid ItemGrid { get; }
-        public List<OngoingAction> OngoingActions { get; } = new(); 
+        public HashSet<OngoingAction> OngoingActions { get; } = new(); 
     }
 
     public abstract class OngoingAction
     {
         public float StartTime { get; }
-        public float Duration { get; }
-        public float GetProgress(float time) => math.unlerp(StartTime, StartTime + Duration, time);
     }
-
+    
     public class TurretLoadingMagazine : OngoingAction
     {
+        public float ActionDuration { get; }
+        
         public int2 NewMagazinePositionBeforeLoad { get; } 
         
-        public Magazine NewMagazine { get; }
-        [CanBeNull] public Magazine PreviousMagazine { get; }
-        public Turret Turret { get; }
+        public Magazine NewMagazine { get; } // thats being loaded to turret
+        [CanBeNull] public Magazine PreviousMagazine { get; } // thats being unloaded back to NewMagazinePositionBeforeLoad 
+        public int2 TurretPos { get; }
+        
+        public float GetProgress(float time)
+        {
+            return math.unlerp(StartTime, StartTime + ActionDuration, time);
+        }
     }
 
     public class AmmoBoxFillingMagazine : OngoingAction
     {
-        public AmmoBox AmmoBox { get; }
-        public Magazine Magazine { get; }
+        public float TimePerAmmoLoad { get; }
+        public float LastAmmoLoadedTime { get; set; }
+        public int2 AmmoBoxPos { get; }
+        public int2 MagazinePos { get; }
+        
+        public float GetProgress(float time, int ammoBoxAmmoLeft, int magazineAmmoCount, int magazineAmmoCapacity)
+        {
+            var ammoLeft = ammoBoxAmmoLeft;
+            var magazineCapacityLeft = magazineAmmoCapacity - magazineAmmoCount;
+            
+            var ammoLoadsLeft = math.min(ammoLeft, magazineCapacityLeft);
+            var loadFinishTime = LastAmmoLoadedTime + ammoLoadsLeft * TimePerAmmoLoad;
+            var loadStartTime = StartTime;
+            
+            return math.unlerp(loadStartTime, loadFinishTime, time);
+        }
     }
     
     
@@ -91,6 +110,22 @@ namespace DefenderGame.Scripts.Components
             gridItem = m_Occupations[position.x + position.y * m_Width];
             return gridItem != null;
         }
+
+        public bool TryGetGridItem<T>(int2 position, out T gridItem) where T : GridItem
+        {
+            if (TryGetGridItem(position, out var item))
+            {
+                if (item is T t)
+                {
+                    gridItem = t;
+                    return true;
+                }
+            }
+            
+            gridItem = default;
+            return false;
+        }
+        
         
         public void RemoveSocketOccupier(GridItem gridItem)
         {

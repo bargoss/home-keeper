@@ -2,7 +2,7 @@
 
 namespace DefenderGame.Scripts.GoViews
 {
-    public class AmmoCaseGOView : MonoBehaviour
+    public class AmmoBoxGOView : MonoBehaviour
     {
         
     }

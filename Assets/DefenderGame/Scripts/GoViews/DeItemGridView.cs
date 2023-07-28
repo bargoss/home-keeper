@@ -11,7 +11,7 @@ namespace DefenderGame.Scripts.GoViews
     {
         // view prefabs:
         [SerializeField] private MagazineGOView m_MagazinePrefab;
-        [SerializeField] private AmmoCaseGOView m_AmmoCasePrefab;
+        [FormerlySerializedAs("m_AmmoCasePrefab")] [SerializeField] private AmmoBoxGOView ammoBoxPrefab;
         [SerializeField] private ShooterGOView m_ShooterPrefab;
         
         private ItemGrid m_ItemGrid;
