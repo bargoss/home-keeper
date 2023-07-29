@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using DefenderGame.Scripts.Systems;
 using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
 
 namespace DefenderGame.Scripts.GoViews
@@ -14,13 +16,21 @@ namespace DefenderGame.Scripts.GoViews
         {
             m_Tiles.ForEach(tile => Destroy(tile.gameObject));
             m_Tiles.Clear();
-            
-            var tileCount = width * height;
-            for (var i = 0; i < tileCount; i++)
+
+            for (int x = 0; x < width; x++)
             {
-                var tile = Instantiate(m_TilePrefab, transform);
-                tile.localScale = Vector3.one * gridLength;
-                m_Tiles.Add(tile);
+                for (int y = 0; y < height; y++) 
+                {
+                    var worldPos = ItemGridUtils.GridToWorldPos(new int2(x,y), new LocalToWorld()
+                    {
+                        Value = transform.localToWorldMatrix
+                    },gridLength);
+                    
+                    var tile = Instantiate(m_TilePrefab, transform);
+                    tile.position = worldPos;
+                    tile.localScale = new Vector3(gridLength, 1, gridLength);
+                    m_Tiles.Add(tile);
+                }
             }
         }
 

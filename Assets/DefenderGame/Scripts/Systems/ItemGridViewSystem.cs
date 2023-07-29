@@ -18,7 +18,7 @@ namespace DefenderGame.Scripts.Systems
             (logical) =>
             {
                 var view = Object.Instantiate(GameResources.Instance.ItemGridViewPrefab);
-                view.Restore(logical.DeItemGridAuthoring.Width, logical.DeItemGridAuthoring.Height, logical.GridLength);
+                view.Restore(logical.ItemGrid.Width, logical.ItemGrid.Height, logical.GridLength);
                 return view;
             },
             (view) => Object.Destroy(view.gameObject)
@@ -71,7 +71,7 @@ namespace DefenderGame.Scripts.Systems
                 viewTransform.localScale = Vector3.one;
 
 
-                itemGrid.DeItemGridAuthoring.ForEachItem((item, pos) =>
+                itemGrid.ItemGrid.ForEachItem((item, pos) =>
                 {
                     switch (item)
                     {

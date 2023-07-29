@@ -47,7 +47,7 @@ namespace DefenderGame.Scripts.Systems
                 if // if there's a valid selection 
                 (
                     itemGrid.OngoingActions.FirstOrDefault(action => action is Selection) is Selection ongoingAction &&
-                    itemGrid.DeItemGridAuthoring.TryGetGridItem(ongoingAction.SelectedObjectPos, out _)
+                    itemGrid.ItemGrid.TryGetGridItem(ongoingAction.SelectedObjectPos, out _)
                 )
                 {
                     itemGrid.HandleMove(ongoingAction.SelectedObjectPos, targetGridPos, time);

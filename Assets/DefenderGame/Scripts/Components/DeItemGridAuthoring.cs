@@ -14,7 +14,8 @@ namespace DefenderGame.Scripts.Components
             public override void Bake(DeItemGridAuthoring authoring)
             {
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
-                AddComponentObject(entity, new DeItemGrid(authoring.width, authoring.height, authoring.gridLength));
+                //AddComponentObject(entity, new DeItemGrid(authoring.width, authoring.height, authoring.gridLength));
+                AddComponentObject(entity, new DeItemGrid());
             }
         }
     }

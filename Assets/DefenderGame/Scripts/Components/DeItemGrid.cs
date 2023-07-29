@@ -9,44 +9,46 @@ namespace DefenderGame.Scripts.Components
 {
     public class DeItemGrid : IComponentData
     {
-        public DeItemGrid<DeGridObject> DeItemGridAuthoring { get; }
+        public DeItemGrid<DeGridObject> ItemGrid { get; }
 
         public HashSet<OngoingAction> OngoingActions { get; } = new();
         public float GridLength { get; }
 
-        public DeItemGrid(int width, int height, float gridLength)
-        {
-            DeItemGridAuthoring = new DeItemGrid<DeGridObject>(width, height);
-            GridLength = gridLength;
-        }
+        // doesnt work
+        //public DeItemGrid(int width, int height, float gridLength)
+        //{
+        //    ItemGrid = new DeItemGrid<DeGridObject>(width, height);
+        //    GridLength = gridLength;
+        //}
 
         public DeItemGrid()
         {
-            
+            ItemGrid = new DeItemGrid<DeGridObject>(5, 5);
+            GridLength = 2;
         }
 
         public void HandleMove(int2 startPos, int2 endPos, float time)
         {
             if(
-                DeItemGridAuthoring.TryGetGridItem(startPos, out var startItem)
+                ItemGrid.TryGetGridItem(startPos, out var startItem)
             )
             {
-                if (DeItemGridAuthoring.TryGetGridItem(endPos, out var endItem))
+                if (ItemGrid.TryGetGridItem(endPos, out var endItem))
                 {
                     if(startItem is AmmoBox && endItem is Magazine)
                     {
-                        DeItemGridAuthoring.RemoveItem(startItem);
+                        ItemGrid.RemoveItem(startItem);
                         OngoingActions.Add(new AmmoBoxFillingMagazine(time, 0.1f, startPos, endPos));
                     }
                     else if(startItem is Magazine magazine1 && endItem is Turret turret1)
                     {
-                        DeItemGridAuthoring.RemoveItem(startItem);
+                        ItemGrid.RemoveItem(startItem);
                         OngoingActions.Add(new TurretLoadingMagazine(time, 0.1f, startPos, magazine1, turret1.Magazine, endPos));
                     }
                 }
                 else
                 {
-                    DeItemGridAuthoring.RemoveItem(startItem);
+                    ItemGrid.RemoveItem(startItem);
                     OngoingActions.Add(new Moving(time, startItem, startPos, endPos, 0.5f));
                 }
             }
@@ -58,7 +60,7 @@ namespace DefenderGame.Scripts.Components
         }
         public bool TryGetGridObject<T>(int2 position, out T gridObject) where T : DeGridObject
         {
-            if (DeItemGridAuthoring.TryGetGridItem(position, out var item))
+            if (ItemGrid.TryGetGridItem(position, out var item))
             {
                 // if its of type
                 if (item is T t)
