@@ -3,9 +3,27 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using Unity.Entities;
 using Unity.Mathematics;
+using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace DefenderGame.Scripts.Components
 {
+    public class DeItemGridAuthoring : MonoBehaviour
+    {
+        public int width = 5;
+        public int height = 5;
+        public float gridLength = 2;
+        
+        public class DeItemGridBaker : Baker<DeItemGridAuthoring>
+        {
+            public override void Bake(DeItemGridAuthoring authoring)
+            {
+                var entity = GetEntity(TransformUsageFlags.Dynamic);
+                AddComponentObject(entity, new DeItemGrid(authoring.width, authoring.height, authoring.gridLength));
+            }
+        }
+    }
+    
     public class DeItemGrid : IComponentData
     {
         public ItemGrid<DeGridObject> ItemGrid { get; }
@@ -13,9 +31,9 @@ namespace DefenderGame.Scripts.Components
         public HashSet<OngoingAction> OngoingActions { get; } = new();
         public float GridLength { get; }
 
-        public DeItemGrid(ItemGrid<DeGridObject> itemGrid, float gridLength)
+        public DeItemGrid(int width, int height, float gridLength)
         {
-            ItemGrid = itemGrid;
+            ItemGrid = new ItemGrid<DeGridObject>(width, height);
             GridLength = gridLength;
         }
 
