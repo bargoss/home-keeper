@@ -21,8 +21,29 @@ namespace DefenderGame.Scripts.Components
 
     public class DeItemGrid : IComponentData
     {
-        public ItemGrid ItemGrid { get; }
-        public HashSet<OngoingAction> OngoingActions { get; } = new(); 
+        public DeItemGrid(ItemGrid<DeGridObject> itemGrid)
+        {
+            ItemGrid = itemGrid;
+        }
+
+        public ItemGrid<DeGridObject> ItemGrid { get; }
+        public HashSet<OngoingAction> OngoingActions { get; } = new();
+        
+        public bool TryGetGridObject<T>(int2 position, out T gridObject) where T : DeGridObject
+        {
+            if (ItemGrid.TryGetGridItem(position, out var item))
+            {
+                // if its of type
+                if (item.Item is T t)
+                {
+                    gridObject = t;
+                    return true;
+                }
+            }
+
+            gridObject = null;
+            return false;
+        }
     }
 
     public abstract class OngoingAction
@@ -68,15 +89,15 @@ namespace DefenderGame.Scripts.Components
     
     
     
-    public class ItemGrid
+    public class ItemGrid<T>
     {
-        [ItemCanBeNull] private readonly GridItem[] m_Occupations;
+        [ItemCanBeNull] private readonly GridItem<T>[] m_Occupations;
         private readonly int m_Width;
         private readonly int m_Height;
-        private readonly HashSet<GridItem> m_Items;
-        private readonly Dictionary<GridItem, int2> m_ItemPivots;
+        private readonly HashSet<GridItem<T>> m_Items;
+        private readonly Dictionary<GridItem<T>, int2> m_ItemPivots;
         
-        public void ForEachItem(Action<GridItem, int2> action)
+        public void ForEachItem(Action<GridItem<T>, int2> action)
         {
             foreach (var item in m_Items)
             {
@@ -84,7 +105,7 @@ namespace DefenderGame.Scripts.Components
             }
         }
 
-        public int2[] GetOccupyingGrids(GridItem gridItem)
+        public int2[] GetOccupyingGrids(GridItem<T> gridItem)
         {
             var result = new List<int2>();
             for (var i = 0; i < m_Occupations.Length; i++)
@@ -99,7 +120,7 @@ namespace DefenderGame.Scripts.Components
         } 
         
         // with bounds check
-        public bool TryGetGridItem(int2 position, out GridItem gridItem)
+        public bool TryGetGridItem(int2 position, out GridItem<T> gridItem)
         {
             if (position.x < 0 || position.x >= m_Width || position.y < 0 || position.y >= m_Height)
             {
@@ -110,24 +131,8 @@ namespace DefenderGame.Scripts.Components
             gridItem = m_Occupations[position.x + position.y * m_Width];
             return gridItem != null;
         }
-
-        public bool TryGetGridItem<T>(int2 position, out T gridItem) where T : GridItem
-        {
-            if (TryGetGridItem(position, out var item))
-            {
-                if (item is T t)
-                {
-                    gridItem = t;
-                    return true;
-                }
-            }
-            
-            gridItem = default;
-            return false;
-        }
         
-        
-        public void RemoveSocketOccupier(GridItem gridItem)
+        public void RemoveSocketOccupier(GridItem<T> gridItem)
         {
             m_Items.Remove(gridItem);
             m_ItemPivots.Remove(gridItem);
@@ -160,7 +165,7 @@ namespace DefenderGame.Scripts.Components
             return true;
         }
         
-        public bool TryPlaceSocketOccupier(int2 pivot, GridItem gridItem)
+        public bool TryPlaceSocketOccupier(int2 pivot, GridItem<T> gridItem)
         {
             if (!IsSpaceAvailable(pivot, gridItem.Occupations))
             {
@@ -181,20 +186,31 @@ namespace DefenderGame.Scripts.Components
 
         public ItemGrid(int width, int height)
         {
-            m_Occupations = new GridItem[width * height];
-            m_Items = new HashSet<GridItem>();
-            m_ItemPivots = new Dictionary<GridItem, int2>();
+            m_Occupations = new GridItem<T>[width * height];
+            m_Items = new HashSet<GridItem<T>>();
+            m_ItemPivots = new Dictionary<GridItem<T>, int2>();
             m_Width = width;
             m_Height = height;
         }
     }
 
-    public abstract class GridItem
+    public class GridItem<T>
+    {
+        public T Item { get; }
+        public int2[] Occupations { get; }
+        
+        public GridItem(T item, int2[] occupations)
+        {
+            Item = item;
+            Occupations = occupations;
+        }
+    }
+    public abstract class DeGridObject
     {
         public virtual int2[] Occupations => new int2[1]{new int2(0,0)};
     }
 
-    public class AmmoBox : GridItem
+    public class AmmoBox : DeGridObject
     {
         public int AmmoCount { get; private set; }
         public int AmmoCapacity { get; }
@@ -210,7 +226,7 @@ namespace DefenderGame.Scripts.Components
         }
     }
 
-    public class Magazine : GridItem
+    public class Magazine : DeGridObject
     {
         public int AmmoCount { get; private set; }
         public int AmmoCapacity { get; }
@@ -226,7 +242,7 @@ namespace DefenderGame.Scripts.Components
         }
     }
 
-    public class Turret : GridItem
+    public class Turret : DeGridObject
     {
         public float LastShotTime { get; private set; }
         public Magazine Magazine { get; private set; }

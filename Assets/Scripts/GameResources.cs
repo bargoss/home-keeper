@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using BulletCircle.GoViews;
+using DefenderGame.Scripts.Components;
 using DefenderGame.Scripts.GoViews;
 using UnityEngine;
 
@@ -16,8 +17,17 @@ public class GameResources : ScriptableObject
     public ShooterGOView shooterGoViewPrefab;
 
     public DeItemGridView ItemGridViewPrefab;
-
     
+    public TurretGOView TurretGOViewPrefab;
+    public MagazineGOView MagazineGOViewPrefab;
+    public AmmoBoxGOView AmmoBoxGOViewPrefab;
+    public BulletGOView BulletGoView;
+    
+    public ParticleSystem ImpactParticleEffectPrefab;
+    public ParticleSystem SmallShockEffectPrefab;
+    public ParticleSystem ShootEffectPrefab;
+
+
 
     public static GameResources Instance
     {
@@ -33,7 +43,7 @@ public class GameResources : ScriptableObject
         }
     }
 
-    
+
     private void Init()
     {
         

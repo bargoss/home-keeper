@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using DefenderGame.Scripts.Components;
-using DefenderGame.Scripts.GoViews;
 using Unity.Entities;
 using UnityEngine;
 
@@ -11,7 +10,7 @@ namespace DefenderGame.Scripts.Systems
     {
         protected override void OnCreate()
         {
-            RequireForUpdate<ItemGrid>();
+            RequireForUpdate<DeItemGrid>();
         }
 
         protected override void OnUpdate()
@@ -28,7 +27,7 @@ namespace DefenderGame.Scripts.Systems
         {
             itemGrid.ItemGrid.ForEachItem((gridItem, pos) =>
             {
-                switch (gridItem)
+                switch (gridItem.Item)
                 {
                     case AmmoBox ammoBox:
                         break;
@@ -52,8 +51,8 @@ namespace DefenderGame.Scripts.Systems
                 {
                     case AmmoBoxFillingMagazine ammoBoxFillingMagazine:
                         if (
-                            itemGrid.ItemGrid.TryGetGridItem<AmmoBox>(ammoBoxFillingMagazine.AmmoBoxPos, out var ammoBox) &&
-                            itemGrid.ItemGrid.TryGetGridItem<Magazine>(ammoBoxFillingMagazine.MagazinePos, out var magazine)
+                            itemGrid.TryGetGridObject<AmmoBox>(ammoBoxFillingMagazine.AmmoBoxPos, out var ammoBox) &&
+                            itemGrid.TryGetGridObject<Magazine>(ammoBoxFillingMagazine.MagazinePos, out var magazine)
                         )
                         {
                             if(ammoBox.AmmoCount == 0){ completedActions.Add(ongoingAction); }
@@ -69,7 +68,7 @@ namespace DefenderGame.Scripts.Systems
                         
                         break;
                     case TurretLoadingMagazine turretLoadingMagazine:
-                        if (itemGrid.ItemGrid.TryGetGridItem<Turret>(turretLoadingMagazine.TurretPos, out var turret))
+                        if (itemGrid.TryGetGridObject<Turret>(turretLoadingMagazine.TurretPos, out var turret))
                         {
                             // todo
                         }
@@ -81,51 +80,6 @@ namespace DefenderGame.Scripts.Systems
             }
             
             completedActions.ForEach(action => itemGrid.OngoingActions.Remove(action));
-        }
-    }
-
-    public partial class ItemGridViewSystem : SystemBase
-    {
-        public Dictionary<ItemGrid, DeItemGridView> ItemGridViews = new();
-        public Dictionary<Turret, TurretGOView> TurretViews = new();
-        public Dictionary<Magazine, MagazineGOView> MagazineViews = new();
-        public Dictionary<AmmoBox, AmmoBoxGOView> AmmoBoxViews = new();
-
-        protected override void OnCreate()
-        {
-            RequireForUpdate<ItemGrid>();
-        }
-        protected override void OnUpdate()
-        {
-            var itemGridViewPrefab = GameResources.Instance.ItemGridViewPrefab;
-
-            HandleViewCreation();
-            HandleViewDestroying();
-            HandleViewUpdating();
-        }
-
-        private void HandleViewCreation()
-        {
-            Entities.ForEach((Entity entity, ItemGrid itemGrid) =>
-            {
-                // todo
-                
-                
-            }).WithBurst().Run();
-        }
-        private void HandleViewDestroying()
-        {
-            Entities.ForEach((Entity entity, ItemGrid itemGrid) =>
-            {
-                // todo
-            }).WithBurst().Run();
-        }
-        private void HandleViewUpdating()
-        {
-            Entities.ForEach((Entity entity, ItemGrid itemGrid) =>
-            {
-                // todo
-            }).WithBurst().Run();
         }
     }
 }

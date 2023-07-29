@@ -9,13 +9,6 @@ namespace DefenderGame.Scripts.GoViews
 {
     public class DeItemGridView : MonoBehaviour
     {
-        // view prefabs:
-        [SerializeField] private MagazineGOView m_MagazinePrefab;
-        [FormerlySerializedAs("m_AmmoCasePrefab")] [SerializeField] private AmmoBoxGOView ammoBoxPrefab;
-        [SerializeField] private ShooterGOView m_ShooterPrefab;
-        
-        private ItemGrid m_ItemGrid;
-
         public void Restore(int width, int height)
         {
             
