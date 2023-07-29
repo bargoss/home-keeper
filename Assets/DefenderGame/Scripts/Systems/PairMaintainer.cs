@@ -5,11 +5,11 @@ namespace DefenderGame.Scripts.Systems
 {
     public class PairMaintainer<TLogical, TView>
     {
-        private Dictionary<TLogical, TView> LogicalToView = new();
-        private HashSet<TLogical> m_Touched = new();
+        private readonly Dictionary<TLogical, TView> m_LogicalToView = new();
+        private readonly HashSet<TLogical> m_Touched = new();
         
-        private Func<TLogical, TView> m_CreateView;
-        private Action<TView> m_DisposeView;
+        private readonly Func<TLogical, TView> m_CreateView;
+        private readonly Action<TView> m_DisposeView;
         
         //ctor
         public PairMaintainer(Func<TLogical, TView> createView, Action<TView> disposeView)
@@ -21,26 +21,26 @@ namespace DefenderGame.Scripts.Systems
         public TView GetOrCreateView(TLogical logical)
         {
             m_Touched.Add(logical);
-            if (LogicalToView.TryGetValue(logical, out var view))
+            if (m_LogicalToView.TryGetValue(logical, out var view))
             {
                 return view;
             }
             else
             {
                 var pair = m_CreateView(logical);
-                LogicalToView.Add(logical, pair);
+                m_LogicalToView.Add(logical, pair);
                 return pair;
             }
         }
 
         public void DisposeAndClearUntouchedViews()
         {
-            foreach (var logical in LogicalToView.Keys)
+            foreach (var logical in m_LogicalToView.Keys)
             {
                 if (!m_Touched.Contains(logical))
                 {
-                    m_DisposeView(LogicalToView[logical]);
-                    LogicalToView.Remove(logical);
+                    m_DisposeView(m_LogicalToView[logical]);
+                    m_LogicalToView.Remove(logical);
                 }
             }
             m_Touched.Clear();
