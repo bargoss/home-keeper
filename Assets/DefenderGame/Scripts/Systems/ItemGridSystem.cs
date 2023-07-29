@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using DefenderGame.Scripts.Components;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace DefenderGame.Scripts.Systems
 {
+    [UpdateInGroup(typeof(SimulationSystemGroup))]
     public partial class ItemGridSystem : SystemBase
     {
         protected override void OnCreate()
@@ -46,6 +48,7 @@ namespace DefenderGame.Scripts.Systems
             });
 
             var completedActions = new List<OngoingAction>();
+            var newActions = new List<OngoingAction>();
             
             foreach (var ongoingAction in itemGrid.OngoingActions)
             {
@@ -70,6 +73,49 @@ namespace DefenderGame.Scripts.Systems
                         else{ completedActions.Add(ongoingAction); }
                         
                         break;
+                    case GridEffect gridEffect:
+                        if (time > gridEffect.StartTime + gridEffect.Duration)
+                        {
+                            completedActions.Add(gridEffect);
+                        } 
+                        break;
+                    case Moving moving:
+                        if(moving.StartTime + moving.Duration > time)
+                        {
+                            // todo
+                            var placedToTarget = itemGrid.ItemGrid.TryPlaceItem(moving.TargetPosition, moving.MovingObject);
+                            if (placedToTarget)
+                            {
+                                //public GridEffect(float startTime, int2[] gridPositions, EnMsg msg) : base(startTime)
+                                newActions.Add(new GridEffect(
+                                    time,
+                                    ItemGridUtils.GetGridsFromPivotAndOffsets(
+                                        moving.TargetPosition, moving.MovingObject.Occupations
+                                    ),
+                                    GridEffect.EnMsg.Neutral, 0f)
+                                );
+                                break;
+                            }
+
+                            newActions.Add(new GridEffect(
+                                time,
+                                ItemGridUtils.GetGridsFromPivotAndOffsets(
+                                    moving.TargetPosition, moving.MovingObject.Occupations
+                                ),
+                                GridEffect.EnMsg.Negative, 0f)
+                            );
+                            
+                            var placedBackToOriginalPos = itemGrid.ItemGrid.TryPlaceItem(moving.OriginalPosition, moving.MovingObject);
+                            
+                            // todo handle further cases if it fails to place back to original position
+
+                            completedActions.Add(moving);
+                        }
+                        
+                        break;
+                    case Selection selection:
+                        // ignored
+                        break;
                     case TurretLoadingMagazine turretLoadingMagazine:
                         if (itemGrid.TryGetGridObject<Turret>(turretLoadingMagazine.TurretPos, out var turret))
                         {
@@ -91,6 +137,7 @@ namespace DefenderGame.Scripts.Systems
                         }
                         else { completedActions.Add(ongoingAction); }
                         break;
+                    
                     default:
                         Debug.LogError($"Unknown ongoing action type: {ongoingAction.GetType()}");
                         break;
@@ -98,6 +145,7 @@ namespace DefenderGame.Scripts.Systems
             }
             
             completedActions.ForEach(action => itemGrid.OngoingActions.Remove(action));
+            newActions.ForEach(action => itemGrid.OngoingActions.Add(action));
         }
     }
 }

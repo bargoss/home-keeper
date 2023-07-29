@@ -10,6 +10,8 @@ using Object = UnityEngine.Object;
 
 namespace DefenderGame.Scripts.Systems
 {
+    [UpdateInGroup(typeof(SimulationSystemGroup))]
+    [UpdateAfter(typeof(ItemGridSystem))]
     public partial class ItemGridViewSystem : SystemBase
     {
         private readonly PairMaintainer<DeItemGrid, DeItemGridView> m_ItemGridViews = new(
@@ -76,7 +78,7 @@ namespace DefenderGame.Scripts.Systems
                         case AmmoBox ammoBox:
                             var ammoBoxView = m_AmmoBoxViews.GetOrCreateView(ammoBox);
                             var ammoBoxViewTr = ammoBoxView.transform;
-                            ammoBoxViewTr.position = (Vector3)gridLtw.Position + new Vector3(pos.x, 0, pos.y);
+                            ammoBoxViewTr.position = ItemGridUtils.GridToWorldPos(pos, gridLtw);
                             ammoBoxViewTr.rotation = gridLtw.Rotation;
 
                             if (ammoBox.AmmoCountChangedTime.Equals((float)SystemAPI.Time.ElapsedTime))
@@ -88,7 +90,7 @@ namespace DefenderGame.Scripts.Systems
                         case Magazine magazine:
                             var magazineView = m_MagazineViews.GetOrCreateView(magazine);
                             var magazineViewTr = magazineView.transform;
-                            magazineViewTr.position = (Vector3)gridLtw.Position + new Vector3(pos.x, 0, pos.y);
+                            magazineViewTr.position = ItemGridUtils.GridToWorldPos(pos, gridLtw);
                             magazineViewTr.rotation = gridLtw.Rotation;
 
                             if (magazine.AmmoCountChangedTime.Equals((float)SystemAPI.Time.ElapsedTime))
@@ -100,7 +102,7 @@ namespace DefenderGame.Scripts.Systems
                         case Turret turret:
                             var turretView = m_TurretViews.GetOrCreateView(turret);
                             var turretViewTr = turretView.transform;
-                            turretViewTr.position = (Vector3)gridLtw.Position + new Vector3(pos.x, 0, pos.y);
+                            turretViewTr.position = ItemGridUtils.GridToWorldPos(pos, gridLtw);
                             turretViewTr.rotation = gridLtw.Rotation;
 
                             if (turret.LastShotTime.Equals((float)SystemAPI.Time.ElapsedTime))
@@ -228,7 +230,7 @@ namespace DefenderGame.Scripts.Systems
                 magViewTr.position = magSlotTr.position;
                 magViewTr.rotation = magSlotTr.rotation;
 
-                var endPos = GridToWorldPos(turretLoadingMagazine.NewMagazinePositionBeforeLoad, gridLtw);
+                var endPos = ItemGridUtils.GridToWorldPos(turretLoadingMagazine.NewMagazinePositionBeforeLoad, gridLtw);
                 var endRot = gridLtw.Rotation;
 
                 var duration = turretLoadingMagazine.ActionDuration;
@@ -250,7 +252,7 @@ namespace DefenderGame.Scripts.Systems
                 turretLoadingMagazine.NewMagazine.AmmoTier
             );
             var newMagViewTr = newMagView.transform;
-            newMagViewTr.position = GridToWorldPos(turretLoadingMagazine.NewMagazinePositionBeforeLoad, gridLtw);
+            newMagViewTr.position = ItemGridUtils.GridToWorldPos(turretLoadingMagazine.NewMagazinePositionBeforeLoad, gridLtw);
             newMagViewTr.rotation = gridLtw.Rotation;
 
 
@@ -267,8 +269,11 @@ namespace DefenderGame.Scripts.Systems
                 .OnComplete(() => { newMagView.HandleDestroy(); }
                 );
         }
+    }
 
-        private static Vector3 GridToWorldPos(int2 gridPos, LocalToWorld itemGridLtw)
+    public static class ItemGridUtils
+    {
+        public static Vector3 GridToWorldPos(int2 gridPos, LocalToWorld itemGridLtw)
         {
             var gridPosAsF4 = new float4(gridPos.x, 0, gridPos.y, 1);
             var transformed = math.mul(itemGridLtw.Value, gridPosAsF4);
@@ -276,12 +281,22 @@ namespace DefenderGame.Scripts.Systems
         }
 
         [UsedImplicitly]
-        private static int2 WorldToGridPos(Vector3 worldPos, LocalToWorld itemGridLtw)
+        public static int2 WorldToGridPos(Vector3 worldPos, LocalToWorld itemGridLtw)
         {
             var inv = math.inverse(itemGridLtw.Value);
             var worldPosAsF4 = new float4(worldPos.x, worldPos.y, worldPos.z, 1);
             var transformed = math.mul(inv, worldPosAsF4);
             return new int2((int)transformed.x, (int)transformed.z);
+        }
+
+        public static int2[] GetGridsFromPivotAndOffsets(int2 pivot, int2[] offsets)
+        {
+            var grids = new int2[offsets.Length];
+            for (var i = 0; i < offsets.Length; i++)
+            {
+                grids[i] = pivot + offsets[i];
+            }
+            return grids;
         }
     }
 }

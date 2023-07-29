@@ -48,7 +48,62 @@ namespace DefenderGame.Scripts.Components
 
     public abstract class OngoingAction
     {
+        protected OngoingAction(float startTime)
+        {
+            StartTime = startTime;
+        }
+
         public float StartTime { get; }
+    }
+    
+    public class Selection : OngoingAction
+    {
+        public int2 SelectedObjectPos { get; }
+
+        public Selection(float startTime, int2 selectedObjectPos) : base(startTime)
+        {
+            SelectedObjectPos = selectedObjectPos;
+        }
+    }
+
+    public class Moving : OngoingAction
+    {
+        public DeGridObject MovingObject { get; }
+        public int2 OriginalPosition { get; }
+        public int2 TargetPosition { get; }
+        
+        public float Duration { get; }
+
+        public Moving(float startTime, DeGridObject movingObject, int2 originalPosition, int2 targetPosition, float duration) : base(startTime)
+        {
+            MovingObject = movingObject;
+            OriginalPosition = originalPosition;
+            TargetPosition = targetPosition;
+            Duration = duration;
+        }
+    }
+    
+    public class GridEffect : OngoingAction
+    {
+        public int2[] GridPositions { get; }
+        public EnMsg Msg { get; }
+        public float Duration { get; }
+
+        public enum EnMsg
+        {
+            Positive,
+            Negative,
+            Warning,
+            Neutral
+        }
+
+
+        public GridEffect(float startTime, int2[] gridPositions, EnMsg msg, float duration) : base(startTime)
+        {
+            GridPositions = gridPositions;
+            Msg = msg;
+            Duration = duration;
+        }
     }
     
     public class TurretLoadingMagazine : OngoingAction
@@ -64,6 +119,15 @@ namespace DefenderGame.Scripts.Components
         public float GetProgress(float time)
         {
             return math.unlerp(StartTime, StartTime + ActionDuration, time);
+        }
+
+        public TurretLoadingMagazine(float startTime, float actionDuration, int2 newMagazinePositionBeforeLoad, Magazine newMagazine, [CanBeNull] Magazine previousMagazine, int2 turretPos) : base(startTime)
+        {
+            ActionDuration = actionDuration;
+            NewMagazinePositionBeforeLoad = newMagazinePositionBeforeLoad;
+            NewMagazine = newMagazine;
+            PreviousMagazine = previousMagazine;
+            TurretPos = turretPos;
         }
     }
 
@@ -84,6 +148,14 @@ namespace DefenderGame.Scripts.Components
             var loadStartTime = StartTime;
             
             return math.unlerp(loadStartTime, loadFinishTime, time);
+        }
+
+        public AmmoBoxFillingMagazine(float startTime, float timePerAmmoLoad, int2 ammoBoxPos, int2 magazinePos) : base(startTime)
+        {
+            TimePerAmmoLoad = timePerAmmoLoad;
+            AmmoBoxPos = ammoBoxPos;
+            MagazinePos = magazinePos;
+            LastAmmoLoadedTime = startTime;
         }
     }
     
