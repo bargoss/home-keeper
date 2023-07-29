@@ -16,8 +16,6 @@ namespace DefenderGame.Scripts.Systems
 
         protected override void OnUpdate()
         {
-            
-            //Entities.ForEach((Entity entity, ref ParticleView particleView, in LocalToWorld localToWorld) =>
             Entities.ForEach((DeItemGrid itemGrid) =>
             {
                 HandleUpdateItemGrid(itemGrid, (float)SystemAPI.Time.ElapsedTime);
@@ -82,7 +80,6 @@ namespace DefenderGame.Scripts.Systems
                     case Moving moving:
                         if(moving.StartTime + moving.Duration > time)
                         {
-                            // todo
                             var placedToTarget = itemGrid.ItemGrid.TryPlaceItem(moving.TargetPosition, moving.MovingObject);
                             if (placedToTarget)
                             {

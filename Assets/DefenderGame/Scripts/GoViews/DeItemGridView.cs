@@ -9,7 +9,9 @@ namespace DefenderGame.Scripts.GoViews
 {
     public class DeItemGridView : MonoBehaviour
     {
-        public void Restore(int width, int height)
+        [SerializeField] private GameObject GridItemPrefab;
+        
+        public void Restore(int width, int height, float gridLength)
         {
             
         }

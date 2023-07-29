@@ -21,14 +21,48 @@ namespace DefenderGame.Scripts.Components
 
     public class DeItemGrid : IComponentData
     {
-        public DeItemGrid(ItemGrid<DeGridObject> itemGrid)
+        public ItemGrid<DeGridObject> ItemGrid { get; }
+
+        public HashSet<OngoingAction> OngoingActions { get; } = new();
+        public float GridLength { get; }
+
+        public DeItemGrid(ItemGrid<DeGridObject> itemGrid, float gridLength)
         {
             ItemGrid = itemGrid;
+            GridLength = gridLength;
         }
 
-        public ItemGrid<DeGridObject> ItemGrid { get; }
-        public HashSet<OngoingAction> OngoingActions { get; } = new();
-        
+        public void HandleMove(int2 startPos, int2 endPos, float time)
+        {
+            if(
+                ItemGrid.TryGetGridItem(startPos, out var startItem)
+            )
+            {
+                if (ItemGrid.TryGetGridItem(endPos, out var endItem))
+                {
+                    if(startItem is AmmoBox ammoBox0 && endItem is Magazine magazine0)
+                    {
+                        ItemGrid.RemoveItem(startItem);
+                        OngoingActions.Add(new AmmoBoxFillingMagazine(time, 0.1f, startPos, endPos));
+                    }
+                    else if(startItem is Magazine magazine1 && endItem is Turret turret1)
+                    {
+                        ItemGrid.RemoveItem(startItem);
+                        OngoingActions.Add(new TurretLoadingMagazine(time, 0.1f, startPos, magazine1, turret1.Magazine, endPos));
+                    }
+                }
+                else
+                {
+                    ItemGrid.RemoveItem(startItem);
+                    OngoingActions.Add(new Moving(time, startItem, startPos, endPos, 0.5f));
+                }
+            }
+        }
+
+        public bool IsPositionOccupied(int2 position)
+        {
+            return TryGetGridObject<DeGridObject>(position, out _);
+        }
         public bool TryGetGridObject<T>(int2 position, out T gridObject) where T : DeGridObject
         {
             if (ItemGrid.TryGetGridItem(position, out var item))
@@ -204,7 +238,7 @@ namespace DefenderGame.Scripts.Components
             return gridItem != null;
         }
         
-        public void RemoveSocketOccupier(T gridItem)
+        public void RemoveItem(T gridItem)
         {
             m_Items.Remove(gridItem);
             m_ItemPivots.Remove(gridItem);

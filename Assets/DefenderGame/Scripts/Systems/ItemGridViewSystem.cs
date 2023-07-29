@@ -18,7 +18,7 @@ namespace DefenderGame.Scripts.Systems
             (logical) =>
             {
                 var view = Object.Instantiate(GameResources.Instance.ItemGridViewPrefab);
-                view.Restore(logical.ItemGrid.Width, logical.ItemGrid.Height);
+                view.Restore(logical.ItemGrid.Width, logical.ItemGrid.Height, logical.GridLength);
                 return view;
             },
             (view) => Object.Destroy(view.gameObject)
@@ -78,7 +78,7 @@ namespace DefenderGame.Scripts.Systems
                         case AmmoBox ammoBox:
                             var ammoBoxView = m_AmmoBoxViews.GetOrCreateView(ammoBox);
                             var ammoBoxViewTr = ammoBoxView.transform;
-                            ammoBoxViewTr.position = ItemGridUtils.GridToWorldPos(pos, gridLtw);
+                            ammoBoxViewTr.position = ItemGridUtils.GridToWorldPos(pos, gridLtw, itemGrid.GridLength);
                             ammoBoxViewTr.rotation = gridLtw.Rotation;
 
                             if (ammoBox.AmmoCountChangedTime.Equals((float)SystemAPI.Time.ElapsedTime))
@@ -90,7 +90,7 @@ namespace DefenderGame.Scripts.Systems
                         case Magazine magazine:
                             var magazineView = m_MagazineViews.GetOrCreateView(magazine);
                             var magazineViewTr = magazineView.transform;
-                            magazineViewTr.position = ItemGridUtils.GridToWorldPos(pos, gridLtw);
+                            magazineViewTr.position = ItemGridUtils.GridToWorldPos(pos, gridLtw, itemGrid.GridLength);
                             magazineViewTr.rotation = gridLtw.Rotation;
 
                             if (magazine.AmmoCountChangedTime.Equals((float)SystemAPI.Time.ElapsedTime))
@@ -102,7 +102,7 @@ namespace DefenderGame.Scripts.Systems
                         case Turret turret:
                             var turretView = m_TurretViews.GetOrCreateView(turret);
                             var turretViewTr = turretView.transform;
-                            turretViewTr.position = ItemGridUtils.GridToWorldPos(pos, gridLtw);
+                            turretViewTr.position = ItemGridUtils.GridToWorldPos(pos, gridLtw, itemGrid.GridLength);
                             turretViewTr.rotation = gridLtw.Rotation;
 
                             if (turret.LastShotTime.Equals((float)SystemAPI.Time.ElapsedTime))
@@ -145,8 +145,9 @@ namespace DefenderGame.Scripts.Systems
                                     itemGrid.TryGetGridObject<Turret>(turretLoadingMagazine.TurretPos, out var turret)
                                 )
                                 {
-                                    StartTurretMagLoadingAnimation(turret, turretLoadingMagazine, gridLtw,
-                                        m_TurretViews);
+                                    StartTurretMagLoadingAnimation(
+                                        turret, turretLoadingMagazine, gridLtw, m_TurretViews, itemGrid.GridLength
+                                    );
                                 }
                                 else Debug.LogError("shouldn't happen");
 
@@ -207,8 +208,8 @@ namespace DefenderGame.Scripts.Systems
             Turret turret,
             TurretLoadingMagazine turretLoadingMagazine,
             LocalToWorld gridLtw,
-            PairMaintainer<Turret, TurretGOView> turretViews
-
+            PairMaintainer<Turret, TurretGOView> turretViews,
+            float gridLength
         )
         {
             var turretView = turretViews.GetOrCreateView(turret);
@@ -230,7 +231,7 @@ namespace DefenderGame.Scripts.Systems
                 magViewTr.position = magSlotTr.position;
                 magViewTr.rotation = magSlotTr.rotation;
 
-                var endPos = ItemGridUtils.GridToWorldPos(turretLoadingMagazine.NewMagazinePositionBeforeLoad, gridLtw);
+                var endPos = ItemGridUtils.GridToWorldPos(turretLoadingMagazine.NewMagazinePositionBeforeLoad, gridLtw, gridLength);
                 var endRot = gridLtw.Rotation;
 
                 var duration = turretLoadingMagazine.ActionDuration;
@@ -252,7 +253,7 @@ namespace DefenderGame.Scripts.Systems
                 turretLoadingMagazine.NewMagazine.AmmoTier
             );
             var newMagViewTr = newMagView.transform;
-            newMagViewTr.position = ItemGridUtils.GridToWorldPos(turretLoadingMagazine.NewMagazinePositionBeforeLoad, gridLtw);
+            newMagViewTr.position = ItemGridUtils.GridToWorldPos(turretLoadingMagazine.NewMagazinePositionBeforeLoad, gridLtw, gridLength);
             newMagViewTr.rotation = gridLtw.Rotation;
 
 
@@ -273,22 +274,22 @@ namespace DefenderGame.Scripts.Systems
 
     public static class ItemGridUtils
     {
-        public static Vector3 GridToWorldPos(int2 gridPos, LocalToWorld itemGridLtw)
+        public static Vector3 GridToWorldPos(int2 gridPos, LocalToWorld itemGridLtw, float gridLength)
         {
-            var gridPosAsF4 = new float4(gridPos.x, 0, gridPos.y, 1);
+            var gridPosAsF4 = new float4(gridPos.x * gridLength, 0, gridPos.y * gridLength, 1);
             var transformed = math.mul(itemGridLtw.Value, gridPosAsF4);
             return transformed.xyz;
         }
 
         [UsedImplicitly]
-        public static int2 WorldToGridPos(Vector3 worldPos, LocalToWorld itemGridLtw)
+        public static int2 WorldToGridPos(Vector3 worldPos, LocalToWorld itemGridLtw, float gridLength)
         {
             var inv = math.inverse(itemGridLtw.Value);
             var worldPosAsF4 = new float4(worldPos.x, worldPos.y, worldPos.z, 1);
             var transformed = math.mul(inv, worldPosAsF4);
-            return new int2((int)transformed.x, (int)transformed.z);
+            return new int2((int)math.round(transformed.x / gridLength), (int)math.round(transformed.z / gridLength));
         }
-
+        
         public static int2[] GetGridsFromPivotAndOffsets(int2 pivot, int2[] offsets)
         {
             var grids = new int2[offsets.Length];
