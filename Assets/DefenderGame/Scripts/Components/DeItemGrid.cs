@@ -3,62 +3,50 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using Unity.Entities;
 using Unity.Mathematics;
-using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace DefenderGame.Scripts.Components
 {
-    public class DeItemGridAuthoring : MonoBehaviour
-    {
-        public int width = 5;
-        public int height = 5;
-        public float gridLength = 2;
-        
-        public class DeItemGridBaker : Baker<DeItemGridAuthoring>
-        {
-            public override void Bake(DeItemGridAuthoring authoring)
-            {
-                var entity = GetEntity(TransformUsageFlags.Dynamic);
-                AddComponentObject(entity, new DeItemGrid(authoring.width, authoring.height, authoring.gridLength));
-            }
-        }
-    }
-    
     public class DeItemGrid : IComponentData
     {
-        public ItemGrid<DeGridObject> ItemGrid { get; }
+        public DeItemGrid<DeGridObject> DeItemGridAuthoring { get; }
 
         public HashSet<OngoingAction> OngoingActions { get; } = new();
         public float GridLength { get; }
 
         public DeItemGrid(int width, int height, float gridLength)
         {
-            ItemGrid = new ItemGrid<DeGridObject>(width, height);
+            DeItemGridAuthoring = new DeItemGrid<DeGridObject>(width, height);
             GridLength = gridLength;
+        }
+
+        public DeItemGrid()
+        {
+            
         }
 
         public void HandleMove(int2 startPos, int2 endPos, float time)
         {
             if(
-                ItemGrid.TryGetGridItem(startPos, out var startItem)
+                DeItemGridAuthoring.TryGetGridItem(startPos, out var startItem)
             )
             {
-                if (ItemGrid.TryGetGridItem(endPos, out var endItem))
+                if (DeItemGridAuthoring.TryGetGridItem(endPos, out var endItem))
                 {
                     if(startItem is AmmoBox && endItem is Magazine)
                     {
-                        ItemGrid.RemoveItem(startItem);
+                        DeItemGridAuthoring.RemoveItem(startItem);
                         OngoingActions.Add(new AmmoBoxFillingMagazine(time, 0.1f, startPos, endPos));
                     }
                     else if(startItem is Magazine magazine1 && endItem is Turret turret1)
                     {
-                        ItemGrid.RemoveItem(startItem);
+                        DeItemGridAuthoring.RemoveItem(startItem);
                         OngoingActions.Add(new TurretLoadingMagazine(time, 0.1f, startPos, magazine1, turret1.Magazine, endPos));
                     }
                 }
                 else
                 {
-                    ItemGrid.RemoveItem(startItem);
+                    DeItemGridAuthoring.RemoveItem(startItem);
                     OngoingActions.Add(new Moving(time, startItem, startPos, endPos, 0.5f));
                 }
             }
@@ -70,7 +58,7 @@ namespace DefenderGame.Scripts.Components
         }
         public bool TryGetGridObject<T>(int2 position, out T gridObject) where T : DeGridObject
         {
-            if (ItemGrid.TryGetGridItem(position, out var item))
+            if (DeItemGridAuthoring.TryGetGridItem(position, out var item))
             {
                 // if its of type
                 if (item is T t)
@@ -84,7 +72,7 @@ namespace DefenderGame.Scripts.Components
             return false;
         }
     }
-    
+
     public abstract class OngoingAction
     {
         protected OngoingAction(float startTime)
@@ -200,7 +188,7 @@ namespace DefenderGame.Scripts.Components
     
     
     
-    public class ItemGrid<T> where T : class, IGridItem
+    public class DeItemGrid<T> where T : class, IGridItem
     {
         [ItemCanBeNull] private readonly T[] m_Occupations;
         public int Width{get;}
@@ -295,7 +283,7 @@ namespace DefenderGame.Scripts.Components
         
         
 
-        public ItemGrid(int width, int height)
+        public DeItemGrid(int width, int height)
         {
             m_Occupations = new T[width * height];
             m_Items = new HashSet<T>();

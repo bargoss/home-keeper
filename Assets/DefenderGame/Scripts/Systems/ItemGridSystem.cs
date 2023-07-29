@@ -24,7 +24,7 @@ namespace DefenderGame.Scripts.Systems
 
         private static void HandleUpdateItemGrid(DeItemGrid itemGrid, float time)
         {
-            itemGrid.ItemGrid.ForEachItem((gridItem, _) =>
+            itemGrid.DeItemGridAuthoring.ForEachItem((gridItem, _) =>
             {
                 switch (gridItem)
                 {
@@ -80,7 +80,7 @@ namespace DefenderGame.Scripts.Systems
                     case Moving moving:
                         if(moving.StartTime + moving.Duration > time)
                         {
-                            var placedToTarget = itemGrid.ItemGrid.TryPlaceItem(moving.TargetPosition, moving.MovingObject);
+                            var placedToTarget = itemGrid.DeItemGridAuthoring.TryPlaceItem(moving.TargetPosition, moving.MovingObject);
                             if (placedToTarget)
                             {
                                 //public GridEffect(float startTime, int2[] gridPositions, EnMsg msg) : base(startTime)
@@ -102,7 +102,7 @@ namespace DefenderGame.Scripts.Systems
                                 GridEffect.EnMsg.Negative, 0f)
                             );
                             
-                            var placedBackToOriginalPos = itemGrid.ItemGrid.TryPlaceItem(moving.OriginalPosition, moving.MovingObject);
+                            var placedBackToOriginalPos = itemGrid.DeItemGridAuthoring.TryPlaceItem(moving.OriginalPosition, moving.MovingObject);
                             
                             // todo handle further cases if it fails to place back to original position
 
@@ -120,7 +120,7 @@ namespace DefenderGame.Scripts.Systems
                             if (turretLoadingMagazine.StartTime + turretLoadingMagazine.ActionDuration > time) 
                             {
                                 turret.SetMagazine(turretLoadingMagazine.NewMagazine, time);
-                                if (itemGrid.ItemGrid.TryPlaceItem(turretLoadingMagazine.NewMagazinePositionBeforeLoad, turretLoadingMagazine.PreviousMagazine))
+                                if (itemGrid.DeItemGridAuthoring.TryPlaceItem(turretLoadingMagazine.NewMagazinePositionBeforeLoad, turretLoadingMagazine.PreviousMagazine))
                                 {
                                     // OK
                                 }

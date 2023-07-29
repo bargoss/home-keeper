@@ -16,3 +16,18 @@ MonoBehaviour:
   MagazineMaterial: {fileID: 2100000, guid: 376dc78aee7457546b41509fb355afe6, type: 2}
   shooterGoViewPrefab: {fileID: 3396015738664773049, guid: b65b251491836b9428c58265cd640af1,
     type: 3}
+  ItemGridViewPrefab: {fileID: 4376772450810658266, guid: 92d4edc6a374ec64d84c10c0079ae8e8,
+    type: 3}
+  TurretGOViewPrefab: {fileID: -5850004364349056552, guid: 15035dbb344c11f47b14ba1879c53f47,
+    type: 3}
+  MagazineGOViewPrefab: {fileID: 2554376799700593922, guid: 8c25cabf132d6554da0f72d51b92b287,
+    type: 3}
+  AmmoBoxGOViewPrefab: {fileID: 6963813071267036980, guid: a0bc673f6a34f054d808480639236d26,
+    type: 3}
+  BulletGoView: {fileID: 7006923083862456779, guid: 7e94da408f7240e468f3afb5f1c70c75,
+    type: 3}
+  ImpactParticleEffectPrefab: {fileID: 19806788, guid: c2f28a236b0696a4f90a994422019577,
+    type: 3}
+  SmallShockEffectPrefab: {fileID: 19806788, guid: c2f28a236b0696a4f90a994422019577,
+    type: 3}
+  ShootEffectPrefab: {fileID: 19817660, guid: 79b0a8abb1f641b4a8faa10b904758ea, type: 3}

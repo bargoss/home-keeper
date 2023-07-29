@@ -18,7 +18,7 @@ namespace DefenderGame.Scripts.Systems
             (logical) =>
             {
                 var view = Object.Instantiate(GameResources.Instance.ItemGridViewPrefab);
-                view.Restore(logical.ItemGrid.Width, logical.ItemGrid.Height, logical.GridLength);
+                view.Restore(logical.DeItemGridAuthoring.Width, logical.DeItemGridAuthoring.Height, logical.GridLength);
                 return view;
             },
             (view) => Object.Destroy(view.gameObject)
@@ -62,7 +62,7 @@ namespace DefenderGame.Scripts.Systems
 
         protected override void OnUpdate()
         {
-            Entities.ForEach((DeItemGrid itemGrid, LocalToWorld gridLtw) =>
+            foreach (var (itemGrid, gridLtw) in SystemAPI.Query<DeItemGrid, LocalToWorld>())
             {
                 var view = m_ItemGridViews.GetOrCreateView(itemGrid);
                 var viewTransform = view.transform;
@@ -71,7 +71,7 @@ namespace DefenderGame.Scripts.Systems
                 viewTransform.localScale = Vector3.one;
 
 
-                itemGrid.ItemGrid.ForEachItem((item, pos) =>
+                itemGrid.DeItemGridAuthoring.ForEachItem((item, pos) =>
                 {
                     switch (item)
                     {
@@ -159,7 +159,7 @@ namespace DefenderGame.Scripts.Systems
                             break;
                     }
                 }
-            }).WithBurst().Run();
+            }
 
 
             // garbage collection pretty much
