@@ -1,24 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using DefenderGame.Scripts.GoViews;
 using JetBrains.Annotations;
 using Unity.Entities;
 using Unity.Mathematics;
 
 namespace DefenderGame.Scripts.Components
 {
-    public struct Socket : IComponentData
-    {
-        public readonly int SocketIndex;
-        
-        public Socket(int socketIndex)
-        {
-            SocketIndex = socketIndex;
-        }
-    }
-
     public class DeItemGrid : IComponentData
     {
         public ItemGrid<DeGridObject> ItemGrid { get; }
@@ -40,7 +27,7 @@ namespace DefenderGame.Scripts.Components
             {
                 if (ItemGrid.TryGetGridItem(endPos, out var endItem))
                 {
-                    if(startItem is AmmoBox ammoBox0 && endItem is Magazine magazine0)
+                    if(startItem is AmmoBox && endItem is Magazine)
                     {
                         ItemGrid.RemoveItem(startItem);
                         OngoingActions.Add(new AmmoBoxFillingMagazine(time, 0.1f, startPos, endPos));
@@ -79,7 +66,7 @@ namespace DefenderGame.Scripts.Components
             return false;
         }
     }
-
+    
     public abstract class OngoingAction
     {
         protected OngoingAction(float startTime)
@@ -216,7 +203,7 @@ namespace DefenderGame.Scripts.Components
             var result = new List<int2>();
             for (var i = 0; i < m_Occupations.Length; i++)
             {
-                if (m_Occupations[i].Equals(gridItem))
+                if (m_Occupations[i] != null && m_Occupations[i].Equals(gridItem))
                 {
                     result.Add(new int2(i % Width, i / Width));
                 }
@@ -312,12 +299,23 @@ namespace DefenderGame.Scripts.Components
     public class AmmoBox : DeGridObject
     {
         public int AmmoCount { get; private set; }
+
         public int AmmoCapacity { get; }
+
         public int AmmoTier { get; }
+
         public int BoxTier { get; }
-        
+
         public float AmmoCountChangedTime { get; private set; }
         
+        public AmmoBox(int ammoCount, int ammoCapacity, int ammoTier, int boxTier)
+        {
+            AmmoCount = ammoCount;
+            AmmoCapacity = ammoCapacity;
+            AmmoTier = ammoTier;
+            BoxTier = boxTier;
+        }
+
         public void SetAmmoCount(int ammoCount, float time)
         {
             AmmoCount = ammoCount;
@@ -339,16 +337,33 @@ namespace DefenderGame.Scripts.Components
             AmmoCount = ammoCount;
             AmmoCountChangedTime = time;
         }
+        
+        public Magazine(int ammoCount, int ammoCapacity, int ammoTier, int magazineTier)
+        {
+            AmmoCount = ammoCount;
+            AmmoCapacity = ammoCapacity;
+            AmmoTier = ammoTier;
+            MagazineTier = magazineTier;
+        }
     }
 
     public class Turret : DeGridObject
     {
         public float LastShotTime { get; private set; }
-        public Magazine Magazine { get; private set; }
+        [CanBeNull] public Magazine Magazine { get; private set; }
         public float3 AimDirection { get; set; }
         public float LastMagazineChangedTime { get; private set; }
         
         public float FireRate { get; }
+        
+        //ctor with all these field
+        public Turret(float fireRate, float lastShotTime, [CanBeNull] Magazine magazine, float lastMagazineChangedTime)
+        {
+            FireRate = fireRate;
+            LastShotTime = lastShotTime;
+            Magazine = magazine;
+            LastMagazineChangedTime = lastMagazineChangedTime;
+        }
         
         public void SetMagazine(Magazine magazine, float time)
         {
@@ -358,7 +373,7 @@ namespace DefenderGame.Scripts.Components
         
         public bool TryShoot(float time)
         {
-            if(time > LastShotTime + FireRate && Magazine.AmmoCount > 0)
+            if(time > LastShotTime + FireRate && Magazine is { AmmoCount: > 0 })
             {
                 Magazine.SetAmmoCount(Magazine.AmmoCount - 1, time);
                 LastShotTime = time;
@@ -368,10 +383,4 @@ namespace DefenderGame.Scripts.Components
             return false;
         }
     }
-    
-
-    /*
-    Requirements:
-        Item Entity should be able access other items in SocketGrid  
-     */
 }
