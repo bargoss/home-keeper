@@ -138,6 +138,15 @@ namespace DefenderGame.Scripts.Systems
                             }
 
                             break;
+                        case GridEffect gridEffect:
+                            // todo
+                            break;
+                        case Moving moving:
+                            // todo
+                            break;
+                        case Selection selection:
+                            // todo
+                            break;
                         case TurretLoadingMagazine turretLoadingMagazine:
                             if (turretLoadingMagazine.StartTime.Equals((float)SystemAPI.Time.ElapsedTime))
                             {

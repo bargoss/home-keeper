@@ -60,7 +60,7 @@ namespace DefenderGame.Scripts.Systems
                         {
                             if(ammoBox.AmmoCount == 0){ completedActions.Add(ongoingAction); }
                             else if(magazine.AmmoCount == magazine.AmmoCapacity){ completedActions.Add(ongoingAction); }
-                            else if(ammoBoxFillingMagazine.LastAmmoLoadedTime + ammoBoxFillingMagazine.TimePerAmmoLoad > time)
+                            else if(time > ammoBoxFillingMagazine.LastAmmoLoadedTime + ammoBoxFillingMagazine.TimePerAmmoLoad)
                             {
                                 // transfer ammo
                                 ammoBox.SetAmmoCount(ammoBox.AmmoCount - 1, time);
@@ -78,7 +78,7 @@ namespace DefenderGame.Scripts.Systems
                         } 
                         break;
                     case Moving moving:
-                        if(moving.StartTime + moving.Duration > time)
+                        if(time > moving.StartTime + moving.Duration)
                         {
                             var placedToTarget = itemGrid.ItemGrid.TryPlaceItem(moving.TargetPosition, moving.MovingObject);
                             if (placedToTarget)
@@ -91,22 +91,25 @@ namespace DefenderGame.Scripts.Systems
                                     ),
                                     GridEffect.EnMsg.Neutral, 0f)
                                 );
-                                break;
+                                
+                                completedActions.Add(moving);                                
                             }
-
-                            newActions.Add(new GridEffect(
-                                time,
-                                ItemGridUtils.GetGridsFromPivotAndOffsets(
-                                    moving.TargetPosition, moving.MovingObject.Occupations
-                                ),
-                                GridEffect.EnMsg.Negative, 0f)
-                            );
+                            else
+                            {
+                                newActions.Add(new GridEffect(
+                                    time,
+                                    ItemGridUtils.GetGridsFromPivotAndOffsets(
+                                        moving.TargetPosition, moving.MovingObject.Occupations
+                                    ),
+                                    GridEffect.EnMsg.Negative, 0f)
+                                );
                             
-                            var placedBackToOriginalPos = itemGrid.ItemGrid.TryPlaceItem(moving.OriginalPosition, moving.MovingObject);
+                                var placedBackToOriginalPos = itemGrid.ItemGrid.TryPlaceItem(moving.OriginalPosition, moving.MovingObject);
                             
-                            // todo handle further cases if it fails to place back to original position
+                                // todo handle further cases if it fails to place back to original position
 
-                            completedActions.Add(moving);
+                                completedActions.Add(moving);
+                            }
                         }
                         
                         break;
@@ -117,7 +120,7 @@ namespace DefenderGame.Scripts.Systems
                         if (itemGrid.TryGetGridObject<Turret>(turretLoadingMagazine.TurretPos, out var turret))
                         {
                             // todo
-                            if (turretLoadingMagazine.StartTime + turretLoadingMagazine.ActionDuration > time) 
+                            if (time > turretLoadingMagazine.StartTime + turretLoadingMagazine.ActionDuration) 
                             {
                                 turret.SetMagazine(turretLoadingMagazine.NewMagazine, time);
                                 if (itemGrid.ItemGrid.TryPlaceItem(turretLoadingMagazine.NewMagazinePositionBeforeLoad, turretLoadingMagazine.PreviousMagazine))

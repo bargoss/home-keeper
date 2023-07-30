@@ -58,6 +58,7 @@ namespace DefenderGame.Scripts.Systems
             if (playerInput.Down)
             {
                 var targetGridPos = ItemGridUtils.WorldToGridPos(playerInput.MousePos, itemGridLtw, itemGrid.GridLength);
+                Debug.Log("clicked grid pos: " + targetGridPos);
 
                 if // if there's a valid selection 
                 (
@@ -66,6 +67,7 @@ namespace DefenderGame.Scripts.Systems
                 )
                 {
                     itemGrid.HandleMove(ongoingAction.SelectedObjectPos, targetGridPos, time);
+                    itemGrid.OngoingActions.RemoveWhere(action => action is Selection);
                 }
                 else // selecting now
                 {
@@ -74,8 +76,6 @@ namespace DefenderGame.Scripts.Systems
                         itemGrid.OngoingActions.Add(new Selection(time, targetGridPos));
                     }
                 }
-
-                itemGrid.OngoingActions.RemoveWhere(action => action is Selection);
             }
         }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DefenderGame.Scripts.Systems
 {
@@ -35,7 +36,7 @@ namespace DefenderGame.Scripts.Systems
 
         public void DisposeAndClearUntouchedViews()
         {
-            foreach (var logical in m_LogicalToView.Keys)
+            foreach (var logical in m_LogicalToView.Keys.ToList())
             {
                 if (!m_Touched.Contains(logical))
                 {
