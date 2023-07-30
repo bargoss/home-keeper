@@ -1,6 +1,8 @@
 ﻿using System;
 using DefaultNamespace;
+using DefenderGame.Scripts.Components;
 using DG.Tweening;
+using JetBrains.Annotations;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -16,9 +18,11 @@ namespace DefenderGame.Scripts.GoViews
         [SerializeField] private Transform m_Muzzle;
         [SerializeField] private Transform m_MagazineSlot;
         public Transform MagazineSlot => m_MagazineSlot;
+        [CanBeNull] private MagazineGOView m_LoadedMagazineView; 
         
         
         private Vector3 m_AimDirection;
+        private int m_AmmoInMagazine;
 
         private void Update()
         {
@@ -29,6 +33,28 @@ namespace DefenderGame.Scripts.GoViews
             }
         }
 
+        public void SetMagazineView([CanBeNull] Magazine magazine)
+        {
+            if(m_LoadedMagazineView != null){
+                m_LoadedMagazineView.HandleDestroy();
+                m_LoadedMagazineView = null;
+            }
+
+            m_AmmoInMagazine = magazine?.AmmoCapacity ?? 0;
+
+            if (magazine != null)
+            {
+                m_LoadedMagazineView = PoolManager.Instance.MagazineViewPool.Get();
+                m_LoadedMagazineView.Restore(magazine.AmmoCount, magazine.AmmoCapacity, magazine.AmmoTier);
+                var magazineTr = m_LoadedMagazineView.transform;
+                magazineTr.SetParent(m_MagazineSlot);
+                var magazineSlotTr = m_MagazineSlot.transform;
+                magazineTr.position = magazineSlotTr.position;
+                magazineTr.rotation = magazineSlotTr.rotation;
+                magazineTr.localScale = magazineSlotTr.localScale;
+            }
+        }
+        
         public void UpdateAimDirection(float3 aimDirection)
         {
             m_AimDirection = aimDirection;
@@ -39,6 +65,7 @@ namespace DefenderGame.Scripts.GoViews
             m_GunShakeParent.ResetLocal();
             m_BarrelRecoilTweenParent.ResetLocal();
             m_BarrelAimParent.ResetLocal();
+            m_AmmoInMagazine = 0;
             
             m_AimDirection = aimDirection;
             if (m_AimDirection.sqrMagnitude > 0.1f)
@@ -64,6 +91,13 @@ namespace DefenderGame.Scripts.GoViews
                 // todo, empty case eject here
                 m_BarrelRecoilTweenParent.DOLocalMoveZ(0f, 0.1f).SetEase(Ease.OutQuad);
             });
+
+            m_AmmoInMagazine--;
+            
+            if (m_LoadedMagazineView != null)
+            {
+                m_LoadedMagazineView.SetAmmoCount(m_AmmoInMagazine);
+            }
         }
     }
 }

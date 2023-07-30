@@ -137,7 +137,7 @@ namespace DefenderGame.Scripts.Systems
                     switch (onGoingAction)
                     {
                         case AmmoBoxFillingMagazine ammoBoxFillingMagazine:
-                            if (ammoBoxFillingMagazine.LastAmmoLoadedTime.Equals((float)SystemAPI.Time.ElapsedTime))
+                            if ((ammoBoxFillingMagazine.LastAmmoLoadedTime).Equals((float)SystemAPI.Time.ElapsedTime))
                             {
                                 if (
                                     itemGrid.TryGetGridObject<AmmoBox>(ammoBoxFillingMagazine.AmmoBoxPos,
@@ -230,13 +230,14 @@ namespace DefenderGame.Scripts.Systems
 
             var jumpTargetPos = magazineViewBulletFeedTr.position;
             var targetRotation = magazineViewBulletFeedTr.rotation;
-
+            
             bulletView.transform.DOJump(jumpTargetPos, 0.5f, 1, 0.5f)
                 .Join(bulletView.transform.DORotateQuaternion(targetRotation, 0.5f))
                 .OnComplete(() =>
                     {
                         //PoolManager.Instance.PlaySmallShockEffect(bulletView.transform.position, targetUp);
                         bulletView.HandleDestroy();
+                        magazineView.ShakeFromTop();
                     }
                 );
         }
@@ -250,6 +251,7 @@ namespace DefenderGame.Scripts.Systems
         )
         {
             var turretView = turretViews.GetOrCreateView(turret);
+            turretView.SetMagazineView(null);
 
             var magSlotTr = turretView.MagazineSlot.transform;
 
@@ -278,7 +280,7 @@ namespace DefenderGame.Scripts.Systems
                     .Join(magViewTr.DORotateQuaternion(endRot, 0.6f * duration))
                     .AppendCallback(() => magView.ShakeFromBottom(0.3f * duration))
                     .AppendInterval(0.3f * duration)
-                    .OnComplete(() => { magView.HandleDestroy(); }
+                    .AppendCallback(() => { magView.HandleDestroy();}
                     );
             }
 
@@ -304,7 +306,7 @@ namespace DefenderGame.Scripts.Systems
                 .Join(newMagViewTr.DORotateQuaternion(newMagEndRot, 0.6f * newMagDuration))
                 .AppendCallback(() => newMagView.ShakeFromTop(0.3f * newMagDuration))
                 .AppendInterval(0.3f * newMagDuration)
-                .OnComplete(() => { newMagView.HandleDestroy(); }
+                .AppendCallback(() => { newMagView.HandleDestroy(); turretView.SetMagazineView(turretLoadingMagazine.NewMagazine);}
                 );
         }
     }

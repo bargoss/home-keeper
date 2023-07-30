@@ -37,12 +37,12 @@ namespace DefenderGame.Scripts.Components
                 {
                     if(startItem is AmmoBox && endItem is Magazine)
                     {
-                        OngoingActions.Add(new AmmoBoxFillingMagazine(time, 0.1f, startPos, endPos));
+                        OngoingActions.Add(new AmmoBoxFillingMagazine(time, 0.5f, startPos, endPos));
                     }
                     else if(startItem is Magazine magazine1 && endItem is Turret turret1)
                     {
                         ItemGrid.RemoveItem(startItem);
-                        OngoingActions.Add(new TurretLoadingMagazine(time, 0.1f, startPos, magazine1, turret1.Magazine, endPos));
+                        OngoingActions.Add(new TurretLoadingMagazine(time, 1.5f, startPos, magazine1, turret1.Magazine, endPos));
                     }
                 }
                 else
