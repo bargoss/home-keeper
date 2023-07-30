@@ -301,6 +301,7 @@ namespace DefenderGame.Scripts.Components
     public abstract class DeGridObject : IGridItem
     {
         public virtual int2[] GetOccupations() => new int2[1];
+        public abstract DeGridObject Clone();
     }
 
     public class AmmoBox : DeGridObject
@@ -328,6 +329,14 @@ namespace DefenderGame.Scripts.Components
             AmmoCount = ammoCount;
             AmmoCountChangedTime = time;
         }
+        
+        public override DeGridObject Clone()
+        {
+            return new AmmoBox(AmmoCount, AmmoCapacity, AmmoTier, BoxTier)
+            {
+                AmmoCountChangedTime = AmmoCountChangedTime,
+            };
+        }
     }
 
     public class Magazine : DeGridObject
@@ -351,6 +360,14 @@ namespace DefenderGame.Scripts.Components
             AmmoCapacity = ammoCapacity;
             AmmoTier = ammoTier;
             MagazineTier = magazineTier;
+        }
+
+        public override DeGridObject Clone()
+        {
+            return new Magazine(AmmoCount, AmmoCapacity, AmmoTier, MagazineTier)
+            {
+                AmmoCountChangedTime = AmmoCountChangedTime,
+            };
         }
     }
 
@@ -388,6 +405,11 @@ namespace DefenderGame.Scripts.Components
             }
             
             return false;
+        }
+
+        public override DeGridObject Clone()
+        {
+            return new Turret(FireRate, LastShotTime, Magazine, LastMagazineChangedTime);
         }
     }
 }

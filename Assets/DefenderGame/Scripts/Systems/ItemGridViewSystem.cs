@@ -1,4 +1,5 @@
-﻿using DefenderGame.Scripts.Components;
+﻿using System;
+using DefenderGame.Scripts.Components;
 using DefenderGame.Scripts.GoViews;
 using DG.Tweening;
 using JetBrains.Annotations;
@@ -54,6 +55,17 @@ namespace DefenderGame.Scripts.Systems
             (view) => Object.Destroy(view.gameObject)
         );
 
+        private MonoBehaviour GetOrCreateView<TLogical>(TLogical logical) where TLogical : class, IGridItem
+        {
+            return logical switch
+            {
+                Turret turret => m_TurretViews.GetOrCreateView(turret),
+                Magazine magazine => m_MagazineViews.GetOrCreateView(magazine),
+                AmmoBox ammoBox => m_AmmoBoxViews.GetOrCreateView(ammoBox),
+                _ => throw new ArgumentOutOfRangeException(nameof(logical), logical, null)
+            };
+        }
+
 
         protected override void OnCreate()
         {
@@ -64,8 +76,10 @@ namespace DefenderGame.Scripts.Systems
         {
             foreach (var (itemGrid, gridLtw) in SystemAPI.Query<DeItemGrid, LocalToWorld>())
             {
-                var view = m_ItemGridViews.GetOrCreateView(itemGrid);
-                var viewTransform = view.transform;
+                var itemGridView = m_ItemGridViews.GetOrCreateView(itemGrid);
+                itemGridView.ResetHighlights();
+                
+                var viewTransform = itemGridView.transform;
                 viewTransform.position = gridLtw.Position;
                 viewTransform.rotation = gridLtw.Rotation;
                 viewTransform.localScale = Vector3.one;
@@ -142,10 +156,24 @@ namespace DefenderGame.Scripts.Systems
                             // todo
                             break;
                         case Moving moving:
-                            // todo
+                            //if (moving.StartTime.Equals((float)SystemAPI.Time.ElapsedTime))
+                            //{
+                            //    var movingView = GetOrCreateView(moving.MovingObject.Clone());
+                            //    var movingViewTr = movingView.transform;
+                            //    movingViewTr.position = ItemGridUtils.GridToWorldPos(moving.OriginalPosition, gridLtw, itemGrid.GridLength);
+                            //    var movingTargetPos = ItemGridUtils.GridToWorldPos(moving.TargetPosition, gridLtw, itemGrid.GridLength);
+                            //    movingViewTr.DOJump(movingTargetPos, 1, 1, moving.Duration);
+                            //}
+
                             break;
                         case Selection selection:
                             // todo
+                            if (itemGrid.ItemGrid.TryGetGridItem(selection.SelectedObjectPos, out var selectedObject))
+                            {
+                                var highLightPositions = ItemGridUtils.GetGridsFromPivotAndOffsets(selection.SelectedObjectPos, selectedObject.GetOccupations());
+                                itemGridView.HighlightGrids(highLightPositions);
+                            }
+
                             break;
                         case TurretLoadingMagazine turretLoadingMagazine:
                             if (turretLoadingMagazine.StartTime.Equals((float)SystemAPI.Time.ElapsedTime))

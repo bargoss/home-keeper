@@ -46,3 +46,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TilePrefab: {fileID: 4644033435146425712, guid: 76c2c255331852845a417b47cf7c59dc,
     type: 3}
+  m_TileMaterial: {fileID: 2100000, guid: 8c922775086cd6c4585ad5d5f796587c, type: 2}
+  m_TileSelectedMaterial: {fileID: 2100000, guid: d0776b6316a527d4da8bce52df7e8f47,
+    type: 2}
