@@ -1,5 +1,37 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &643926136175320622
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1727104936360446695}
+  m_Layer: 0
+  m_Name: BottomParent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1727104936360446695
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 643926136175320622}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 781661374123599748}
+  m_Father: {fileID: 2426757021493216446}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &852221430515421017
 GameObject:
   m_ObjectHideFlags: 0
@@ -48,7 +80,7 @@ MonoBehaviour:
   m_BulletFeed: {fileID: 3939737463548158757}
   m_BulletBottom: {fileID: 6911213189614761497}
   m_TopParent: {fileID: 2363523562460914488}
-  m_BottomParent: {fileID: 2426757021493216446}
+  m_BottomParent: {fileID: 1727104936360446695}
   m_AmmoCountText: {fileID: 4156350547489614805}
 --- !u!1 &866960794945019896
 GameObject:
@@ -60,7 +92,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2426757021493216446}
   m_Layer: 0
-  m_Name: BottomParent
+  m_Name: dasdas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -78,7 +110,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 781661374123599748}
+  - {fileID: 1727104936360446695}
   m_Father: {fileID: 2363523562460914488}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -379,7 +411,7 @@ Transform:
   m_Children:
   - {fileID: 986820568918510285}
   - {fileID: 1493078628811249315}
-  m_Father: {fileID: 2426757021493216446}
+  m_Father: {fileID: 1727104936360446695}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7642360554910263689

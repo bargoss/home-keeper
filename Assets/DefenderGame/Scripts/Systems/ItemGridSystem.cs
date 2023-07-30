@@ -28,10 +28,10 @@ namespace DefenderGame.Scripts.Systems
             {
                 switch (gridItem)
                 {
-                    //case AmmoBox ammoBox:
-                    //    break;
-                    //case Magazine magazine:
-                    //    break;
+                    case AmmoBox ammoBox:
+                        break;
+                    case Magazine magazine:
+                        break;
                     case Turret turret:
                         var shot = turret.TryShoot(time);
                         if (shot)
