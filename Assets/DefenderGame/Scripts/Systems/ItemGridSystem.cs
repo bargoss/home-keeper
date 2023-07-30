@@ -87,7 +87,7 @@ namespace DefenderGame.Scripts.Systems
                                 newActions.Add(new GridEffect(
                                     time,
                                     ItemGridUtils.GetGridsFromPivotAndOffsets(
-                                        moving.TargetPosition, moving.MovingObject.Occupations
+                                        moving.TargetPosition, moving.MovingObject.GetOccupations()
                                     ),
                                     GridEffect.EnMsg.Neutral, 0f)
                                 );
@@ -99,7 +99,7 @@ namespace DefenderGame.Scripts.Systems
                                 newActions.Add(new GridEffect(
                                     time,
                                     ItemGridUtils.GetGridsFromPivotAndOffsets(
-                                        moving.TargetPosition, moving.MovingObject.Occupations
+                                        moving.TargetPosition, moving.MovingObject.GetOccupations()
                                     ),
                                     GridEffect.EnMsg.Negative, 0f)
                                 );
@@ -123,14 +123,17 @@ namespace DefenderGame.Scripts.Systems
                             if (time > turretLoadingMagazine.StartTime + turretLoadingMagazine.ActionDuration) 
                             {
                                 turret.SetMagazine(turretLoadingMagazine.NewMagazine, time);
-                                if (itemGrid.ItemGrid.TryPlaceItem(turretLoadingMagazine.NewMagazinePositionBeforeLoad, turretLoadingMagazine.PreviousMagazine))
+                                if (turretLoadingMagazine.PreviousMagazine != null)
                                 {
-                                    // OK
-                                }
-                                else
-                                {
-                                    // todo handle this case (low priority)
-                                    Debug.LogError("Failed to place magazine back to grid because its occupied, we should probably place it somewhere else or something");
+                                    if (itemGrid.ItemGrid.TryPlaceItem(turretLoadingMagazine.NewMagazinePositionBeforeLoad, turretLoadingMagazine.PreviousMagazine))
+                                    {
+                                        // OK
+                                    }
+                                    else
+                                    {
+                                        // todo handle this case (low priority)
+                                        Debug.LogError("Failed to place magazine back to grid because its occupied, we should probably place it somewhere else or something");
+                                    }                                    
                                 }
                                 completedActions.Add(ongoingAction);
                             }

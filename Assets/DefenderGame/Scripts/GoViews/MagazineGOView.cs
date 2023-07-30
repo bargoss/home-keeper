@@ -22,6 +22,7 @@ namespace DefenderGame.Scripts.GoViews
         public void Restore(int ammoCount, int ammoCapacity, int ammoTier)
         {
             m_AmmoCapacity = ammoCapacity;
+            SetAmmoCount(ammoCount);
             
             m_TopParent.ResetLocal();            
             m_BottomParent.ResetLocal();

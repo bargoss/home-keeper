@@ -37,7 +37,6 @@ namespace DefenderGame.Scripts.Components
                 {
                     if(startItem is AmmoBox && endItem is Magazine)
                     {
-                        ItemGrid.RemoveItem(startItem);
                         OngoingActions.Add(new AmmoBoxFillingMagazine(time, 0.1f, startPos, endPos));
                     }
                     else if(startItem is Magazine magazine1 && endItem is Turret turret1)
@@ -266,14 +265,14 @@ namespace DefenderGame.Scripts.Components
             return true;
         }
         
-        public bool TryPlaceItem(int2 pivot, T gridItem)
+        public bool TryPlaceItem(int2 pivot, [NotNull] T gridItem)
         {
-            if (!IsSpaceAvailable(pivot, gridItem.Occupations))
+            if (!IsSpaceAvailable(pivot, gridItem.GetOccupations()))
             {
                 return false;
             }
             
-            foreach (var occupation in gridItem.Occupations)
+            foreach (var occupation in gridItem.GetOccupations())
             {
                 var position = pivot + occupation;
                 m_Occupations[position.x + position.y * Width] = gridItem;
@@ -297,11 +296,11 @@ namespace DefenderGame.Scripts.Components
 
     public interface IGridItem
     {
-        public int2[] Occupations { get; }
+        public int2[] GetOccupations();
     }
     public abstract class DeGridObject : IGridItem
     {
-        public virtual int2[] Occupations { get; } = new int2[1];
+        public virtual int2[] GetOccupations() => new int2[1];
     }
 
     public class AmmoBox : DeGridObject
