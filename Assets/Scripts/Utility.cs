@@ -16,6 +16,13 @@ namespace DefaultNamespace
         public static float3 Forward => new float3(0, 0, 1);
 
         
+        public static void CopyTRS(Transform source, Transform destination)
+        {
+            destination.position = source.position;
+            destination.rotation = source.rotation;
+            destination.localScale = source.localScale;
+        }
+
         public static void ResetLocal(this Transform transform)
         {
             transform.localPosition = Vector3.zero;

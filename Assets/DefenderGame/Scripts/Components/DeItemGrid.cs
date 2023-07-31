@@ -60,8 +60,16 @@ namespace DefenderGame.Scripts.Components
                 }
                 else
                 {
-                    ItemGrid.RemoveItem(startItem);
-                    OngoingActions.Add(new Moving(time, startItem, startPos, endPos, 0.5f));
+                    if (startItem is Turret turret0 && turret0.Magazine != null)
+                    {
+                        OngoingActions.Add(new Moving(time, turret0.Magazine, startPos, endPos, 0.5f));
+                        turret0.SetMagazine(null, time);
+                    }
+                    else
+                    {
+                        ItemGrid.RemoveItem(startItem);
+                        OngoingActions.Add(new Moving(time, startItem, startPos, endPos, 0.5f));
+                    }
                 }
             }
         }
@@ -181,8 +189,9 @@ namespace DefenderGame.Scripts.Components
             PreviousMagazine = previousMagazine;
             TurretPos = turretPos;
             
-            var blockedGrids = ItemGridUtils.GetGridsFromPivotAndOffsets(newMagazinePositionBeforeLoad, newMagazine.GetOccupations());
-            m_BlockingGrids = blockedGrids.ToArray();
+            var blockedGrids0 = ItemGridUtils.GetGridsFromPivotAndOffsets(newMagazinePositionBeforeLoad, newMagazine.GetOccupations());
+            var blockedGrids1 = ItemGridUtils.GetGridsFromPivotAndOffsets(turretPos, newMagazine.GetOccupations()); // todo what if turret is not 1x1 size?
+            m_BlockingGrids = blockedGrids0.Union(blockedGrids1).ToArray();
         }
     }
 

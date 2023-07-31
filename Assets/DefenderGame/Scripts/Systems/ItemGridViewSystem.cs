@@ -1,4 +1,5 @@
 ﻿using System;
+using DefaultNamespace;
 using DefenderGame.Scripts.Components;
 using DefenderGame.Scripts.GoViews;
 using DG.Tweening;
@@ -124,6 +125,11 @@ namespace DefenderGame.Scripts.Systems
                                 if (turret.Magazine != null) turretView.AnimateShoot(turret.Magazine.AmmoCount);
                                 turretView.UpdateAimDirection(turret.AimDirection);
                             }
+                            
+                            if(turret.LastMagazineChangedTime.Equals((float)SystemAPI.Time.ElapsedTime))
+                            {
+                                turretView.SetMagazineView(turret.Magazine);
+                            }
 
                             break;
                         default:
@@ -132,7 +138,7 @@ namespace DefenderGame.Scripts.Systems
                     }
                 });
 
-                itemGridView.HighlightGrids(itemGrid.GetBlockedGrids(), Color.red);
+                itemGridView.HighlightGrids(itemGrid.GetBlockedGrids(),Color.Lerp(Color.red, Color.white, 0.8f));
 
                 foreach (var onGoingAction in itemGrid.OngoingActions)
                 {
@@ -163,8 +169,18 @@ namespace DefenderGame.Scripts.Systems
                                 var movingView = GetOrCreateView(moving.MovingObject);
                                 var movingViewTr = movingView.transform;
                                 movingViewTr.position = ItemGridUtils.GridToWorldPos(moving.OriginalPosition, gridLtw, itemGrid.GridLength);
+                                
+                                if (itemGrid.TryGetGridObject<Turret>(moving.OriginalPosition, out var turret))
+                                {
+                                    // that magazine came out of a turret
+                                    var turretView = m_TurretViews.GetOrCreateView(turret);
+                                    Utility.CopyTRS(turretView.MagazineSlot, movingViewTr);
+                                }
+                                    
+                                
                                 var movingTargetPos = ItemGridUtils.GridToWorldPos(moving.TargetPosition, gridLtw, itemGrid.GridLength);
-                                movingViewTr.DOJump(movingTargetPos, 1, 1, moving.Duration);
+                                movingViewTr.DOJump(movingTargetPos, 1, 1, moving.Duration)
+                                    .Join(movingViewTr.DORotateQuaternion(quaternion.identity, moving.Duration));
                             }
                             else
                             {
