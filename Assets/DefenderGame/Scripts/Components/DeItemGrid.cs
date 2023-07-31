@@ -35,7 +35,7 @@ namespace DefenderGame.Scripts.Components
 
         public DeItemGrid()
         {
-            ItemGrid = new DeItemGrid<DeGridObject>(5, 5);
+            ItemGrid = new DeItemGrid<DeGridObject>(4, 4);
             GridLength = 2;
         }
 

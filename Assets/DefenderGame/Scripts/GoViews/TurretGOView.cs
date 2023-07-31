@@ -48,7 +48,7 @@ namespace DefenderGame.Scripts.GoViews
                 var magazineSlotTr = m_MagazineSlot.transform;
                 magazineTr.position = magazineSlotTr.position;
                 magazineTr.rotation = magazineSlotTr.rotation;
-                magazineTr.localScale = magazineSlotTr.localScale;
+                //magazineTr.localScale = magazineSlotTr.localScale;
             }
         }
         
