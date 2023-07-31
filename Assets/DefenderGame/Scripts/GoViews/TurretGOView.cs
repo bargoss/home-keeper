@@ -22,7 +22,6 @@ namespace DefenderGame.Scripts.GoViews
         
         
         private Vector3 m_AimDirection;
-        private int m_AmmoInMagazine;
 
         private void Update()
         {
@@ -39,8 +38,6 @@ namespace DefenderGame.Scripts.GoViews
                 m_LoadedMagazineView.HandleDestroy();
                 m_LoadedMagazineView = null;
             }
-
-            m_AmmoInMagazine = magazine?.AmmoCapacity ?? 0;
 
             if (magazine != null)
             {
@@ -60,12 +57,13 @@ namespace DefenderGame.Scripts.GoViews
             m_AimDirection = aimDirection;
         }
 
-        public void Restore(Vector3 aimDirection)
+        public void Restore(Vector3 aimDirection, Magazine magazine)
         {
             m_GunShakeParent.ResetLocal();
             m_BarrelRecoilTweenParent.ResetLocal();
             m_BarrelAimParent.ResetLocal();
-            m_AmmoInMagazine = 0;
+
+            SetMagazineView(magazine);
             
             m_AimDirection = aimDirection;
             if (m_AimDirection.sqrMagnitude > 0.1f)
@@ -81,7 +79,7 @@ namespace DefenderGame.Scripts.GoViews
             m_GunShakeParent.DOShakePosition(0.5f, 0.05f, 10, 90, false, true);
         }
 
-        public void AnimateShoot()
+        public void AnimateShoot(int newAmmoCount)
         {
             PoolManager.Instance.PlayShootEffect(m_Muzzle.position, m_Muzzle.forward);
             
@@ -91,12 +89,10 @@ namespace DefenderGame.Scripts.GoViews
                 // todo, empty case eject here
                 m_BarrelRecoilTweenParent.DOLocalMoveZ(0f, 0.1f).SetEase(Ease.OutQuad);
             });
-
-            m_AmmoInMagazine--;
             
             if (m_LoadedMagazineView != null)
             {
-                m_LoadedMagazineView.SetAmmoCount(m_AmmoInMagazine);
+                m_LoadedMagazineView.SetAmmoCount(newAmmoCount);
             }
         }
     }
