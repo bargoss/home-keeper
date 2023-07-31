@@ -158,14 +158,19 @@ namespace DefenderGame.Scripts.Systems
                             // todo
                             break;
                         case Moving moving:
-                            //if (moving.StartTime.Equals((float)SystemAPI.Time.ElapsedTime))
-                            //{
-                            //    var movingView = GetOrCreateView(moving.MovingObject.Clone());
-                            //    var movingViewTr = movingView.transform;
-                            //    movingViewTr.position = ItemGridUtils.GridToWorldPos(moving.OriginalPosition, gridLtw, itemGrid.GridLength);
-                            //    var movingTargetPos = ItemGridUtils.GridToWorldPos(moving.TargetPosition, gridLtw, itemGrid.GridLength);
-                            //    movingViewTr.DOJump(movingTargetPos, 1, 1, moving.Duration);
-                            //}
+                            if (moving.StartTime.Equals((float)SystemAPI.Time.ElapsedTime))
+                            {
+                                var movingView = GetOrCreateView(moving.MovingObject);
+                                var movingViewTr = movingView.transform;
+                                movingViewTr.position = ItemGridUtils.GridToWorldPos(moving.OriginalPosition, gridLtw, itemGrid.GridLength);
+                                var movingTargetPos = ItemGridUtils.GridToWorldPos(moving.TargetPosition, gridLtw, itemGrid.GridLength);
+                                movingViewTr.DOJump(movingTargetPos, 1, 1, moving.Duration);
+                            }
+                            else
+                            {
+                                // touch
+                                GetOrCreateView(moving.MovingObject);
+                            }
 
                             break;
                         case Selection selection:
