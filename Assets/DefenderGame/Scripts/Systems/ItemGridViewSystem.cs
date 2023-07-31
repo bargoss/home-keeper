@@ -168,7 +168,7 @@ namespace DefenderGame.Scripts.Systems
                             }
                             else
                             {
-                                // touch
+                                // touch it so it doesn't get cleaned up
                                 GetOrCreateView(moving.MovingObject);
                             }
 
