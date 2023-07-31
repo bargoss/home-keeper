@@ -17,8 +17,6 @@ namespace DefenderGame.Scripts.GoViews
         [SerializeField] private Material m_TileMaterial;
         [SerializeField] private Material m_TileSelectedMaterial;
         
-        private readonly HashSet<int2> m_HighlightedGrids = new();
-        
         private int m_Width;
         private int m_Height;
         private float m_GridLength;
@@ -31,7 +29,6 @@ namespace DefenderGame.Scripts.GoViews
             m_Tiles.ForEach(tile => Destroy(tile.gameObject));
             m_Tiles.Clear();
             m_TileRenderers.Clear();
-            m_HighlightedGrids.Clear();
 
             for (int y = 0; y < height; y++)
             {
@@ -51,24 +48,28 @@ namespace DefenderGame.Scripts.GoViews
             }
         }
         
-        public void HighlightGrids(int2[] grids)
+        public void HighlightGrids(IEnumerable<int2> grids, Color color)
         {
             // set materials of grids
             foreach (var grid in grids)
             {
                 var tileRenderer = m_TileRenderers[GetGridIndex(grid)];
-                tileRenderer.material = m_TileSelectedMaterial;
+                // set color
+                tileRenderer.material.color = color;
             }
-
-            m_HighlightedGrids.AddRange(grids);
+        }
+        public void HighlightGrid(int2 grid, Color color)
+        {
+            var tileRenderer = m_TileRenderers[GetGridIndex(grid)];
+            // set color
+            tileRenderer.material.color = color;
         }
         
         public void ResetHighlights()
         {
-            foreach (var grid in m_HighlightedGrids)
+            foreach (var tileRenderer in m_TileRenderers)
             {
-                var tileRenderer = m_TileRenderers[GetGridIndex(grid)];
-                tileRenderer.material = m_TileMaterial;
+                tileRenderer.material.color = Color.white;
             }
         }
         

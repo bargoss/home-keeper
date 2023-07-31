@@ -57,13 +57,16 @@ namespace DefenderGame.Scripts.Systems
         {
             if (playerInput.Down)
             {
+                var blockedGrids = itemGrid.GetBlockedGrids();
+                
                 var targetGridPos = ItemGridUtils.WorldToGridPos(playerInput.MousePos, itemGridLtw, itemGrid.GridLength);
                 Debug.Log("clicked grid pos: " + targetGridPos);
 
                 if // if there's a valid selection 
                 (
                     itemGrid.OngoingActions.FirstOrDefault(action => action is Selection) is Selection ongoingAction &&
-                    itemGrid.ItemGrid.TryGetGridItem(ongoingAction.SelectedObjectPos, out _)
+                    itemGrid.ItemGrid.TryGetGridItem(ongoingAction.SelectedObjectPos, out _) &&
+                    !blockedGrids.Contains(targetGridPos)
                 )
                 {
                     itemGrid.HandleMove(ongoingAction.SelectedObjectPos, targetGridPos, time);
@@ -71,7 +74,7 @@ namespace DefenderGame.Scripts.Systems
                 }
                 else // selecting now
                 {
-                    if (itemGrid.IsPositionOccupied(targetGridPos))
+                    if (itemGrid.IsPositionOccupied(targetGridPos) && !blockedGrids.Contains(targetGridPos))
                     {
                         itemGrid.OngoingActions.Add(new Selection(time, targetGridPos));
                     }

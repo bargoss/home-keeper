@@ -132,6 +132,8 @@ namespace DefenderGame.Scripts.Systems
                     }
                 });
 
+                itemGridView.HighlightGrids(itemGrid.GetBlockedGrids(), Color.red);
+
                 foreach (var onGoingAction in itemGrid.OngoingActions)
                 {
                     switch (onGoingAction)
@@ -171,7 +173,7 @@ namespace DefenderGame.Scripts.Systems
                             if (itemGrid.ItemGrid.TryGetGridItem(selection.SelectedObjectPos, out var selectedObject))
                             {
                                 var highLightPositions = ItemGridUtils.GetGridsFromPivotAndOffsets(selection.SelectedObjectPos, selectedObject.GetOccupations());
-                                itemGridView.HighlightGrids(highLightPositions);
+                                itemGridView.HighlightGrids(highLightPositions, Color.yellow);
                             }
 
                             break;

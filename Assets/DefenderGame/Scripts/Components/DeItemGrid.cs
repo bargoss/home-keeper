@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using DefenderGame.Scripts.Systems;
 using JetBrains.Annotations;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -13,6 +15,16 @@ namespace DefenderGame.Scripts.Components
 
         public HashSet<OngoingAction> OngoingActions { get; } = new();
         public float GridLength { get; }
+        
+        public HashSet<int2> GetBlockedGrids()
+        {
+            var blockedGrids = new HashSet<int2>();
+            foreach (var ongoingAction in OngoingActions)
+            {
+                blockedGrids.UnionWith(ongoingAction.BlockingGrids);
+            }
+            return blockedGrids;
+        }
 
         // doesnt work
         //public DeItemGrid(int width, int height, float gridLength)
@@ -43,6 +55,7 @@ namespace DefenderGame.Scripts.Components
                     {
                         ItemGrid.RemoveItem(startItem);
                         OngoingActions.Add(new TurretLoadingMagazine(time, 1.5f, startPos, magazine1, turret1.Magazine, endPos));
+                        turret1.SetMagazine(null, time);
                     }
                 }
                 else
@@ -76,6 +89,10 @@ namespace DefenderGame.Scripts.Components
 
     public abstract class OngoingAction
     {
+        protected int2[] m_BlockingGrids = {};
+
+        public IEnumerable<int2> BlockingGrids => m_BlockingGrids;
+
         protected OngoingAction(float startTime)
         {
             StartTime = startTime;
@@ -108,6 +125,13 @@ namespace DefenderGame.Scripts.Components
             OriginalPosition = originalPosition;
             TargetPosition = targetPosition;
             Duration = duration;
+            
+            var destinationCoordinates =
+                ItemGridUtils.GetGridsFromPivotAndOffsets(originalPosition, movingObject.GetOccupations());
+            var sourceCoordinates =
+                ItemGridUtils.GetGridsFromPivotAndOffsets(targetPosition, movingObject.GetOccupations());
+            var blockingGrids = destinationCoordinates.Union(sourceCoordinates);
+            m_BlockingGrids = blockingGrids.ToArray();
         }
     }
     
@@ -156,6 +180,9 @@ namespace DefenderGame.Scripts.Components
             NewMagazine = newMagazine;
             PreviousMagazine = previousMagazine;
             TurretPos = turretPos;
+            
+            var blockedGrids = ItemGridUtils.GetGridsFromPivotAndOffsets(newMagazinePositionBeforeLoad, newMagazine.GetOccupations());
+            m_BlockingGrids = blockedGrids.ToArray();
         }
     }
 
