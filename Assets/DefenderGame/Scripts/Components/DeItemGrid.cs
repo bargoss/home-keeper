@@ -57,6 +57,19 @@ namespace DefenderGame.Scripts.Components
                         OngoingActions.Add(new TurretLoadingMagazine(time, 1.5f, startPos, magazine1, turret1.Magazine, endPos));
                         turret1.SetMagazine(null, time);
                     }
+                    else if (startItem is Turret turret2A && endItem is Turret turret2B && turret2A.Magazine != null && turret2B.Magazine == null)
+                    {
+                        // magswap
+                        OngoingActions.Add(new TurretLoadingMagazine(time, 1.5f, startPos, turret2A.Magazine, null, endPos));
+                        turret2A.SetMagazine(null, time);
+                    }
+                    else // just swap
+                    {
+                        ItemGrid.RemoveItem(startItem);
+                        ItemGrid.RemoveItem(endItem);
+                        OngoingActions.Add(new Moving(time, startItem, startPos, endPos, 0.5f));
+                        OngoingActions.Add(new Moving(time, endItem, endPos, startPos, 0.5f));
+                    }
                 }
                 else
                 {
