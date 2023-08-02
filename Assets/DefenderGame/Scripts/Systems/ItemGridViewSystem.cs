@@ -86,7 +86,7 @@ namespace DefenderGame.Scripts.Systems
                 viewTransform.localScale = Vector3.one;
 
 
-                itemGrid.ItemGrid.ForEachItem((item, pos) =>
+                foreach (var (item, pos) in itemGrid.ItemGrid.Items)
                 {
                     switch (item)
                     {
@@ -136,8 +136,8 @@ namespace DefenderGame.Scripts.Systems
                             Debug.LogError("Unknown item type");
                             break;
                     }
-                });
-
+                }
+                
                 itemGridView.HighlightGrids(itemGrid.GetBlockedGrids(),Color.Lerp(Color.red, Color.white, 0.8f));
 
                 foreach (var onGoingAction in itemGrid.OngoingActions)

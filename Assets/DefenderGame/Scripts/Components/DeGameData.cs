@@ -3,7 +3,7 @@ using Unity.Mathematics;
 
 namespace DefenderGame.Scripts.Components
 {
-    public struct DeGameData : IComponentData
+    public class DeGameData : IComponentData
     {
         public PlayerInput PlayerInput;
     }

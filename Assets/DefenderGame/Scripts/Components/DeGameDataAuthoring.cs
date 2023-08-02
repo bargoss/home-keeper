@@ -10,7 +10,7 @@ namespace DefenderGame.Scripts.Components
             public override void Bake(DeGameDataAuthoring authoring)
             {
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
-                AddComponent(entity, new DeGameData());
+                AddComponentObject(entity, new DeGameData());
             }
         }
     }

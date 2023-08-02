@@ -25,7 +25,7 @@ namespace DefenderGame.Scripts.Systems
 
         private static void HandleUpdateItemGrid(DeItemGrid itemGrid, float time)
         {
-            itemGrid.ItemGrid.ForEachItem((gridItem, _) =>
+            foreach (var (gridItem, pivot) in itemGrid.ItemGrid.Items)
             {
                 switch (gridItem)
                 {
@@ -34,18 +34,19 @@ namespace DefenderGame.Scripts.Systems
                     case Magazine magazine:
                         break;
                     case Turret turret:
-                        var shot = turret.TryShoot(time);
-                        if (shot)
-                        {
-                            // todo create bullet entity
-                        }
+                        //// not here
+                        //var shot = turret.TryShoot(time);
+                        //if (shot)
+                        //{
+                        //    // todo create bullet entity
+                        //}
                         break;
                     default:
                         Debug.LogError($"Unknown grid item type: {gridItem.GetType()}");
                         break;
                 }
-            });
-
+            }
+            
             var completedActions = new List<OngoingAction>();
             var newActions = new List<OngoingAction>();
             

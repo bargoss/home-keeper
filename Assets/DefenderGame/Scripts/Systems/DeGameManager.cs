@@ -22,10 +22,9 @@ namespace DefenderGame.Scripts.Systems
 
         protected override void OnUpdate()
         {
-            var gameDataRw =  SystemAPI.GetSingletonRW<DeGameData>();
-            var gameData = gameDataRw.ValueRO;
+            var gameData = SystemAPI.ManagedAPI.GetSingleton<DeGameData>();
             var playerInput = gameData.PlayerInput.GetUpdated(Utility.GetMousePositionInWorldSpaceXZ(), Input.GetMouseButton(0));
-            
+
             var itemGridEntity = SystemAPI.ManagedAPI.GetSingletonEntity<DeItemGrid>();
             var itemGrid = SystemAPI.ManagedAPI.GetComponent<DeItemGrid>(itemGridEntity);
             var itemGridLtw = SystemAPI.GetComponent<LocalToWorld>(itemGridEntity);
@@ -51,7 +50,6 @@ namespace DefenderGame.Scripts.Systems
             
             
             gameData.PlayerInput = playerInput;
-            gameDataRw.ValueRW = gameData;
         }
 
         private static void HandleItemGridControl(PlayerInput playerInput, LocalToWorld itemGridLtw, DeItemGrid itemGrid, float time)
@@ -61,6 +59,12 @@ namespace DefenderGame.Scripts.Systems
                 var blockedGrids = itemGrid.GetBlockedGrids();
                 
                 var targetGridPos = ItemGridUtils.WorldToGridPos(playerInput.MousePos, itemGridLtw, itemGrid.GridLength);
+                if (targetGridPos.x < itemGrid.ItemGrid.Width && targetGridPos.y < itemGrid.ItemGrid.Height == false)
+                {
+                    // out of bounds
+                    return;
+                }
+                
                 Debug.Log("clicked grid pos: " + targetGridPos);
 
                 if // if there's a valid selection 

@@ -246,11 +246,25 @@ namespace DefenderGame.Scripts.Components
         private readonly HashSet<T> m_Items;
         private readonly Dictionary<T, int2> m_ItemPivots;
         
-        public void ForEachItem(Action<T, int2> action)
+        
+        //** lambda in dots is problematic with Entities.ForEach **
+        //public void ForEachItem(Action<T, int2> action)
+        //{
+        //    foreach (var item in m_Items)
+        //    {
+        //        action(item, m_ItemPivots[item]);
+        //    }
+        //}
+        
+        // Ienumerable version
+        public IEnumerable<(T item, int2 pivot)> Items
         {
-            foreach (var item in m_Items)
+            get
             {
-                action(item, m_ItemPivots[item]);
+                foreach (var item in m_Items)
+                {
+                    yield return (item, m_ItemPivots[item]);
+                }
             }
         }
 
