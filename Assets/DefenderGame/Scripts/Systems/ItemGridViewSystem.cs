@@ -123,8 +123,8 @@ namespace DefenderGame.Scripts.Systems
                             if (turret.LastShotTime.Equals((float)SystemAPI.Time.ElapsedTime))
                             {
                                 if (turret.Magazine != null) turretView.AnimateShoot(turret.Magazine.AmmoCount);
-                                turretView.UpdateAimDirection(turret.AimDirection);
                             }
+                            turretView.UpdateAimDirection(turret.AimDirection);
                             
                             if(turret.LastMagazineChangedTime.Equals((float)SystemAPI.Time.ElapsedTime))
                             {

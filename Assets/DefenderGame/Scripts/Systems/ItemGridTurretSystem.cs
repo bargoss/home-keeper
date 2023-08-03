@@ -11,6 +11,8 @@ using UnityEngine.Analytics;
 
 namespace DefenderGame.Scripts.Systems
 {
+    [UpdateInGroup(typeof(SimulationSystemGroup))]
+    [UpdateBefore(typeof(ItemGridViewSystem))]
     public partial class ItemGridTurretSystem : SystemBase
     {
         private readonly List<float3> m_EnemyPositions = new();
@@ -18,9 +20,7 @@ namespace DefenderGame.Scripts.Systems
         protected override void OnCreate()
         {
             RequireForUpdate(GetEntityQuery(typeof(DeItemGrid)));
-            RequireForUpdate(GetEntityQuery(typeof(DeGameData)));
             RequireForUpdate(GetEntityQuery(typeof(DeEnemy)));
-            RequireForUpdate(GetEntityQuery(typeof(DeEnemyTarget)));
         }
 
         protected override void OnUpdate()
@@ -64,15 +64,17 @@ namespace DefenderGame.Scripts.Systems
                             turret.TryShoot((float)SystemAPI.Time.ElapsedTime)
                         )
                         {
-                            var projectile = ecb.Instantiate(gamePrefabs.Enemy0Prefab);
+                            var projectile = ecb.Instantiate(gamePrefabs.ProjectilePrefab);
                             var rot = quaternion.LookRotation(turret.AimDirection, Utility.Up);
                             var pos = turretPosition + Utility.Up * 0.75f;
                             ecb.SetLocalPositionRotation(projectile, pos, rot);
-                            ecb.SetVelocity(projectile, turret.AimDirection * 10f);
+                            ecb.SetVelocity(projectile, turret.AimDirection * 100f);
                         }
                     }
                 }
             }).WithoutBurst().Run();
+            
+            ecb.Playback(EntityManager);
         }
     }
 }

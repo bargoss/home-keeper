@@ -241,7 +241,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4445cf99a9f4b13b7fa61889850b8c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  EnemySpawnRate: 0.22
+  EnemySpawnRate: 2.5
 --- !u!4 &1084720884
 Transform:
   m_ObjectHideFlags: 0
