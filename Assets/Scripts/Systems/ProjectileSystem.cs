@@ -14,11 +14,12 @@ namespace Systems
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     public partial struct ProjectileSystem : ISystem
     {
+        public void OnCreate(ref SystemState state)
+        {
+            state.RequireForUpdate<Projectile>();
+        }
         public void OnUpdate(ref SystemState state)
         {
-            return;
-            
-            var ecb = new EntityCommandBuffer(Allocator.Temp);
             foreach (var (statefulCollisionEvents, projectile, projectilePhysicsVelocity, entity) in SystemAPI.Query<DynamicBuffer<StatefulCollisionEvent>, Projectile, PhysicsVelocity>().WithEntityAccess())
             {
                 foreach (var collision in statefulCollisionEvents)
@@ -36,7 +37,7 @@ namespace Systems
                         }
                         
                         //var damage = projectile.BaseDamage * collision.CollisionDetails.EstimatedImpulse;
-                        var damage = 1 * collision.CollisionDetails.EstimatedImpulse;
+                        var damage = projectile.BaseDamage; // * collision.CollisionDetails.EstimatedImpulse;
                         
                         var health = healthRwOpt.ValueRO;
                         health.HitPoints -= damage;
@@ -49,13 +50,13 @@ namespace Systems
                             physicsVelocityRwOpt.ValueRW = physicsVelocity;
                         }
                     }
-                    
-                    //ecb.DestroyEntity(entity);
                 }
             }
+        }
+        
+        public void OnDestroy(ref SystemState state)
+        {
             
-            ecb.Playback(state.EntityManager);
-            ecb.Dispose();
         }
     }
 }

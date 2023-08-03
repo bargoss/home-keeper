@@ -10,6 +10,12 @@ namespace Systems
     public partial struct LifeSpanSystem : ISystem
     {
         [BurstCompile]
+        public void OnCreate(ref SystemState state)
+        {
+            state.RequireForUpdate<LifeSpan>();
+        }
+        
+        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
@@ -32,6 +38,12 @@ namespace Systems
                 commandBuffer.Playback(state.EntityManager);
             }
             commandBuffer.Dispose();
-        }        
+        }
+        
+        [BurstCompile]
+        public void OnDestroy(ref SystemState state)
+        {
+            
+        }
     }
 }

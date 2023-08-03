@@ -2,11 +2,14 @@
 using System.Linq;
 using DefaultNamespace;
 using DefenderGame.Scripts.Components;
+using HomeKeeper.Components;
 using JetBrains.Annotations;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
+using Magazine = DefenderGame.Scripts.Components.Magazine;
 
 namespace DefenderGame.Scripts.Systems
 {
@@ -43,8 +46,13 @@ namespace DefenderGame.Scripts.Systems
 
                 m_Initialized = true;
             }
+
+            //SystemAPI.Query<>()
             
             
+            
+            HandleEnemySpawning(EntityManager);
+
             HandleItemGridControl(playerInput, itemGridLtw, itemGrid, time);
             
             
@@ -52,6 +60,28 @@ namespace DefenderGame.Scripts.Systems
             gameData.PlayerInput = playerInput;
         }
 
+        private void HandleEnemySpawning(EntityManager entityManager)
+        {
+            var ecb = new EntityCommandBuffer(Allocator.Temp);
+
+            var enemySpawnerEntity = SystemAPI.GetSingletonEntity<DeEnemySpawnPosition>();
+            var enemySpawnerLtw = SystemAPI.GetComponent<LocalToWorld>(enemySpawnerEntity);
+            var gameData = SystemAPI.ManagedAPI.GetSingleton<DeGameData>();
+            var prefabs = SystemAPI.GetSingleton<DeGamePrefabs>();
+            
+            
+            var spawnCooldown = gameData.EnemySpawnRate;
+            var time = (float)SystemAPI.Time.ElapsedTime; 
+            if (time > gameData.LastEnemySpawnTime + spawnCooldown)
+            {
+                var enemy = ecb.Instantiate(prefabs.Enemy0Prefab);
+                ecb.SetLocalPositionRotation(enemy, enemySpawnerLtw.Position, quaternion.LookRotation(new float3(0,0,-1), new float3(0,1,0)));
+                gameData.LastEnemySpawnTime = time;
+            }
+            
+            ecb.Playback(entityManager);
+        }
+        
         private static void HandleItemGridControl(PlayerInput playerInput, LocalToWorld itemGridLtw, DeItemGrid itemGrid, float time)
         {
             if (playerInput.Down)

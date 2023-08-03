@@ -7,7 +7,7 @@ namespace DefaultNamespace.Authoring
 {
     public class ProjectileAuthoring : MonoBehaviour
     {
-        //public float BaseDamage = 1;
+        public float BaseDamage = 1;
     }
     
     public class ProjectileBaker : Baker<ProjectileAuthoring>
@@ -18,7 +18,7 @@ namespace DefaultNamespace.Authoring
             AddComponent(entity, new Projectile()
             {
                 Penetration = 0,
-                BaseDamage = 1
+                BaseDamage = authoring.BaseDamage
             });
         }
     }

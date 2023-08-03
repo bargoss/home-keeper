@@ -5,7 +5,12 @@ namespace DefenderGame.Scripts.Components
 {
     public class DeGameData : IComponentData
     {
+        // stats:
+        public float EnemySpawnRate;
+        
+        // state:
         public PlayerInput PlayerInput;
+        public float LastEnemySpawnTime;
     }
 
     public readonly struct PlayerInput
