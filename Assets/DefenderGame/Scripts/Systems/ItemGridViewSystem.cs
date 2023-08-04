@@ -144,17 +144,80 @@ namespace DefenderGame.Scripts.Systems
                 {
                     switch (onGoingAction)
                     {
-                        case AmmoBoxFillingMagazine ammoBoxFillingMagazine:
+                        case AmmoTransfer ammoBoxFillingMagazine:
                             if ((ammoBoxFillingMagazine.LastAmmoLoadedTime).Equals((float)SystemAPI.Time.ElapsedTime))
                             {
                                 if (
-                                    itemGrid.TryGetGridObject<AmmoBox>(ammoBoxFillingMagazine.AmmoBoxPos,
+                                    itemGrid.TryGetGridObject<AmmoBox>(ammoBoxFillingMagazine.AmmoSourcePos,
                                         out var ammoBox) &&
-                                    itemGrid.TryGetGridObject<Magazine>(ammoBoxFillingMagazine.MagazinePos,
+                                    itemGrid.TryGetGridObject<Magazine>(ammoBoxFillingMagazine.AmmoDestinationPos,
                                         out var magazine)
                                 )
                                 {
-                                    AnimateAmmoBoxToMagazine(ammoBox, magazine, m_AmmoBoxViews, m_MagazineViews);
+                                    var ammoBoxView = m_AmmoBoxViews.GetOrCreateView(ammoBox);
+                                    var ammoBoxViewTr = ammoBoxView.transform;
+                                    var magazineView = m_MagazineViews.GetOrCreateView(magazine);
+                                    var magazineViewTr = magazineView.transform;
+                                    
+                                    /*
+                                     *
+                                     private static void AnimateBulletTransfer(
+                                    Vector3 sourcePos, Quaternion sourceRotation,
+                                    Vector3 destinationPos, Quaternion destinationRotation,
+                                    int ammoTier,
+                                    Action onRoundTransferredToDestination
+        )
+                                     */
+
+                                    var ammoBoxFeed = ammoBoxView.BulletFeed;
+                                    var magFeed = magazineView.BulletFeed;
+                                    
+                                    AnimateBulletTransfer(
+                                        ammoBoxFeed.position, ammoBoxFeed.rotation,
+                                        magFeed.position, magFeed.rotation,
+                                        ammoBox.AmmoTier,
+                                        () =>
+                                        {
+                                            ammoBoxView.SetAmmoCount(ammoBox.AmmoCount);
+                                            magazineView.SetAmmoCount(magazine.AmmoCount);
+                                            magazineView.ShakeFromTop();
+                                        }
+                                    );
+                                }
+                                else if (
+                                    itemGrid.TryGetGridObject<Magazine>(ammoBoxFillingMagazine.AmmoSourcePos,out var mag0) &&
+                                    itemGrid.TryGetGridObject<Magazine>(ammoBoxFillingMagazine.AmmoDestinationPos,out var mag1)
+                                )
+                                {
+                                    var magView0 = m_MagazineViews.GetOrCreateView(mag0);
+                                    var magView1 = m_MagazineViews.GetOrCreateView(mag1);
+
+                                    /*
+                                     *
+                                     private static void AnimateBulletTransfer(
+                                    Vector3 sourcePos, Quaternion sourceRotation,
+                                    Vector3 destinationPos, Quaternion destinationRotation,
+                                    int ammoTier,
+                                    Action onRoundTransferredToDestination
+        )
+                                     */
+
+                                    var bulletFeed0 = magView0.BulletFeed.transform;
+                                    var bulletFeed1 = magView1.BulletFeed.transform;
+                                    
+                                    AnimateBulletTransfer(
+                                        bulletFeed0.position, bulletFeed0.rotation,
+                                        bulletFeed1.position, bulletFeed1.rotation,
+                                        mag0.AmmoTier,
+                                        () =>
+                                        {
+                                            magView0.SetAmmoCount(mag0.AmmoCount);
+                                            magView1.SetAmmoCount(mag1.AmmoCount);
+                                            magView1.ShakeFromTop();
+                                            magView0.ShakeFromBottom();
+                                        }
+                                    );
+
                                 }
                                 else Debug.LogError("shouldn't happen");
                             }
@@ -229,6 +292,36 @@ namespace DefenderGame.Scripts.Systems
             m_AmmoBoxViews.DisposeAndClearUntouchedViews();
         }
 
+        private static void AnimateBulletTransfer(
+            Vector3 sourcePos, Quaternion sourceRotation,
+            Vector3 destinationPos, Quaternion destinationRotation,
+            int ammoTier,
+            Action onRoundTransferredToDestination
+        )
+        {
+            var bulletView = PoolManager.Instance.BulletViewPool.Get();
+            var bulletViewTr = bulletView.transform;
+            bulletView.Restore(ammoTier);
+            
+            
+            bulletViewTr.position = sourcePos;
+            bulletViewTr.rotation = sourceRotation;
+
+            var jumpTargetPos = destinationPos;
+            var targetRotation = destinationRotation;
+            
+            bulletView.transform.DOJump(jumpTargetPos, 0.5f, 1, 0.5f)
+                .Join(bulletView.transform.DORotateQuaternion(targetRotation, 0.5f))
+                .OnComplete(() =>
+                    {
+                        bulletView.HandleDestroy();
+                        onRoundTransferredToDestination?.Invoke();
+                        //magazineView.ShakeFromTop();
+                    }
+                );
+   
+        }
+        
         private static void AnimateAmmoBoxToMagazine(
             AmmoBox ammoBox,
             Magazine magazine,

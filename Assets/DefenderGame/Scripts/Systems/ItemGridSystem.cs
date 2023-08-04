@@ -54,20 +54,38 @@ namespace DefenderGame.Scripts.Systems
             {
                 switch (ongoingAction)
                 {
-                    case AmmoBoxFillingMagazine ammoBoxFillingMagazine:
+                    case AmmoTransfer ammoBoxFillingMagazine:
                         if (
-                            itemGrid.TryGetGridObject<AmmoBox>(ammoBoxFillingMagazine.AmmoBoxPos, out var ammoBox) &&
-                            itemGrid.TryGetGridObject<Magazine>(ammoBoxFillingMagazine.MagazinePos, out var magazine)
+                            itemGrid.TryGetGridObject<DeGridObject>(ammoBoxFillingMagazine.AmmoSourcePos,out var ammoSource) &&
+                            itemGrid.TryGetGridObject<DeGridObject>(ammoBoxFillingMagazine.AmmoDestinationPos,out var ammoDestination)
                         )
                         {
-                            if(ammoBox.AmmoCount == 0){ completedActions.Add(ongoingAction); }
-                            else if(magazine.AmmoCount == magazine.AmmoCapacity){ completedActions.Add(ongoingAction); }
-                            else if(time > ammoBoxFillingMagazine.LastAmmoLoadedTime + ammoBoxFillingMagazine.TimePerAmmoLoad)
+                            if (ammoSource is AmmoBox ammoBox && ammoDestination is Magazine magazine)
                             {
-                                // transfer ammo
-                                ammoBox.SetAmmoCount(ammoBox.AmmoCount - 1, time);
-                                magazine.SetAmmoCount(magazine.AmmoCount + 1, time);
-                                ammoBoxFillingMagazine.LastAmmoLoadedTime = time;
+                                if(ammoBox.AmmoCount == 0){ completedActions.Add(ongoingAction); }
+                                else if(magazine.AmmoCount == magazine.AmmoCapacity){ completedActions.Add(ongoingAction); }
+                                else if(time > ammoBoxFillingMagazine.LastAmmoLoadedTime + ammoBoxFillingMagazine.TimePerAmmoLoad)
+                                {
+                                    // transfer ammo
+                                    ammoBox.SetAmmoCount(ammoBox.AmmoCount - 1, time);
+                                    magazine.SetAmmoCount(magazine.AmmoCount + 1, time);
+                                    ammoBoxFillingMagazine.LastAmmoLoadedTime = time;
+                                }                                
+                            }
+                            else
+                            {
+                                if (ammoSource is Magazine mag0 && ammoDestination is Magazine mag1)
+                                {
+                                    if(mag0.AmmoCount == 0){ completedActions.Add(ongoingAction); }
+                                    else if(mag1.AmmoCount == mag1.AmmoCapacity){ completedActions.Add(ongoingAction); }
+                                    else if(time > ammoBoxFillingMagazine.LastAmmoLoadedTime + ammoBoxFillingMagazine.TimePerAmmoLoad)
+                                    {
+                                        // transfer ammo
+                                        mag0.SetAmmoCount(mag0.AmmoCount - 1, time);
+                                        mag1.SetAmmoCount(mag1.AmmoCount + 1, time);
+                                        ammoBoxFillingMagazine.LastAmmoLoadedTime = time;
+                                    }                                                                    
+                                }
                             }
                         }
                         else{ completedActions.Add(ongoingAction); }

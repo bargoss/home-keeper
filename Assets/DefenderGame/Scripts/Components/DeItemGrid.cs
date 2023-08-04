@@ -47,9 +47,13 @@ namespace DefenderGame.Scripts.Components
             {
                 if (ItemGrid.TryGetGridItem(endPos, out var endItem))
                 {
-                    if(startItem is AmmoBox && endItem is Magazine)
+                    if (startItem is Magazine magSource && endItem is Magazine magDest)
                     {
-                        OngoingActions.Add(new AmmoBoxFillingMagazine(time, 0.5f, startPos, endPos));
+                        OngoingActions.Add(new AmmoTransfer(time, 0.5f, startPos, endPos));
+                    }
+                    else if(startItem is AmmoBox && endItem is Magazine)
+                    {
+                        OngoingActions.Add(new AmmoTransfer(time, 0.5f, startPos, endPos));
                     }
                     else if(startItem is Magazine magazine1 && endItem is Turret turret1)
                     {
@@ -208,12 +212,12 @@ namespace DefenderGame.Scripts.Components
         }
     }
 
-    public class AmmoBoxFillingMagazine : OngoingAction
+    public class AmmoTransfer : OngoingAction
     {
         public float TimePerAmmoLoad { get; }
         public float LastAmmoLoadedTime { get; set; }
-        public int2 AmmoBoxPos { get; }
-        public int2 MagazinePos { get; }
+        public int2 AmmoSourcePos { get; }
+        public int2 AmmoDestinationPos { get; }
         
         public float GetProgress(float time, int ammoBoxAmmoLeft, int magazineAmmoCount, int magazineAmmoCapacity)
         {
@@ -227,11 +231,11 @@ namespace DefenderGame.Scripts.Components
             return math.unlerp(loadStartTime, loadFinishTime, time);
         }
 
-        public AmmoBoxFillingMagazine(float startTime, float timePerAmmoLoad, int2 ammoBoxPos, int2 magazinePos) : base(startTime)
+        public AmmoTransfer(float startTime, float timePerAmmoLoad, int2 ammoSourcePos, int2 ammoDestinationPos) : base(startTime)
         {
             TimePerAmmoLoad = timePerAmmoLoad;
-            AmmoBoxPos = ammoBoxPos;
-            MagazinePos = magazinePos;
+            AmmoSourcePos = ammoSourcePos;
+            AmmoDestinationPos = ammoDestinationPos;
             LastAmmoLoadedTime = startTime;
         }
     }
