@@ -16,12 +16,7 @@ namespace DefaultNamespace.Authoring
         public override void Bake(HealthAuthoring authoring)
         {
             var entity = GetEntity(authoring.gameObject, TransformUsageFlags.Dynamic);
-            AddComponent(entity, new Health()
-            {
-                MaxHitPoints = authoring.MaxHitPoints,
-                HitPoints = authoring.MaxHitPoints,
-                DestroyOnDeath = authoring.DestroyOnDeath
-            });
+            AddComponent(entity, new Health(authoring.MaxHitPoints, authoring.DestroyOnDeath));
         }
     }
 }

@@ -11,6 +11,12 @@ namespace Systems
     public partial struct HealthSystem : ISystem
     {
         [BurstCompile]
+        public void OnCreate(ref SystemState state)
+        {
+            state.RequireForUpdate<Health>();
+        }
+        
+        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
@@ -18,20 +24,25 @@ namespace Systems
             foreach (var (healthRw, entity) in SystemAPI.Query<RefRW<Health>>().WithEntityAccess())
             {
                 var health = healthRw.ValueRO;
-                if (health.HitPoints > 0)
+                health.Update();
+                
+                
+                if (health is { HitPoints: <= 0, DestroyOnDeath: true })
                 {
-                    health.HitPoints = math.clamp(health.HitPoints, 0, health.MaxHitPoints);
-                    healthRw.ValueRW = health;
-                }
-                else
-                {
-                    if(health.DestroyOnDeath){
-                        commandBuffer.DestroyEntity(entity);
-                    }
+                    commandBuffer.DestroyEntity(entity);
                 }
             }
             
-            commandBuffer.Playback(state.EntityManager);
+            if (!commandBuffer.IsEmpty)
+            {
+                commandBuffer.Playback(state.EntityManager);
+            }
+        }
+        
+        [BurstCompile]
+        public void OnDestroy(ref SystemState state)
+        {
+            
         }
     }
 }

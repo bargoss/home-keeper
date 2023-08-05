@@ -12,10 +12,41 @@ namespace HomeKeeper.Components
 {
     public struct Health : IComponentData
     {
-        public float HitPoints;
+        public float HitPoints { get; private set; }
         public float MaxHitPoints;
         public bool DestroyOnDeath;
         public bool IsDead => HitPoints <= 0;
+        
+        public float TotalDamageThisFrame { get; private set; }
+
+        private float m_Damage;
+        
+        public void HandleDamage(float damage)
+        {
+            m_Damage += damage;
+        }
+        
+        public void Update()
+        {
+            TotalDamageThisFrame = m_Damage;
+            HitPoints -= m_Damage;
+            if (HitPoints <= 0)
+            {
+                HitPoints = 0;
+            }
+
+            m_Damage = 0;
+        }
+        
+        // ctor
+        public Health(float maxHitPoints, bool destroyOnDeath = true)
+        {
+            MaxHitPoints = maxHitPoints;
+            HitPoints = maxHitPoints;
+            DestroyOnDeath = destroyOnDeath;
+            TotalDamageThisFrame = 0;
+            m_Damage = 0;
+        }
     }
     public struct LifeSpan : IComponentData
     {

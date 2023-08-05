@@ -6,6 +6,7 @@ using Unity.Physics.Systems;
 using Unity.Transforms;
 using UnityEngine;
 using Plane = UnityEngine.Plane;
+using RaycastHit = Unity.Physics.RaycastHit;
 
 namespace DefaultNamespace
 {
@@ -14,7 +15,48 @@ namespace DefaultNamespace
         public static float3 Up => new float3(0, 1, 0);
         public static float3 Right => new float3(1, 0, 0);
         public static float3 Forward => new float3(0, 0, 1);
+        
+        public static void ControlVelocity(float3 currentVelocity, float3 targetVelocity, float maxAcceleration, float deltaTime, out float3 newVelocity)
+        {
+            var deltaVelocity = targetVelocity - currentVelocity;
+            var clampedDeltaVelocity = deltaVelocity.ClampMagnitude(maxAcceleration * deltaTime);
+            newVelocity = currentVelocity + clampedDeltaVelocity;
+        }
 
+        public static bool Raycast(this BuildPhysicsWorldData buildPhysicsWorldData, float3 start, float3 end, out RaycastHit hit)
+        {
+            return Raycast(buildPhysicsWorldData, start, end, 0xffffffff, out hit);
+        }
+        public static bool Raycast(this BuildPhysicsWorldData buildPhysicsWorldData, float3 start, float3 end, uint tag, out RaycastHit hit)
+        {
+            var collisionWorld = buildPhysicsWorldData.PhysicsData.PhysicsWorld.CollisionWorld;
+            var collisionFilter = CollisionFilter.Default;
+            collisionFilter.BelongsTo = tag;
+            var raycastInput = new RaycastInput
+            {
+                Start = start,
+                End = end,
+                Filter = collisionFilter
+            };
+            return collisionWorld.CastRay(raycastInput, out hit);
+        }
+
+        public static bool SphereCast(this BuildPhysicsWorldData buildPhysicsWorldData, float3 start, float3 end, float radius, out ColliderCastHit hit)
+        {
+            return SphereCast(buildPhysicsWorldData, start, end, radius, 0xffffffff, out hit);
+        }
+        
+        public static bool SphereCast(this BuildPhysicsWorldData buildPhysicsWorldData, float3 start, float3 end, float radius, uint tag, out ColliderCastHit hit)
+        {
+            var collisionWorld = buildPhysicsWorldData.PhysicsData.PhysicsWorld.CollisionWorld;
+            var collisionFilter = CollisionFilter.Default;
+            collisionFilter.BelongsTo = tag;
+            
+            var direction = end - start;
+            var distance = math.length(direction);
+            return collisionWorld.SphereCast(start, radius, direction, distance, out hit, collisionFilter);
+        }
+        
         
         public static void CopyTRS(Transform source, Transform destination)
         {

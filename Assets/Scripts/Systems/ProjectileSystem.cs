@@ -40,7 +40,7 @@ namespace Systems
                         var damage = projectile.BaseDamage; // * collision.CollisionDetails.EstimatedImpulse;
                         
                         var health = healthRwOpt.ValueRO;
-                        health.HitPoints -= damage;
+                        health.HandleDamage(damage);
                         healthRwOpt.ValueRW = health;
                         
                         if(physicsVelocityRwOpt.IsValid)
