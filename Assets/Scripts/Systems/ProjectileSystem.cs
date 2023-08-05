@@ -31,10 +31,10 @@ namespace Systems
                     
                     if(healthRwOpt.IsValid)
                     {
-                        if (!collision.CollisionDetails.IsValid)
-                        {
-                            Debug.LogError("Invalid collision details, adjust the component so this is calculated");
-                        }
+                        //if (!collision.CollisionDetails.IsValid)
+                        //{
+                        //    Debug.LogError("Invalid collision details, adjust the component so this is calculated");
+                        //}
                         
                         //var damage = projectile.BaseDamage * collision.CollisionDetails.EstimatedImpulse;
                         var damage = projectile.BaseDamage; // * collision.CollisionDetails.EstimatedImpulse;
