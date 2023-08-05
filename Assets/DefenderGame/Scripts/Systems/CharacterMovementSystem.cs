@@ -18,7 +18,7 @@ namespace DefenderGame.Scripts.Systems
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            SystemAPI.Query<CharacterMovement, LocalTransform, PhysicsVelocity>()
+            //SystemAPI.Query<CharacterMovement, LocalTransform, PhysicsVelocity>()
         }
 
         [BurstCompile]
@@ -33,7 +33,7 @@ namespace DefenderGame.Scripts.Systems
         public readonly Entity Self;
         private readonly RefRW<CharacterMovement> m_CharacterMovement;
         private readonly RefRO<LocalTransform> m_LocalTransform;
-        private readonly RefRO<Health>
+        //private readonly RefRO<Health>
 
 
     }
