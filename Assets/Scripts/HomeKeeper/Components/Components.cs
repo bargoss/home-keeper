@@ -113,7 +113,7 @@ namespace HomeKeeper.Components
         
     }
 
-    public struct CharacterMovement : IComponentData
+    public struct CharacterMovement2 : IComponentData
     {
         public struct SStats
         {

@@ -12,7 +12,7 @@ namespace HomeKeeper.Systems
     {
         public void OnUpdate(ref SystemState state)
         {
-            foreach (var (enemy, localToWorld, characterMovementRw, entity) in SystemAPI.Query<Enemy, LocalToWorld,RefRW<CharacterMovement>>().WithEntityAccess())
+            foreach (var (enemy, localToWorld, characterMovementRw, entity) in SystemAPI.Query<Enemy, LocalToWorld,RefRW<CharacterMovement2>>().WithEntityAccess())
             {
                 var characterMovement = characterMovementRw.ValueRO;
                 
