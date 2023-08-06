@@ -22,6 +22,8 @@ public class GameResources : ScriptableObject
     public MagazineGOView MagazineGOViewPrefab;
     public AmmoBoxGOView AmmoBoxGOViewPrefab;
     public BulletGOView BulletGoView;
+
+    public CharacterGOView CharacterGOViewPrefab;
     
     public ParticleSystem ImpactParticleEffectPrefab;
     public ParticleSystem SmallShockEffectPrefab;

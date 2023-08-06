@@ -34,6 +34,8 @@ namespace DefenderGame.Scripts.Systems
                     out _
                 );
 
+                aspect.Grounded = grounded; 
+
                 if (grounded)
                 {
                     var movementInput = aspect.CharacterMovement.ValueRO.MovementInput;
@@ -112,6 +114,12 @@ namespace DefenderGame.Scripts.Systems
             }
 
             return false;
+        }
+        
+        public bool Grounded
+        {
+            get => CharacterMovement.ValueRO.IsGrounded;
+            set => CharacterMovement.ValueRW.IsGrounded = value;
         }
         
         //private readonly RefRO<Health>

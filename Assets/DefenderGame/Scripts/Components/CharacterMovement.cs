@@ -12,6 +12,7 @@ namespace DefenderGame.Scripts.Components
         // state
         public float LastJumpTime;
         public bool Jumped;
+        public bool IsGrounded;
         
         // input
         public float3 MovementInput;
