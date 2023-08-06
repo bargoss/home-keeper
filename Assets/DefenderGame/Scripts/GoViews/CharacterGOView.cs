@@ -16,19 +16,28 @@ namespace DefenderGame.Scripts.GoViews
         
         
 
-        public void HandleFixedUpdate(Vector3 movementVelocity, Vector3 lookDirection, bool grounded, bool attacked)
+        public void HandleFixedUpdate(Vector3 position, Vector3 movementVelocity, Vector3 lookDirection, bool grounded, bool attacked)
         {
             var moving = movementVelocity.sqrMagnitude > 0.5f;
             
-            // set animator params
-            m_Animator.SetBool(AnimatorParamMoving, moving);
-            m_Animator.SetBool(AnimatorParamJump, !grounded);
-            if (attacked)
+            m_CharacterParent.transform.rotation = Quaternion.LookRotation(lookDirection - lookDirection.y * Vector3.up);
+            transform.position = position;
+
+            try
             {
-                m_Animator.SetTrigger(AnimatorParamAttack);
+                // set animator params
+                m_Animator.SetBool(AnimatorParamMoving, moving);
+                if (attacked)
+                {
+                    m_Animator.SetTrigger(AnimatorParamAttack);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("error setting animator params: " + e);
             }
             
-            m_CharacterParent.transform.rotation = Quaternion.LookRotation(lookDirection - lookDirection.y * Vector3.up);
+            
         }
         
 

@@ -25,26 +25,17 @@ namespace DefenderGame.Scripts.Systems
             var targetEntityLtw = SystemAPI.GetComponent<LocalToWorld>(targetEntity);
             var targetPosition = targetEntityLtw.Position;
             
-            Entities.ForEach((Entity entity, ref DeEnemy enemy, ref Health health, ref LocalTransform localTransform, ref PhysicsVelocity physicsVelocity) =>
+            Entities.ForEach((Entity entity, ref DeEnemy enemy, ref CharacterMovement characterMovement, in Health health, in LocalTransform localTransform) =>
             {
                 if (health.IsDead)
                 {
                     ecb.DestroyEntity(entity);
-                    return;
                 }
                 
                 var movementDirection = math.normalize(targetPosition - localTransform.Position);
-                var movementSpeed = enemy.MovementSpeed;
-                var targetVelocity = movementDirection * movementSpeed;
                 
-                
-                physicsVelocity.Linear = math.lerp(physicsVelocity.Linear, targetVelocity,  SystemAPI.Time.fixedDeltaTime * 10);
-                physicsVelocity.Angular = math.lerp(physicsVelocity.Angular, float3.zero,  SystemAPI.Time.fixedDeltaTime * 10);
-                
-                var targetRotation = quaternion.LookRotationSafe(math.normalize(movementDirection + localTransform.Forward()*0.1f), math.up());
+                characterMovement.MovementInput = movementDirection;
 
-                localTransform.Rotation = math.slerp(localTransform.Rotation, targetRotation, SystemAPI.Time.fixedDeltaTime * 10);
-                 
             }).Run();
 
             ecb.Playback(EntityManager);
