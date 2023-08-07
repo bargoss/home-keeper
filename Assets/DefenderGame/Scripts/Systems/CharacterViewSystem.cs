@@ -12,7 +12,7 @@ namespace DefenderGame.Scripts.Systems
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     public partial class CharacterViewSystem : SystemBase
     {
-        private PairMaintainer<CharacterView, CharacterGOView> m_PairMaintainer = new(
+        private readonly PairMaintainer<CharacterView, CharacterGOView> m_PairMaintainer = new(
             logical =>
             {
                 var characterView = Object.Instantiate(GameResources.Instance.CharacterGOViewPrefab);
