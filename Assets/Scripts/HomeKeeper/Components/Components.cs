@@ -23,12 +23,24 @@ namespace HomeKeeper.Components
         public float TotalDamageThisFrame { get; private set; }
 
         private float m_Damage;
-        public float3 LastDamagePosition { get; private set; }
+        public float3 BiggestDamagePosition { get; private set; }
+        public float3 BiggestDamageNormal { get; private set; }
+        public float BiggestDamage { get; private set; }
         
-        public void HandleDamage(float damage, float3 damagePosition)
+        public float3 m_BiggestDamagePositionInternal;
+        public float3 m_BiggestDamageNormalInternal;
+        public float m_BiggestDamageInternal;
+        
+        public void HandleDamage(float damage, float3 damagePosition, float3 damageNormal)
         {
             m_Damage += damage;
-            LastDamagePosition = damagePosition;
+            
+            if (damage > m_BiggestDamageInternal)
+            {
+                m_BiggestDamageInternal = damage;
+                m_BiggestDamagePositionInternal = damagePosition;
+                m_BiggestDamageNormalInternal = damageNormal;
+            }
         }
         
         
@@ -50,6 +62,14 @@ namespace HomeKeeper.Components
                 DiedNow = true;
                 DeathTime = time;
             }
+            
+            BiggestDamage = m_BiggestDamageInternal;
+            BiggestDamagePosition = m_BiggestDamagePositionInternal;
+            BiggestDamageNormal = m_BiggestDamageNormalInternal;
+            
+            m_BiggestDamageInternal = 0;
+            m_BiggestDamagePositionInternal = float3.zero;
+            m_BiggestDamageNormalInternal = float3.zero;
         }
         
         // ctor
@@ -62,7 +82,12 @@ namespace HomeKeeper.Components
             m_Damage = 0;
             DeathTime = 0;
             DiedNow = false;
-            LastDamagePosition = float3.zero;
+            BiggestDamagePosition = float3.zero;
+            BiggestDamageNormal = float3.zero;
+            BiggestDamage = 0;
+            m_BiggestDamagePositionInternal = float3.zero;
+            m_BiggestDamageNormalInternal = float3.zero;
+            m_BiggestDamageInternal = 0;
         }
     }
     public struct LifeSpan : IComponentData

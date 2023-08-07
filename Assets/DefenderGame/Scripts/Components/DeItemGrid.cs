@@ -464,7 +464,8 @@ namespace DefenderGame.Scripts.Components
         
         public bool TryShoot(float time)
         {
-            if(time > LastShotTime + FireRate && Magazine is { AmmoCount: > 0 })
+            var fireCooldown = 1f/FireRate;
+            if(time > LastShotTime + fireCooldown && Magazine is { AmmoCount: > 0 })
             {
                 Magazine.SetAmmoCount(Magazine.AmmoCount - 1, time);
                 LastShotTime = time;

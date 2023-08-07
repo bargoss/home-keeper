@@ -41,7 +41,7 @@ namespace Systems
                         var damage = projectile.BaseDamage; // * collision.CollisionDetails.EstimatedImpulse;
                         
                         var health = healthRwOpt.ValueRO;
-                        health.HandleDamage(damage, localTransform.Position);
+                        health.HandleDamage(damage, collision.CollisionDetails.AverageContactPointPosition, collision.Normal);
                         healthRwOpt.ValueRW = health;
                         
                         if(physicsVelocityRwOpt.IsValid)

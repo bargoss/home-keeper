@@ -42,9 +42,11 @@ namespace DefenderGame.Scripts.Systems
                 var health = healthRo.ValueRO;
                 if (health.DiedNow)
                 {
-                    rb.LinearVelocity = float3.zero;
-                    rb.AngularVelocityLocalSpace = float3.zero;
-                    colliderAspect.SetCollisionResponse(CollisionResponsePolicy.None);
+                    
+                    //rb.LinearVelocity = float3.zero;
+                    //rb.AngularVelocityLocalSpace = float3.zero;
+                    //colliderAspect.SetCollisionResponse(CollisionResponsePolicy.None);
+                    ecb.RemoveComponent<PhysicsWorldIndex>(entity);
                 }
                 if (health.IsDead && (float)SystemAPI.Time.ElapsedTime > health.DeathTime + 2)
                 {
@@ -52,7 +54,7 @@ namespace DefenderGame.Scripts.Systems
                 }
                 
                 var movementDirection = math.normalize(targetPosition - localTransformRo.ValueRO.Position);
-                movementDirection = new float3(1, 0, 0);
+                //movementDirection = new float3(1, 0, 0);
                 var characterMovement = characterMovementRw.ValueRO;
                 characterMovement.MovementInput = movementDirection;
                 characterMovementRw.ValueRW = characterMovement;

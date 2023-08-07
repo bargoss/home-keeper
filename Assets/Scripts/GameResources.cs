@@ -28,6 +28,7 @@ public class GameResources : ScriptableObject
     public ParticleSystem ImpactParticleEffectPrefab;
     public ParticleSystem SmallShockEffectPrefab;
     public ParticleSystem ShootEffectPrefab;
+    public ParticleSystem BloodEffectPrefab;
 
 
 

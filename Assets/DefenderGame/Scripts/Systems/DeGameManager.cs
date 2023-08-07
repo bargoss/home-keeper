@@ -38,11 +38,11 @@ namespace DefenderGame.Scripts.Systems
             {
                 itemGrid.ItemGrid.TryPlaceItem(new int2(0, 0), new Magazine(5, 10, 0, 0));
                 itemGrid.ItemGrid.TryPlaceItem(new int2(1, 0), new Magazine(5, 10, 0, 0));
-                itemGrid.ItemGrid.TryPlaceItem(new int2(0, 1), new AmmoBox(10, 10, 0, 0));
+                itemGrid.ItemGrid.TryPlaceItem(new int2(0, 1), new AmmoBox(200, 200, 0, 0));
                 itemGrid.ItemGrid.TryPlaceItem(new int2(1, 1), new AmmoBox(3, 10, 0, 0));
                 itemGrid.ItemGrid.TryPlaceItem(new int2(2, 1), new AmmoBox(8, 10, 0, 0));
-                itemGrid.ItemGrid.TryPlaceItem(new int2(0, 2), new Turret(1, 0, null, 0));
-                itemGrid.ItemGrid.TryPlaceItem(new int2(1, 2), new Turret(1, 0, null, 0));
+                itemGrid.ItemGrid.TryPlaceItem(new int2(0, 2), new Turret(0.5f, 5.65f, new Magazine(10,10,0,0), 0));
+                itemGrid.ItemGrid.TryPlaceItem(new int2(1, 2), new Turret(0.5f, 5, new Magazine(10,10,0,0), 0));
 
                 m_Initialized = true;
             }

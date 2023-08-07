@@ -90,7 +90,16 @@ namespace DefenderGame.Scripts.Systems
             }
             else if (m_Health is { IsValid: true, ValueRO: { DiedNow: true } })
             {
-                view.ActivateRagdoll();
+                view.SetRagdoll(true);
+                view.ApplyExplosionForceToRagdoll(m_Health.ValueRO.BiggestDamagePosition, 750, 2);
+                //var normal = math.normalizesafe(m_Health.ValueRO.BiggestDamagePosition - m_LocalTransform.ValueRO.Position, new float3(0,1,0));
+                var normal = m_Health.ValueRO.BiggestDamageNormal;
+                //var cameraForward = (float3)Camera.main.transform.forward;
+                // rotate away from camera towards camera forward plane
+                //normal = math.normalize(normal - cameraForward * math.dot(normal, cameraForward));
+                    
+
+                PoolManager.Instance.PlayBloodEffect(m_Health.ValueRO.BiggestDamagePosition - normal * 2.0f * 0, normal);
             }
             else
             {

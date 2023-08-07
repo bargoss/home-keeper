@@ -33,3 +33,5 @@ MonoBehaviour:
   SmallShockEffectPrefab: {fileID: 19806788, guid: c2f28a236b0696a4f90a994422019577,
     type: 3}
   ShootEffectPrefab: {fileID: 19817660, guid: 79b0a8abb1f641b4a8faa10b904758ea, type: 3}
+  BloodEffectPrefab: {fileID: 5093697972904881979, guid: 43b8629716af0234aaa53ac067b4fac5,
+    type: 3}

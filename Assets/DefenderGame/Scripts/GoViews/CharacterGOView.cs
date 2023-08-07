@@ -44,6 +44,7 @@ namespace DefenderGame.Scripts.GoViews
 
         public void Restore()
         {
+            SetRagdoll(false);
             m_Animator.SetBool(AnimatorParamMoving, false);
             m_Animator.SetBool(AnimatorParamJump, true);
             
@@ -59,12 +60,12 @@ namespace DefenderGame.Scripts.GoViews
             m_Limbs = new List<Rigidbody>(GetComponentsInChildren<Rigidbody>());
         }
 
-        public void ActivateRagdoll()
+        public void SetRagdoll(bool active)
         {
-            m_Animator.enabled = false;
+            m_Animator.enabled = !active;
             foreach (var limb in m_Limbs)
             {
-                limb.isKinematic = false;
+                limb.isKinematic = !active;
             }
         }
         

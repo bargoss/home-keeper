@@ -12,6 +12,7 @@
         private readonly BasicPool<ParticleSystem> m_ImpactParticleEffectPool;
         private readonly BasicPool<ParticleSystem> m_SmallShockEffectPool;
         private readonly BasicPool<ParticleSystem> m_ShootEffectPool;
+        private readonly BasicPool<ParticleSystem> m_BloodEffectPool;
             
         public readonly BasicPool<BulletGOView> BulletViewPool;
         public readonly BasicPool<MagazineGOView> MagazineViewPool;
@@ -22,9 +23,15 @@
             m_ImpactParticleEffectPool = new BasicPool<ParticleSystem>(GameResources.Instance.ImpactParticleEffectPrefab, poolsParent);
             m_SmallShockEffectPool = new BasicPool<ParticleSystem>(GameResources.Instance.SmallShockEffectPrefab, poolsParent);
             m_ShootEffectPool = new BasicPool<ParticleSystem>(GameResources.Instance.ShootEffectPrefab, poolsParent);
+            m_BloodEffectPool = new BasicPool<ParticleSystem>(GameResources.Instance.BloodEffectPrefab, poolsParent);
             
             BulletViewPool = new BasicPool<BulletGOView>(GameResources.Instance.BulletGoView, poolsParent);
             MagazineViewPool = new BasicPool<MagazineGOView>(GameResources.Instance.MagazineGOViewPrefab, poolsParent);
+        }
+        
+        public void PlayBloodEffect(Vector3 position, Vector3 forward)
+        {
+            PlayEffect(position, forward, m_BloodEffectPool);
         }
         
         public void PlayImpactEffect(Vector3 position, Vector3 forward)
