@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace DefenderGame.Scripts.GoViews
@@ -13,7 +14,7 @@ namespace DefenderGame.Scripts.GoViews
         private static readonly int AnimatorParamMoving = Animator.StringToHash("Moving");
         private static readonly int AnimatorParamJump = Animator.StringToHash("Jump");
         
-        
+        [SerializeField] [HideInInspector] private List<Rigidbody> m_Limbs = new List<Rigidbody>();
         
 
         public void HandleFixedUpdate(Vector3 position, Vector3 movementVelocity, Vector3 lookDirection, bool grounded, bool attacked)
@@ -45,6 +46,11 @@ namespace DefenderGame.Scripts.GoViews
         {
             m_Animator.SetBool(AnimatorParamMoving, false);
             m_Animator.SetBool(AnimatorParamJump, true);
+        }
+
+        private void OnValidate()
+        {
+            m_Limbs = new List<Rigidbody>(GetComponentsInChildren<Rigidbody>());
         }
 
         public void ActivateRagdoll()
