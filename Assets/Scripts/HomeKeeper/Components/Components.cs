@@ -16,19 +16,26 @@ namespace HomeKeeper.Components
         public float MaxHitPoints;
         public bool DestroyOnDeath;
         public bool IsDead => HitPoints <= 0;
+        public float DeathTime { get; private set; }
+        public bool DiedNow { get; private set; }
+    
         
         public float TotalDamageThisFrame { get; private set; }
 
         private float m_Damage;
+        public float3 LastDamagePosition { get; private set; }
         
-        public void HandleDamage(float damage)
+        public void HandleDamage(float damage, float3 damagePosition)
         {
             m_Damage += damage;
+            LastDamagePosition = damagePosition;
         }
         
-        public void Update()
+        
+        public void Update(float time)
         {
             TotalDamageThisFrame = m_Damage;
+            var isDeadPrev = IsDead;
             HitPoints -= m_Damage;
             if (HitPoints <= 0)
             {
@@ -36,6 +43,13 @@ namespace HomeKeeper.Components
             }
 
             m_Damage = 0;
+
+            DiedNow = false;
+            if(IsDead && !isDeadPrev)
+            {
+                DiedNow = true;
+                DeathTime = time;
+            }
         }
         
         // ctor
@@ -46,6 +60,9 @@ namespace HomeKeeper.Components
             DestroyOnDeath = destroyOnDeath;
             TotalDamageThisFrame = 0;
             m_Damage = 0;
+            DeathTime = 0;
+            DiedNow = false;
+            LastDamagePosition = float3.zero;
         }
     }
     public struct LifeSpan : IComponentData

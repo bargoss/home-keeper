@@ -46,21 +46,34 @@ namespace DefenderGame.Scripts.GoViews
         {
             m_Animator.SetBool(AnimatorParamMoving, false);
             m_Animator.SetBool(AnimatorParamJump, true);
+            
+            m_Animator.enabled = true;
+            foreach (var limb in m_Limbs)
+            {
+                limb.isKinematic = true;
+            }
         }
 
-        private void OnValidate()
+        private void Awake()
         {
             m_Limbs = new List<Rigidbody>(GetComponentsInChildren<Rigidbody>());
         }
 
         public void ActivateRagdoll()
         {
-            throw new System.NotImplementedException();
+            m_Animator.enabled = false;
+            foreach (var limb in m_Limbs)
+            {
+                limb.isKinematic = false;
+            }
         }
         
-        public void ApplyExplosionForceToRagdoll(Vector3 explosionPosition, float explosionForce)
+        public void ApplyExplosionForceToRagdoll(Vector3 explosionPosition, float explosionForce, float explosionRadius)
         {
-            throw new System.NotImplementedException();
+            foreach (var limb in m_Limbs)
+            {
+                limb.AddExplosionForce(explosionForce, explosionPosition, explosionRadius);
+            }
         }
     }
 }

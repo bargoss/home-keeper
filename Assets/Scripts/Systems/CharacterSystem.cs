@@ -115,7 +115,7 @@ namespace Systems
                                 
                                 if(damage)
                                 {
-                                    targetsHealth.HandleDamage(refRo.ValueRO.AttackDamage);
+                                    targetsHealth.HandleDamage(refRo.ValueRO.AttackDamage, distanceHit.Position);
                                     state.EntityManager.SetComponentData(distanceHit.Entity, targetsHealth);
                                     
                                     if (SystemAPI.GetComponentLookup<CharacterState>().TryGetComponent(distanceHit.Entity, out var targetCharacterState))

@@ -7,6 +7,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Physics.Stateful;
+using Unity.Transforms;
 using UnityEngine;
 
 namespace Systems
@@ -20,7 +21,7 @@ namespace Systems
         }
         public void OnUpdate(ref SystemState state)
         {
-            foreach (var (statefulCollisionEvents, projectile, projectilePhysicsVelocity, entity) in SystemAPI.Query<DynamicBuffer<StatefulCollisionEvent>, Projectile, PhysicsVelocity>().WithEntityAccess())
+            foreach (var (statefulCollisionEvents, projectile, projectilePhysicsVelocity, localTransform, entity) in SystemAPI.Query<DynamicBuffer<StatefulCollisionEvent>, Projectile, PhysicsVelocity, LocalTransform>().WithEntityAccess())
             {
                 foreach (var collision in statefulCollisionEvents)
                 {
@@ -40,7 +41,7 @@ namespace Systems
                         var damage = projectile.BaseDamage; // * collision.CollisionDetails.EstimatedImpulse;
                         
                         var health = healthRwOpt.ValueRO;
-                        health.HandleDamage(damage);
+                        health.HandleDamage(damage, localTransform.Position);
                         healthRwOpt.ValueRW = health;
                         
                         if(physicsVelocityRwOpt.IsValid)

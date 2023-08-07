@@ -24,13 +24,15 @@ namespace Systems
             foreach (var (healthRw, entity) in SystemAPI.Query<RefRW<Health>>().WithEntityAccess())
             {
                 var health = healthRw.ValueRO;
-                health.Update();
+                health.Update((float)SystemAPI.Time.ElapsedTime);
                 
                 
                 if (health is { HitPoints: <= 0, DestroyOnDeath: true })
                 {
                     commandBuffer.DestroyEntity(entity);
                 }
+                
+                healthRw.ValueRW = health;
             }
             
             if (!commandBuffer.IsEmpty)

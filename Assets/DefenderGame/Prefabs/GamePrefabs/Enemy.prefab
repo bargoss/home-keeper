@@ -259,7 +259,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MaxHitPoints: 10
-  DestroyOnDeath: 1
+  DestroyOnDeath: 0
 --- !u!23 &2960158479138982875
 MeshRenderer:
   m_ObjectHideFlags: 0
