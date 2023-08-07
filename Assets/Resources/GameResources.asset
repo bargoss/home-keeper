@@ -26,7 +26,7 @@ MonoBehaviour:
     type: 3}
   BulletGoView: {fileID: 7006923083862456779, guid: 7e94da408f7240e468f3afb5f1c70c75,
     type: 3}
-  CharacterGOViewPrefab: {fileID: 7473800490555074605, guid: 6d2ae32741617084e81b713a6bc47268,
+  CharacterGOViewPrefab: {fileID: 7473800490555074605, guid: 67ee0c0e767bf664ea0f5358b4b18fb5,
     type: 3}
   ImpactParticleEffectPrefab: {fileID: 19806788, guid: c2f28a236b0696a4f90a994422019577,
     type: 3}
