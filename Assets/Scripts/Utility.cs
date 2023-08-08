@@ -5,6 +5,7 @@ using Unity.Physics;
 using Unity.Physics.Systems;
 using Unity.Transforms;
 using UnityEngine;
+using ValueVariant;
 using Plane = UnityEngine.Plane;
 using RaycastHit = Unity.Physics.RaycastHit;
 
