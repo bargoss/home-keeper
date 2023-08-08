@@ -66,9 +66,9 @@ namespace DefenderGame.Scripts.Tests
             
             //SampleVariant2.IActionVisitor<SampleVariant, bool>
             b.Switch(
-                (SampleVariant b) =>
+                (SampleVariant bb) =>
                 {
-                    b.Switch(
+                    bb.Switch(
                         (int i) =>
                         {
                             var a = i;
@@ -89,17 +89,12 @@ namespace DefenderGame.Scripts.Tests
             );
         }
 
-        public void sadasdsa()
-        {
-            SampleVariant a;
-            
-            a.Accept()
-        }
+        
         
     }
     
     [ValueVariant]
-    public readonly partial struct SampleVariant: IValueVariant<SampleVariant, int> { }
+    public readonly partial struct SampleVariant: IValueVariant<SampleVariant, int, long, float> { }
     
     [ValueVariant]
     public readonly partial struct SampleVariant2: IValueVariant<SampleVariant2, SampleVariant, long> { }
