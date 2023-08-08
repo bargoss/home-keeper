@@ -1,6 +1,7 @@
 ﻿using DefaultNamespace;
 using DefenderGame.Scripts.Components;
 using DefenderGame.Scripts.Systems;
+using dotVariant;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -46,6 +47,41 @@ namespace DefenderGame.Scripts.Tests
                 true
             );
             int a = 3;
+        }
+
+        [MenuItem("DefenderGame/Tests/TestTurretUpdate2")]
+        public static void DotVariantTests()
+        {
+            var variant = new dotVariant._G.DefenderGame.Scripts.Tests.MyGrid()
+
+        }
+        
+        [Variant]
+        public partial struct MyGrid
+        {
+            static partial void VariantOf(Turret turret, Magazine magazine, AmmoBox ammoBox);
+        }
+        
+        public struct Turret1
+        {
+            public float LastShot;
+            public float3 AimDirection;
+            public bool HasMagazine;
+            public bool MagazineChanged;
+            public Magazine1 Magazine;
+        }
+        
+        public struct Magazine1
+        {
+            public int CurrentAmmo;
+            public int MaxAmmo;
+            public bool AmmoCountChanged;
+        }
+        
+        public struct AmmoBox1
+        {
+            public int AmmoCount;
+            public bool AmmoCountChanged;
         }
     }
 #endif
