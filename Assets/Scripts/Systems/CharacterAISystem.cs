@@ -42,18 +42,18 @@ namespace Systems
                         SystemAPI.GetComponentLookup<Health>().TryGetComponent(hit.Entity, out var targetHealth1)
                     )
                     {
-                        var isValidTarget = targetFaction1.Value != faction.Value && !targetHealth1.IsDead; 
+                        //var isValidTarget = targetFaction1.Value != faction.Value && !targetHealth1.IsDead; 
                         
-                        if(isValidTarget)
-                        {
-                            if(hit.Distance < closestDistance)
-                            {
-                                closestDistance = hit.Distance;
-                                closestTarget = hit.Entity;
-                                hasTarget = true;
-                                closestTargetPosition = hit.Position;
-                            }
-                        }
+                        //if(isValidTarget)
+                        //{
+                        //    if(hit.Distance < closestDistance)
+                        //    {
+                        //        closestDistance = hit.Distance;
+                        //        closestTarget = hit.Entity;
+                        //        hasTarget = true;
+                        //        closestTargetPosition = hit.Position;
+                        //    }
+                        //}
                     }
                 }
                 

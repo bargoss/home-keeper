@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DefenderGame.Scripts.Tests;
 using SpacialIndexing;
 using Unity.Collections;
 using Unity.Entities;
@@ -7,9 +8,24 @@ using Unity.Entities.Content;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
+using ValueVariant;
 
 namespace HomeKeeper.Components
 {
+    
+    [ValueVariant]
+    public readonly partial struct HealthStatus : IValueVariant<HealthStatus, HealthStatus.Dead, HealthStatus.Alive>
+    {
+        public struct Dead
+        {
+            public float DeathTime;
+            public bool DiedNow;
+        }
+        public struct Alive
+        {
+            
+        }        
+    }
     public struct Health : IComponentData
     {
         public float HitPoints { get; private set; }
@@ -18,6 +34,7 @@ namespace HomeKeeper.Components
         public bool IsDead => HitPoints <= 0;
         public float DeathTime { get; private set; }
         public bool DiedNow { get; private set; }
+        public HealthStatus Status => IsDead ? new HealthStatus.Dead {DeathTime = DeathTime, DiedNow = DiedNow} : new HealthStatus.Alive();
     
         
         public float TotalDamageThisFrame { get; private set; }

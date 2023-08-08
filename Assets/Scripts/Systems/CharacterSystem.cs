@@ -35,7 +35,7 @@ namespace Systems
             {
                 if (SystemAPI.GetComponentLookup<Health>().TryGetComponent(entity, out var health))
                 {
-                    if(health.IsDead) continue;
+                    //if(health.IsDead) continue;
                 }
 
                 var velocity = physicsVelocity.ValueRO;
@@ -71,7 +71,7 @@ namespace Systems
             {
                 if (SystemAPI.GetComponentLookup<Health>().TryGetComponent(entity, out var health))
                 {
-                    if(health.IsDead) continue;
+                    //if(health.IsDead) continue;
                 }
                 
                 var attackInput = item2.ValueRO.Attack;

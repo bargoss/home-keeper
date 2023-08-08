@@ -31,15 +31,15 @@ namespace HomeKeeper.Systems
             
             foreach (var (enemy, health, localToWorld, physicsVelocity, entity) in SystemAPI.Query<Enemy, Health, LocalToWorld, PhysicsVelocity>().WithEntityAccess())
             {
-                if (health.IsDead)
-                {
-                    commandBuffer.DestroyEntity(entity);
-
-                    var dyingEnemyPrefab = gameResources.DyingEnemyPrefab;
-                    var dyingEnemy = commandBuffer.Instantiate(dyingEnemyPrefab);
-                    commandBuffer.SetLocalPositionRotation(dyingEnemy, localToWorld.Position, localToWorld.Rotation);
-                    commandBuffer.SetComponent(dyingEnemy, physicsVelocity);
-                }                
+                //if (health.IsDead)
+                //{
+                //    commandBuffer.DestroyEntity(entity);
+//
+                //    var dyingEnemyPrefab = gameResources.DyingEnemyPrefab;
+                //    var dyingEnemy = commandBuffer.Instantiate(dyingEnemyPrefab);
+                //    commandBuffer.SetLocalPositionRotation(dyingEnemy, localToWorld.Position, localToWorld.Rotation);
+                //    commandBuffer.SetComponent(dyingEnemy, physicsVelocity);
+                //}                
             }
 
             if (!commandBuffer.IsEmpty)

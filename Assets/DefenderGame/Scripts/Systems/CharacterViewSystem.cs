@@ -6,6 +6,7 @@ using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
 using UnityEngine;
+using ValueVariant;
 using Random = Unity.Mathematics.Random;
 
 namespace DefenderGame.Scripts.Systems
@@ -78,7 +79,8 @@ namespace DefenderGame.Scripts.Systems
         
         public void HandleFixedUpdateOfView(CharacterGOView view)
         {
-            if (m_Health is { IsValid: true, ValueRO: { IsDead: false } })
+            //if (m_Health is { IsValid: true, ValueRO: { IsDead: false } })
+            if (m_Health.IsValid && m_Health.ValueRO.Status.TryGetValue(out HealthStatus.Alive _))
             {
                 view.HandleFixedUpdate(
                     m_LocalTransform.ValueRO.Position,

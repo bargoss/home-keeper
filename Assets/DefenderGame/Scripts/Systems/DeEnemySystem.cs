@@ -7,6 +7,7 @@ using Unity.Physics;
 using Unity.Physics.Aspects;
 using Unity.Physics.Authoring;
 using Unity.Transforms;
+using ValueVariant;
 
 namespace DefenderGame.Scripts.Systems
 {
@@ -48,7 +49,8 @@ namespace DefenderGame.Scripts.Systems
                     //colliderAspect.SetCollisionResponse(CollisionResponsePolicy.None);
                     ecb.RemoveComponent<PhysicsWorldIndex>(entity);
                 }
-                if (health.IsDead && (float)SystemAPI.Time.ElapsedTime > health.DeathTime + 2)
+                //if (health.IsDead && (float)SystemAPI.Time.ElapsedTime > health.DeathTime + 2)
+                if (health.Status.TryGetValue(out HealthStatus.Dead dead) && (float)SystemAPI.Time.ElapsedTime > dead.DeathTime + 2)
                 {
                     ecb.DestroyEntity(entity);
                 }
