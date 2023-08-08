@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.johanhelsing.oneof": {
+      "version": "https://github.com/johanhelsing/OneOf-Unity.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "7a43ca3732625c4440c84aca297135bae2cfe4ea"
+    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,

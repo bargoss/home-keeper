@@ -1,6 +1,8 @@
-﻿using DefaultNamespace;
+﻿using System.Collections.Generic;
+using DefaultNamespace;
 using DefenderGame.Scripts.Components;
 using DefenderGame.Scripts.Systems;
+using OneOf;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -47,6 +49,42 @@ namespace DefenderGame.Scripts.Tests
             );
             int a = 3;
         }
+
+        [MenuItem("DefenderGame/Tests/OneOfTest")]
+        public static void OneOfTests()
+        {
+            var grids = new List<Grid>();
+            grids.Add(new Grid()
+            {
+                Item = new TestMagazine()
+            });
+        }
     }
+
+    public struct TestTurret
+    {
+        public float3 Look;
+        public bool Shoot;
+    }
+    public struct TestMagazine
+    {
+        public int Capacity;
+        public int AmmoCount;
+    }
+    public struct None
+    {
+        
+    }
+
+    public struct Grid
+    {
+        public int2 GridPos;
+        public OneOf<None, TestTurret, TestMagazine> Item;
+    }
+    
+    struct Shape
+    {
+    }
+    
 #endif
 }

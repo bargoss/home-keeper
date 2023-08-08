@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.johanhelsing.oneof": "https://github.com/johanhelsing/OneOf-Unity.git",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.collab-proxy": "2.0.4",
     "com.unity.entities": "1.0.10",
