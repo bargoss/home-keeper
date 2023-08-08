@@ -50,23 +50,15 @@ namespace DefenderGame.Scripts.Tests
             int a = 3;
         }
 
-        public class Visitor0 : SampleVariant2.IActionVisitor
-        {
-            public void Visit(in SampleVariant value)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void Visit(in bool value)
-            {
-                throw new NotImplementedException();
-            }
-        } 
         
         [MenuItem("DefenderGame/Tests/212412")]
         public static void MyTest()
         {
             SampleVariant2 b = new SampleVariant2(new SampleVariant(2));
+            // Q: how to get size of a struct
+            // A: yo
+            System.Runtime.InteropServices.Marshal.SizeOf(typeof(SampleVariant2));
+            Debug.Log("size : " + System.Runtime.InteropServices.Marshal.SizeOf(typeof(SampleVariant2)));
             //b.Accept(new Visitor0());
 
             //SampleVariant2.DefaultConverter.Instance.Visit()
@@ -90,7 +82,7 @@ namespace DefenderGame.Scripts.Tests
                         }
                     );
                 },
-                (bool b) =>
+                (long b) =>
                 {
                     
                 }
@@ -104,6 +96,6 @@ namespace DefenderGame.Scripts.Tests
     public readonly partial struct SampleVariant: IValueVariant<SampleVariant, int, long, float> { }
     
     [ValueVariant]
-    public readonly partial struct SampleVariant2: IValueVariant<SampleVariant2, SampleVariant, bool> { }
+    public readonly partial struct SampleVariant2: IValueVariant<SampleVariant2, SampleVariant, long> { }
 #endif
 }
