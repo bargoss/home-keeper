@@ -58,20 +58,11 @@ namespace DefenderGame.Scripts.Systems
             var turrets = itemGridS.ItemGrid.Items.Where(item => item.item is Turret).Select((tuple, i) =>
                 (tuple.item, i)).ToList();
 
-            string msg = "";
-            msg += "TurretA: " + ((Turret)turrets[0].item).LastShotTime + " ";
-            msg += "TurretB: " + ((Turret)turrets[1].item).LastShotTime + "\n";
             
             Entities.ForEach((DeItemGrid itemGrid, LocalToWorld gridLocalToWorld) =>
             {
                 ecb = HandleTurretUpdate(itemGrid, gridLocalToWorld, closestEnemyPosition, enemyPresent, time, deltaTime, ecb, gamePrefabs);
             }).WithoutBurst().Run();
-            
-            msg += "Time : " + time + " ";
-            msg += "TurretA: " + ((Turret)turrets[0].item).LastShotTime + " ";
-            msg += "TurretB: " + ((Turret)turrets[1].item).LastShotTime + "\n";
-
-            Debug.Log(msg);
             
             ecb.Playback(EntityManager);
         }
