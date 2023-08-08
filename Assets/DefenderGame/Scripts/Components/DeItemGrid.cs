@@ -6,6 +6,8 @@ using JetBrains.Annotations;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine.Serialization;
+using ValueVariant;
+using Random = Unity.Mathematics.Random;
 
 namespace DefenderGame.Scripts.Components
 {
@@ -42,29 +44,41 @@ namespace DefenderGame.Scripts.Components
         public void HandleMove(int2 startPos, int2 endPos, float time)
         {
             if(
-                ItemGrid.TryGetGridItem(startPos, out var startItem)
+                ItemGrid.TryGetGridItem(startPos, out var startItemGrid)
             )
             {
-                if (ItemGrid.TryGetGridItem(endPos, out var endItem))
+                if (ItemGrid.TryGetGridItem(endPos, out var endItemGrid))
                 {
-                    if (startItem is Magazine magSource && endItem is Magazine magDest)
+                    var startItem = startItemGrid.Data;
+                    var endItem = endItemGrid.Data;
+                    
+                    //if (startItem is Magazine magSource && endItem is Magazine magDest)
+                    if (startItem.TryGetValue(out Magazine magSource) && endItem.TryGetValue(out Magazine magDest))
                     {
                         OngoingActions.Add(new AmmoTransfer(time, 0.5f, startPos, endPos));
                     }
-                    else if(startItem is AmmoBox && endItem is Magazine)
+                    //else if(startItem is AmmoBox && endItem is Magazine)
+                    else if(startItem.TryGetValue(out AmmoBox _) && endItem.TryGetValue(out Magazine _))
                     {
                         OngoingActions.Add(new AmmoTransfer(time, 0.5f, startPos, endPos));
                     }
-                    else if(startItem is Magazine magazine1 && endItem is Turret turret1)
+                    //else if(startItem is Magazine magazine1 && endItem is Turret turret1)
+                    else if(startItem.TryGetValue(out Magazine magazine1) && endItem.TryGetValue(out Turret turret1))
                     {
-                        ItemGrid.RemoveItem(startItem);
-                        OngoingActions.Add(new TurretLoadingMagazine(time, 1.5f, startPos, magazine1, turret1.Magazine, endPos));
+                        ItemGrid.RemoveItem(startItemGrid);
+                        OngoingActions.Add(new TurretLoadingMagazine(time,
+                            1.5f,
+                            startPos,
+                            magazine1,
+                            turret1.MagazineOpt,
+                            endPos
+                        ));
                         turret1.SetMagazine(null, time);
                     }
-                    else if (startItem is Turret turret2A && endItem is Turret turret2B && turret2A.Magazine != null && turret2B.Magazine == null)
+                    else if (startItem is Turret turret2A && endItem is Turret turret2B && turret2A.MagazineOpt != null && turret2B.MagazineOpt == null)
                     {
                         // magswap
-                        OngoingActions.Add(new TurretLoadingMagazine(time, 1.5f, startPos, turret2A.Magazine, null, endPos));
+                        OngoingActions.Add(new TurretLoadingMagazine(time, 1.5f, startPos, turret2A.MagazineOpt, null, endPos));
                         turret2A.SetMagazine(null, time);
                     }
                     else // just swap
@@ -77,9 +91,9 @@ namespace DefenderGame.Scripts.Components
                 }
                 else
                 {
-                    if (startItem is Turret turret0 && turret0.Magazine != null)
+                    if (startItem is Turret turret0 && turret0.MagazineOpt != null)
                     {
-                        OngoingActions.Add(new Moving(time, turret0.Magazine, startPos, endPos, 0.5f));
+                        OngoingActions.Add(new Moving(time, turret0.MagazineOpt, startPos, endPos, 0.5f));
                         turret0.SetMagazine(null, time);
                     }
                     else
@@ -190,7 +204,7 @@ namespace DefenderGame.Scripts.Components
         public int2 NewMagazinePositionBeforeLoad { get; } 
         
         public Magazine NewMagazine { get; } // thats being loaded to turret
-        [CanBeNull] public Magazine PreviousMagazine { get; } // thats being unloaded back to NewMagazinePositionBeforeLoad 
+        [CanBeNull] public Optf<Magazine> PreviousMagazine { get; } // thats being unloaded back to NewMagazinePositionBeforeLoad 
         public int2 TurretPos { get; }
         
         public float GetProgress(float time)
@@ -198,7 +212,7 @@ namespace DefenderGame.Scripts.Components
             return math.unlerp(StartTime, StartTime + ActionDuration, time);
         }
 
-        public TurretLoadingMagazine(float startTime, float actionDuration, int2 newMagazinePositionBeforeLoad, Magazine newMagazine, [CanBeNull] Magazine previousMagazine, int2 turretPos) : base(startTime)
+        public TurretLoadingMagazine(float startTime, float actionDuration, int2 newMagazinePositionBeforeLoad, Magazine newMagazine, Optf<Magazine> previousMagazine, int2 turretPos) : base(startTime)
         {
             ActionDuration = actionDuration;
             NewMagazinePositionBeforeLoad = newMagazinePositionBeforeLoad;
@@ -206,9 +220,9 @@ namespace DefenderGame.Scripts.Components
             PreviousMagazine = previousMagazine;
             TurretPos = turretPos;
             
-            var blockedGrids0 = ItemGridUtils.GetGridsFromPivotAndOffsets(newMagazinePositionBeforeLoad, newMagazine.GetOccupations());
-            var blockedGrids1 = ItemGridUtils.GetGridsFromPivotAndOffsets(turretPos, newMagazine.GetOccupations()); // todo what if turret is not 1x1 size?
-            m_BlockingGrids = blockedGrids0.Union(blockedGrids1).ToArray();
+            var blockedGrids0 = newMagazinePositionBeforeLoad;
+            var blockedGrids1 = turretPos; // todo what if turret is not 1x1 size?
+            m_BlockingGrids = new []{blockedGrids0, blockedGrids1};
         }
     }
 
@@ -242,7 +256,7 @@ namespace DefenderGame.Scripts.Components
     
     
     
-    public class DeItemGrid<T> where T : class, IGridItem
+    public class DeItemGrid<T> where T : unmanaged, IGridItem
     {
         [ItemCanBeNull] private readonly T[] m_Occupations;
         public int Width{get;}
@@ -365,13 +379,30 @@ namespace DefenderGame.Scripts.Components
     {
         public int2[] GetOccupations();
     }
-    public abstract class DeGridObject : IGridItem
-    {
-        public virtual int2[] GetOccupations() => new int2[1];
-        public abstract DeGridObject Clone();
-    }
 
-    public class AmmoBox : DeGridObject
+    [ValueVariant]
+    public partial struct DeGridObject : IGridItem
+    {
+        public DeGridObjectData Data;
+        public uint Hash;
+        
+        public DeGridObject Clone()
+        {
+            return new DeGridObject()
+            {
+                Data = Data,
+                Hash = Random.CreateFromIndex(Hash).NextUInt()
+            };
+        }
+
+        public int2[] GetOccupations() => new[] {new int2(0, 0)};
+    }
+    [ValueVariant]
+    public readonly partial struct DeGridObjectData : IValueVariant<DeGridObjectData, Turret, Magazine, AmmoBox> { }
+    
+    
+
+    public struct AmmoBox
     {
         public int AmmoCount { get; private set; }
 
@@ -389,6 +420,7 @@ namespace DefenderGame.Scripts.Components
             AmmoCapacity = ammoCapacity;
             AmmoTier = ammoTier;
             BoxTier = boxTier;
+            AmmoCountChangedTime = 0;
         }
 
         public void SetAmmoCount(int ammoCount, float time)
@@ -396,17 +428,9 @@ namespace DefenderGame.Scripts.Components
             AmmoCount = ammoCount;
             AmmoCountChangedTime = time;
         }
-        
-        public override DeGridObject Clone()
-        {
-            return new AmmoBox(AmmoCount, AmmoCapacity, AmmoTier, BoxTier)
-            {
-                AmmoCountChangedTime = AmmoCountChangedTime,
-            };
-        }
     }
 
-    public class Magazine : DeGridObject
+    public struct Magazine
     {
         public int AmmoCount { get; private set; }
         public int AmmoCapacity { get; }
@@ -427,57 +451,47 @@ namespace DefenderGame.Scripts.Components
             AmmoCapacity = ammoCapacity;
             AmmoTier = ammoTier;
             MagazineTier = magazineTier;
-        }
-
-        public override DeGridObject Clone()
-        {
-            return new Magazine(AmmoCount, AmmoCapacity, AmmoTier, MagazineTier)
-            {
-                AmmoCountChangedTime = AmmoCountChangedTime,
-            };
+            AmmoCountChangedTime = 0;
         }
     }
 
-    public class Turret : DeGridObject
+    public struct Turret
     {
         public float LastShotTime { get; private set; }
-        [CanBeNull] public Magazine Magazine { get; private set; }
+        public Optf<Magazine> MagazineOpt { get; private set; }
         public float3 AimDirection { get; set; }
         public float LastMagazineChangedTime { get; private set; }
         
         public float FireRate { get; }
         
         //ctor with all these field
-        public Turret(float fireRate, float lastShotTime, [CanBeNull] Magazine magazine, float lastMagazineChangedTime)
+        public Turret(float fireRate, float lastShotTime, [CanBeNull] Magazine magazineOpt, float lastMagazineChangedTime)
         {
             FireRate = fireRate;
             LastShotTime = lastShotTime;
-            Magazine = magazine;
+            MagazineOpt = magazineOpt;
             LastMagazineChangedTime = lastMagazineChangedTime;
+            AimDirection = float3.zero;
         }
         
-        public void SetMagazine(Magazine magazine, float time)
+        public void SetMagazine(Optf<Magazine> magazine, float time)
         {
-            Magazine = magazine;
+            MagazineOpt = magazine;
             LastMagazineChangedTime = time;
         }
         
         public bool TryShoot(float time)
         {
             var fireCooldown = 1f/FireRate;
-            if(time > LastShotTime + fireCooldown && Magazine is { AmmoCount: > 0 })
+            if(time > LastShotTime + fireCooldown && MagazineOpt.TryGet(out var magazine) && magazine.AmmoCount > 0)
             {
-                Magazine.SetAmmoCount(Magazine.AmmoCount - 1, time);
+                magazine.SetAmmoCount(magazine.AmmoCount - 1, time);
+                MagazineOpt.Set(magazine);
                 LastShotTime = time;
                 return true;
             }
             
             return false;
-        }
-
-        public override DeGridObject Clone()
-        {
-            return new Turret(FireRate, LastShotTime, Magazine, LastMagazineChangedTime);
         }
     }
 }

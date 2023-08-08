@@ -30,7 +30,7 @@ namespace DefenderGame.Scripts.Systems
             (logical) =>
             {
                 var turretView = Object.Instantiate(GameResources.Instance.TurretGOViewPrefab);
-                turretView.Restore(logical.AimDirection, logical.Magazine);
+                turretView.Restore(logical.AimDirection, logical.MagazineOpt);
                 return turretView;
             },
             (view) => Object.Destroy(view.gameObject)
@@ -122,13 +122,13 @@ namespace DefenderGame.Scripts.Systems
 
                             if (turret.LastShotTime.Equals((float)SystemAPI.Time.ElapsedTime))
                             {
-                                if (turret.Magazine != null) turretView.AnimateShoot(turret.Magazine.AmmoCount);
+                                if (turret.MagazineOpt != null) turretView.AnimateShoot(turret.MagazineOpt.AmmoCount);
                             }
                             turretView.UpdateAimDirection(turret.AimDirection);
                             
                             if(turret.LastMagazineChangedTime.Equals((float)SystemAPI.Time.ElapsedTime))
                             {
-                                turretView.SetMagazineView(turret.Magazine);
+                                turretView.SetMagazineView(turret.MagazineOpt);
                             }
 
                             break;
