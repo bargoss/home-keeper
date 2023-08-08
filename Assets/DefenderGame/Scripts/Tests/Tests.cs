@@ -1,4 +1,5 @@
-﻿using DefaultNamespace;
+﻿using System;
+using DefaultNamespace;
 using DefenderGame.Scripts.Components;
 using DefenderGame.Scripts.Systems;
 using Unity.Entities;
@@ -6,6 +7,7 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEditor;
 using UnityEngine;
+using ValueVariant;
 
 namespace DefenderGame.Scripts.Tests
 {
@@ -47,6 +49,61 @@ namespace DefenderGame.Scripts.Tests
             );
             int a = 3;
         }
+
+        public class Visitor0 : SampleVariant2.IActionVisitor
+        {
+            public void Visit(in SampleVariant value)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Visit(in bool value)
+            {
+                throw new NotImplementedException();
+            }
+        } 
+        
+        [MenuItem("DefenderGame/Tests/212412")]
+        public static void MyTest()
+        {
+            SampleVariant2 b = new SampleVariant2(new SampleVariant(2));
+            //b.Accept(new Visitor0());
+
+            //SampleVariant2.DefaultConverter.Instance.Visit()
+            //b.Accept();
+            
+            //SampleVariant2.IActionVisitor<SampleVariant, bool>
+            b.Match(
+                (SampleVariant b) =>
+                {
+                    b.Match(
+                        (int i) =>
+                        {
+                            var a = i;
+                        },
+                        (long l) => { 
+                        
+                        },
+                        (float f) =>
+                        {
+                            
+                        }
+                    );
+                },
+                (bool b) =>
+                {
+                    
+                }
+            );
+        }
+        
+        
     }
+    
+    [ValueVariant]
+    public readonly partial struct SampleVariant: IValueVariant<SampleVariant, int, long, float> { }
+    
+    [ValueVariant]
+    public readonly partial struct SampleVariant2: IValueVariant<SampleVariant2, SampleVariant, bool> { }
 #endif
 }
