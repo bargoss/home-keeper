@@ -21,17 +21,9 @@ namespace _OnlyOneGame.Scripts.Systems
             {
                 if(playerCharacter.ActionCommand.TryGet(out var actionCommand))
                 {
-                    /*
-                             UnBuildCommand, 
-                            PickupItemCommand, 
-                            CraftItemCommand, 
-                            MineResourceCommand, 
-                            CycleStackCommand
-                     */
-                     
-                     //actionCommand.Switch5(
-                    
-                    
+                    actionCommand.Switch(
+                        ...
+                        );
                 }
             }
         }

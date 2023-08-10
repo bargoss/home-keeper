@@ -2,6 +2,7 @@
 using DefaultNamespace;
 using DefenderGame.Scripts.Components;
 using DefenderGame.Scripts.Systems;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -49,46 +50,24 @@ namespace DefenderGame.Scripts.Tests
             );
             int a = 3;
         }
-
-        /*
+        
         [MenuItem("DefenderGame/Tests/212412")]
         public static void MyTest()
         {
-            SampleVariant2 b = new SampleVariant2(new SampleVariant(2));
-            // Q: how to get size of a struct
-            // A: yo
-            System.Runtime.InteropServices.Marshal.SizeOf(typeof(SampleVariant2));
-            Debug.Log("size : " + System.Runtime.InteropServices.Marshal.SizeOf(typeof(SampleVariant2)));
-            //b.Accept(new Visitor0());
-
-            //SampleVariant2.DefaultConverter.Instance.Visit()
-            //b.Accept();
-            
-            //SampleVariant2.IActionVisitor<SampleVariant, bool>
-            b.Switch(
-                (SampleVariant bb) =>
-                {
-                    bb.Switch(
-                        (int i) =>
-                        {
-                            var a = i;
-                        },
-                        (long l) => { 
-                        
-                        },
-                        (float f) =>
-                        {
-                            
-                        }
-                    );
-                },
-                (long b) =>
-                {
+            var a = (new MyChild0().ToMyBase());
+            switch (a.CurrentTypeId)
+            {
+                case MyBase.TypeId.MyChild0:
                     
-                }
-            );
+                case MyBase.TypeId.MyChild1:
+                case MyBase.TypeId.MyChild2:
+                case MyBase.TypeId.MyChild3:
+                default:
+                    break;
+            }
+            
+            DynamicBuffer<byte> buffer = new DynamicBuffer<byte>();
         }
-        */
         
         
     }
@@ -98,5 +77,39 @@ namespace DefenderGame.Scripts.Tests
     
     [ValueVariant]
     public readonly partial struct SampleVariant2: IValueVariant<SampleVariant2, SampleVariant, long> { }
+    
+    
+    [PolymorphicStruct]
+    public interface IMyBase{}
+    
+    public partial struct MyChild0 : IMyBase
+    {
+        public float MyFloat;
+        public float MyInt;
+    }
+    public partial struct MyChild1 : IMyBase
+    {
+        public float MyInt0;
+        public float MyInt1;
+        public float MyInt2;
+    }
+    public partial struct MyChild2 : IMyBase
+    {
+        public float MyFloat;
+    }
+    public partial struct MyChild3 : IMyBase
+    {
+        public MyList MyList;
+    }
+
+    public struct MyList
+    {
+        public int MyInt0;
+        public int MyInt1;
+        public int MyInt2;
+        public int MyInt3;
+    }
+    
+    
 #endif
 }
