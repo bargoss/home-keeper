@@ -1,10 +1,10 @@
 ﻿using System;
 
-public struct Optf<T> 
+public struct Option<T> 
 {
     private T m_Value;
     private bool m_HasValue;
-    public bool TryGet(out T value)
+    public readonly bool TryGet(out T value)
     {
         value = m_Value;
         return m_HasValue;
@@ -31,24 +31,24 @@ public struct Optf<T>
         m_HasValue = false;
     }
         
-    public static Optf<T> Some(T value)
+    public static Option<T> Some(T value)
     {
-        return new Optf<T>
+        return new Option<T>
         {
             m_Value = value,
             m_HasValue = true
         };
     }
         
-    public static Optf<T> None()
+    public static Option<T> None()
     {
-        return new Optf<T>
+        return new Option<T>
         {
             m_HasValue = false
         };
     }
         
-    public static implicit operator Optf<T>(T value)
+    public static implicit operator Option<T>(T value)
     {
         return Some(value);
     }

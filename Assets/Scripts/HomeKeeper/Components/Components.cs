@@ -9,12 +9,13 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 using ValueVariant;
+using ValueVariant.Details;
 
 namespace HomeKeeper.Components
 {
     
     [ValueVariant]
-    public readonly partial struct HealthStatus : IValueVariant<HealthStatus, HealthStatus.Dead, HealthStatus.Alive>
+    public partial struct HealthStatus : ValueVariant.IValueVariant<HealthStatus, HealthStatus.Dead, HealthStatus.Alive>
     {
         public struct Dead
         {
@@ -331,6 +332,4 @@ namespace HomeKeeper.Components
         All = ~0
     }
     
-    // events
-    public struct EcsEvent : IComponentData { }
 }

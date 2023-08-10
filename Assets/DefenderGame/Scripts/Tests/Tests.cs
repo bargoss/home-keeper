@@ -50,7 +50,7 @@ namespace DefenderGame.Scripts.Tests
             int a = 3;
         }
 
-        
+        /*
         [MenuItem("DefenderGame/Tests/212412")]
         public static void MyTest()
         {
@@ -88,7 +88,7 @@ namespace DefenderGame.Scripts.Tests
                 }
             );
         }
-
+        */
         
         
     }
