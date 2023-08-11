@@ -130,6 +130,11 @@ namespace DefenderGame.Scripts.Systems
                             {
                                 turretView.SetMagazineView(turret.Magazine);
                             }
+                            
+                            if(turret.TurretLevelChangedTime.Equals((float)SystemAPI.Time.ElapsedTime))
+                            {
+                                turretView.SetTurretLevelIndex(turret.TurretLevelIndex);
+                            }
 
                             break;
                         default:
@@ -277,6 +282,31 @@ namespace DefenderGame.Scripts.Systems
                             }
 
                             break;
+                        case TurretMerge turretMerge:
+                            if (turretMerge.StartTime.Equals((float)SystemAPI.Time.ElapsedTime))
+                            {
+                                var movingTurretView = GetOrCreateView(turretMerge.SourceTurret);
+                                var movingTurretViewTr = movingTurretView.transform;
+                                
+                                var startPosition = ItemGridUtils.GridToWorldPos(turretMerge.SourceTurretPosition, gridLtw, itemGrid.GridLength);
+                                var endPosition = ItemGridUtils.GridToWorldPos(turretMerge.DestinationTurretPosition, gridLtw, itemGrid.GridLength);
+                                
+                                movingTurretViewTr.position = startPosition;
+                                movingTurretViewTr.DOJump(endPosition, 1, 1, turretMerge.Duration * 0.66f)
+                                    .Join(movingTurretViewTr.DORotateQuaternion(quaternion.identity, turretMerge.Duration * 0.66f))
+                                    .Append(movingTurretViewTr.DOShakeScale(turretMerge.Duration * 0.33f, 0.5f, 10, 0));
+                                ;
+                                
+                                
+                            }
+                            else
+                            {
+                                // touch it so it doesn't get cleaned up
+                                GetOrCreateView(turretMerge.SourceTurret);
+                            }
+                            
+                            break;
+
                         default:
                             Debug.LogError("Unknown ongoing action type: " + onGoingAction.GetType());
                             break;

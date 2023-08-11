@@ -160,7 +160,20 @@ namespace DefenderGame.Scripts.Systems
                         }
                         else { completedActions.Add(ongoingAction); }
                         break;
-                    
+                    case TurretMerge turretMerge:
+                        var actionCompleted = time > turretMerge.StartTime + turretMerge.Duration;
+                        if (actionCompleted)
+                        {
+                            var turretA = turretMerge.SourceTurret;
+                            if(itemGrid.TryGetGridObject(turretMerge.DestinationTurretPosition, out Turret turretB))
+                            {
+                                turretB.SetTurretLevelIndex(turretB.TurretLevelIndex + 1, time);
+                            }
+                            completedActions.Add(ongoingAction);
+                        }
+                        break;
+
+
                     default:
                         Debug.LogError($"Unknown ongoing action type: {ongoingAction.GetType()}");
                         break;

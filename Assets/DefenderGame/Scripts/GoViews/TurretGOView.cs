@@ -3,6 +3,7 @@ using DefaultNamespace;
 using DefenderGame.Scripts.Components;
 using DG.Tweening;
 using JetBrains.Annotations;
+using TMPro;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -18,7 +19,10 @@ namespace DefenderGame.Scripts.GoViews
         [SerializeField] private Transform m_Muzzle;
         [SerializeField] private Transform m_MagazineSlot;
         public Transform MagazineSlot => m_MagazineSlot;
-        [CanBeNull] private MagazineGOView m_LoadedMagazineView; 
+        [CanBeNull] private MagazineGOView m_LoadedMagazineView;
+
+        [SerializeField] private TextMeshPro m_LevelText;
+        [SerializeField] private Transform m_LevelScaleTransform;
         
         
         private Vector3 m_AimDirection;
@@ -32,6 +36,12 @@ namespace DefenderGame.Scripts.GoViews
             }
         }
 
+        public void SetTurretLevelIndex(int levelIndex)
+        {
+            m_LevelText.text = levelIndex.ToString();
+            m_LevelScaleTransform.localScale = new Vector3(1, 1 + levelIndex * 0.2f, 1);
+        }
+        
         public void SetMagazineView([CanBeNull] Magazine magazine)
         {
             if(m_LoadedMagazineView != null){

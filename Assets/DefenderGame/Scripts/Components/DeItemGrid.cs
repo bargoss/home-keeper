@@ -47,7 +47,12 @@ namespace DefenderGame.Scripts.Components
             {
                 if (ItemGrid.TryGetGridItem(endPos, out var endItem))
                 {
-                    if (startItem is Magazine magSource && endItem is Magazine magDest)
+                    if (startItem is Turret tMerge0 && endItem is Turret tMerge1)
+                    {
+                        ItemGrid.RemoveItem(startItem);
+                        OngoingActions.Add(new TurretMerge(time, 1.5f, tMerge0, startPos,endPos));
+                    }
+                    else if (startItem is Magazine magSource && endItem is Magazine magDest)
                     {
                         OngoingActions.Add(new AmmoTransfer(time, 0.5f, startPos, endPos));
                     }
@@ -157,6 +162,21 @@ namespace DefenderGame.Scripts.Components
                 ItemGridUtils.GetGridsFromPivotAndOffsets(targetPosition, movingObject.GetOccupations());
             var blockingGrids = destinationCoordinates.Union(sourceCoordinates);
             m_BlockingGrids = blockingGrids.ToArray();
+        }
+    }
+
+    public class TurretMerge : OngoingAction
+    {
+        public float Duration;
+        public Turret SourceTurret { get; }
+        public int2 SourceTurretPosition { get; }
+        public int2 DestinationTurretPosition { get; }
+        public TurretMerge(float startTime, float duration, Turret sourceTurret, int2 sourceTurretPosition, int2 destinationTurretPosition) : base(startTime)
+        {
+            Duration = duration;
+            SourceTurret = sourceTurret;
+            DestinationTurretPosition = destinationTurretPosition;
+            SourceTurretPosition = sourceTurretPosition;
         }
     }
     
@@ -446,6 +466,14 @@ namespace DefenderGame.Scripts.Components
         public float LastMagazineChangedTime { get; private set; }
         
         public float FireRate { get; }
+        public int TurretLevelIndex { get; private set; } = 0;
+        public float TurretLevelChangedTime { get; private set; } = 0;
+        
+        public void SetTurretLevelIndex(int turretLevelIndex, float time)
+        {
+            TurretLevelIndex = turretLevelIndex;
+            TurretLevelChangedTime = time;
+        }
         
         //ctor with all these field
         public Turret(float fireRate, float lastShotTime, [CanBeNull] Magazine magazine, float lastMagazineChangedTime)
