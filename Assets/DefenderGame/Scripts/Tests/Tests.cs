@@ -1,8 +1,12 @@
 ﻿using System;
+using _OnlyOneGame.Scripts.Components;
 using DefaultNamespace;
 using DefenderGame.Scripts.Components;
 using DefenderGame.Scripts.Systems;
+using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
+using Unity.Entities.Serialization;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEditor;
@@ -14,6 +18,42 @@ namespace DefenderGame.Scripts.Tests
 #if UNITY_EDITOR
     public static class Tests
     {
+        [MenuItem("DefenderGame/Tests/EntityMappingValueVariant")]
+        public static void EntityMappingValueVariant()
+        {
+            PlayerEvent myVv = new MeleeAttackStartedEvent()
+            {
+                Direction = new float3(0.5f, 0.5f, 0.5f)
+            };
+
+            var worldSource = new World("world a");
+            var worldDestination = new World("world b");
+
+            var eSource = worldSource.EntityManager.CreateEntity();
+            worldSource.EntityManager.AddComponent<OnPlayerCharacter>(eSource);
+            var playerCharacter = new OnPlayerCharacter();
+            playerCharacter.Events = new FixedList128Bytes<PlayerEvent>();
+            playerCharacter.Events.Add(new ItemPickedUpEvent(){Item = MinionType.Tank });
+            playerCharacter.Events.Add(new MeleeAttackStartedEvent() { Direction = new float3(0.15f, 0.25f, 0.35f) });
+            //playerCharacter.OnGoingAction = Option<OnGoingAction>.Some(new ItemPickedUpEvent(){Item = new Item()});
+            worldSource.EntityManager.SetComponentData(eSource, playerCharacter);
+
+            var sourceEntitiesToCopy = new NativeArray<Entity>(1, Allocator.Temp);
+            sourceEntitiesToCopy[0] = eSource;
+
+            worldDestination.EntityManager.CopyEntitiesFrom(worldSource.EntityManager, sourceEntitiesToCopy);
+            
+            // m_ReadonlyTestQuery = entityManager.CreateEntityQuery(ComponentType.ReadOnly<OcclusionTest>());
+            worldDestination.EntityManager.CreateEntityQuery(typeof(OnPlayerCharacter));
+            
+            // get the first entity
+            var eDestination = worldDestination.EntityManager.CreateEntityQuery(typeof(OnPlayerCharacter)).GetSingletonEntity();
+            var playerCharacterDestination = worldDestination.EntityManager.GetComponentData<OnPlayerCharacter>(eDestination);
+            var playerEvent = playerCharacterDestination.Events[0];
+            
+            var a = 3;
+        }
+        
         // menu item
         [MenuItem("DefenderGame/Tests/TestTurretUpdate")]
         public static void TestTurretUpdate()
