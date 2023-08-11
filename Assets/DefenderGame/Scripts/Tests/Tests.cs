@@ -94,7 +94,7 @@ namespace DefenderGame.Scripts.Tests
     }
     
     [ValueVariant]
-    public readonly partial struct SampleVariant: IValueVariant<SampleVariant, int, long, float> { }
+    public readonly partial struct SampleVariant: IValueVariant<SampleVariant, int> { }
     
     [ValueVariant]
     public readonly partial struct SampleVariant2: IValueVariant<SampleVariant2, SampleVariant, long> { }

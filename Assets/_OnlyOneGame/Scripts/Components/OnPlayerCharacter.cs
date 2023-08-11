@@ -8,14 +8,14 @@ namespace _OnlyOneGame.Scripts.Components
     public struct OnPlayerCharacter : IComponentData
     {
         public FixedList512Bytes<Item> InventoryStack;
-        public Option<ActionCommand> ActionCommand;
+        public Option<ActionCommand> ActionCommandOpt;
         public Option<OnGoingAction> OnGoingAction;
 
         public FixedList128Bytes<PlayerEvent> Events;
 
         public float SilencedDuration;
     }
-    
+
     [ValueVariant]
     public partial struct PlayerEvent : IValueVariant<PlayerEvent
         , MeleeAttackStartedEvent
@@ -26,7 +26,8 @@ namespace _OnlyOneGame.Scripts.Components
         , ItemStackChangedEvent
         , DroppedItemEvent
         , ThrownItemEvent
-    > { }
+    >
+    { }
 
     [ValueVariant]
     public partial struct OnGoingActionData : IValueVariant<OnGoingActionData

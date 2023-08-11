@@ -3,6 +3,7 @@ using DefaultNamespace;
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Transforms;
+using ValueVariant;
 
 namespace _OnlyOneGame.Scripts.Systems
 {
@@ -19,19 +20,15 @@ namespace _OnlyOneGame.Scripts.Systems
         {
             foreach (var (playerCharacter, localTransform, entity) in SystemAPI.Query<OnPlayerCharacter, LocalTransform>().WithEntityAccess())
             {
-                if(playerCharacter.ActionCommand.TryGet(out var actionCommand))
+                if(playerCharacter.ActionCommandOpt.TryGet(out var actionCommand))
                 {
-                    /*
-                             UnBuildCommand, 
-                            PickupItemCommand, 
-                            CraftItemCommand, 
-                            MineResourceCommand, 
-                            CycleStackCommand
-                     */
-                     
-                     //actionCommand.Switch5(
-                    
-                    
+                    actionCommand.Switch(
+                        unBuildCommand => {},
+                        pickupItemCommand => {},
+                        craftItemCommand => {},
+                        mineResourceCommand => {},
+                        cycleStackCommand => {}
+                    );
                 }
             }
         }
