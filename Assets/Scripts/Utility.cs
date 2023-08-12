@@ -1,4 +1,5 @@
-﻿using Unity.Collections;
+﻿using System.Linq;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
@@ -22,6 +23,51 @@ namespace DefaultNamespace
             var deltaVelocity = targetVelocity - currentVelocity;
             var clampedDeltaVelocity = deltaVelocity.ClampMagnitude(maxAcceleration * deltaTime);
             newVelocity = currentVelocity + clampedDeltaVelocity;
+        }
+
+        public static bool TryGetFirstOverlapSphere<T0>(
+            this BuildPhysicsWorldData buildPhysicsWorldData,
+            float3 point,
+            float radius,
+            ref ComponentLookup<T0> lookUp0,
+            out Entity entity,
+            out T0 component0
+        )
+            where T0 : unmanaged, IComponentData
+        {
+            var collisionWorld = buildPhysicsWorldData.PhysicsData.PhysicsWorld.CollisionWorld;
+            var collisionFilter = CollisionFilter.Default;
+            collisionFilter.BelongsTo = 0xffffffff;
+
+            var hits = new NativeList<DistanceHit>(Allocator.Temp);
+            collisionWorld.OverlapSphere(point, radius, ref hits, collisionFilter);
+            
+            var closestHitDistance = float.MaxValue;
+            var closestHitEntity = Entity.Null;
+            
+            foreach (var hit in hits)
+            {
+                if(hit.Distance < closestHitDistance && lookUp0.HasComponent(hit.Entity))
+                {
+                    closestHitDistance = hit.Distance;
+                    closestHitEntity = hit.Entity;
+                }
+            }
+            
+            hits.Dispose();
+            
+            if (closestHitEntity != Entity.Null)
+            {
+                entity = closestHitEntity;
+                component0 = lookUp0[entity];
+                return true;
+            }
+            else
+            {
+                entity = Entity.Null;
+                component0 = default;
+                return false;
+            }
         }
 
         public static bool Raycast(this BuildPhysicsWorldData buildPhysicsWorldData, float3 start, float3 end, out RaycastHit hit)

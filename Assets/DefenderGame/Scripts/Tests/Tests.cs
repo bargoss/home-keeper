@@ -21,7 +21,7 @@ namespace DefenderGame.Scripts.Tests
         [MenuItem("DefenderGame/Tests/EntityMappingValueVariant")]
         public static void EntityMappingValueVariant()
         {
-            PlayerEvent myVv = new MeleeAttackStartedEvent()
+            PlayerEvent myVv = new EventMeleeAttackStarted()
             {
                 Direction = new float3(0.5f, 0.5f, 0.5f)
             };
@@ -33,8 +33,8 @@ namespace DefenderGame.Scripts.Tests
             worldSource.EntityManager.AddComponent<OnPlayerCharacter>(eSource);
             var playerCharacter = new OnPlayerCharacter();
             playerCharacter.Events = new FixedList128Bytes<PlayerEvent>();
-            playerCharacter.Events.Add(new ItemPickedUpEvent(){Item = MinionType.Tank });
-            playerCharacter.Events.Add(new MeleeAttackStartedEvent() { Direction = new float3(0.15f, 0.25f, 0.35f) });
+            playerCharacter.Events.Add(new EventItemPickedUp(){Item = MinionType.Tank });
+            playerCharacter.Events.Add(new EventMeleeAttackStarted() { Direction = new float3(0.15f, 0.25f, 0.35f) });
             //playerCharacter.OnGoingAction = Option<OnGoingAction>.Some(new ItemPickedUpEvent(){Item = new Item()});
             worldSource.EntityManager.SetComponentData(eSource, playerCharacter);
 

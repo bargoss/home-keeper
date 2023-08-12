@@ -9,7 +9,7 @@ namespace _OnlyOneGame.Scripts.Components
     {
         public FixedList512Bytes<Item> InventoryStack;
         public Option<ActionCommand> ActionCommandOpt;
-        public Option<OnGoingAction> OnGoingAction;
+        public Option<OnGoingAction> OnGoingActionOpt;
 
         public FixedList128Bytes<PlayerEvent> Events;
 
@@ -18,30 +18,30 @@ namespace _OnlyOneGame.Scripts.Components
 
     [ValueVariant]
     public partial struct PlayerEvent : IValueVariant<PlayerEvent
-        , MeleeAttackStartedEvent
-        , ItemPickedUpEvent
-        , ItemCraftedEvent
-        , UnBuiltEvent
-        , ResourceGatheredEvent
-        , ItemStackChangedEvent
-        , DroppedItemEvent
-        , ThrownItemEvent
+        , EventMeleeAttackStarted
+        , EventItemPickedUp
+        , EventItemCrafted
+        , EventUnbuilt
+        , EventResourceGathered
+        , EventItemStackChanged
+        , EventDroppedItem
+        , EventThrownItem
     >
     { }
 
     [ValueVariant]
     public partial struct OnGoingActionData : IValueVariant<OnGoingActionData
-        , MeleeAttackingAction
-        , UnBuildingAction
+        , ActionMeleeAttacking
+        , ActionUnbuilding
     > { }
 
     [ValueVariant]
     public partial struct ActionCommand : IValueVariant<ActionCommand,
-        UnBuildCommand, 
-        PickupItemCommand, 
-        CraftItemCommand, 
-        MineResourceCommand, 
-        CycleStackCommand
+        CommandUnbuild, 
+        CommandPickupItem, 
+        CommandCraftItem, 
+        CommandMineResource, 
+        CommandCycleStack
     > { }
 
     public struct OnGoingAction
@@ -51,54 +51,54 @@ namespace _OnlyOneGame.Scripts.Components
         public OnGoingActionData Data;
     }
 
-    public struct MeleeAttackCommand
+    public struct CommandMeleeAttack
     {
         public float3 Direction;
     }
-    public struct MeleeAttackingAction
+    public struct ActionMeleeAttacking
     {
         public float3 Direction;
     }
-    public struct MeleeAttackStartedEvent
+    public struct EventMeleeAttackStarted
     {
         public float3 Direction;
     }
 
-    public struct UnBuildCommand { }
+    public struct CommandUnbuild { }
 
-    public struct UnBuildingAction { }
-    public struct UnBuiltEvent { }
+    public struct ActionUnbuilding { }
+    public struct EventUnbuilt { }
     
-    public struct PickupItemCommand { }
-    public struct ItemPickedUpEvent { public Item Item; }
+    public struct CommandPickupItem { }
+    public struct EventItemPickedUp { public Item Item; }
 
-    public struct CraftItemCommand
+    public struct CommandCraftItem
     {
         public Item ItemToCraft;
     }
-    public struct ItemCraftedEvent
+    public struct EventItemCrafted
     {
         public Item CraftedItem;
     }
 
-    public struct MineResourceCommand { }
-    public struct MineResourceAction { }
-    public struct ResourceGatheredEvent { }
+    public struct CommandMineResource { }
+    public struct ActionMineResource { }
+    public struct EventResourceGathered { }
     
-    public struct CycleStackCommand { }
-    public struct ItemStackChangedEvent { }
+    public struct CommandCycleStack { }
+    public struct EventItemStackChanged { }
 
-    public struct DropItemCommand { }
-    public struct DroppedItemEvent
+    public struct CommandDropItem { }
+    public struct EventDroppedItem
     {
         public Item Item;
     }
 
-    public struct ThrowItemCommand
+    public struct CommandThrowItem
     {
         public float3 ThrowVelocity;
     }
-    public struct ThrownItemEvent
+    public struct EventThrownItem
     {
         public Item Item;
         public float3 ThrowVelocity;

@@ -15,7 +15,7 @@ namespace DefenderGame.Scripts.Systems
     {
         protected override void OnCreate()
         {
-            //RequireForUpdate<DeEnemy>();
+            RequireForUpdate<DeEnemy>();
             //RequireForUpdate<Health>();
         }
         protected override void OnUpdate()
@@ -24,9 +24,12 @@ namespace DefenderGame.Scripts.Systems
 
             var ecb = new EntityCommandBuffer(Allocator.Temp);
 
-            var targetEntity = SystemAPI.GetSingletonEntity<DeEnemyTarget>();
-            var targetEntityLtw = SystemAPI.GetComponent<LocalToWorld>(targetEntity);
-            var targetPosition = targetEntityLtw.Position;
+            var targetPosition = float3.zero;
+            if (SystemAPI.TryGetSingletonEntity<DeEnemyTarget>(out var targetEntity))
+            {
+                targetPosition = SystemAPI.GetComponent<LocalToWorld>(targetEntity).Position;
+            }
+            
 
             foreach (var (rb,
                          deEnemy,
