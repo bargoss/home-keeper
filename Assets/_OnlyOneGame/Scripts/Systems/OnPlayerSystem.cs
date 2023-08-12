@@ -35,7 +35,7 @@ namespace _OnlyOneGame.Scripts.Systems
                         command => {},
                         command => {},
                         command => {},
-                        command2 => {}
+                        command => {}
                     );
 
                     Action<UnBuildCommand> a = i => { };
