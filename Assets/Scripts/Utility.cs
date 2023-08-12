@@ -1,4 +1,6 @@
 ﻿using System.Linq;
+using Components;
+using HomeKeeper.Components;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -6,6 +8,7 @@ using Unity.Physics;
 using Unity.Physics.Systems;
 using Unity.Transforms;
 using UnityEngine;
+using UnityEngine.Windows.WebCam;
 using ValueVariant;
 using Plane = UnityEngine.Plane;
 using RaycastHit = Unity.Physics.RaycastHit;
@@ -17,7 +20,8 @@ namespace DefaultNamespace
         public static float3 Up => new float3(0, 1, 0);
         public static float3 Right => new float3(1, 0, 0);
         public static float3 Forward => new float3(0, 0, 1);
-        
+
+
         public static void ControlVelocity(float3 currentVelocity, float3 targetVelocity, float maxAcceleration, float deltaTime, out float3 newVelocity)
         {
             var deltaVelocity = targetVelocity - currentVelocity;
@@ -25,6 +29,101 @@ namespace DefaultNamespace
             newVelocity = currentVelocity + clampedDeltaVelocity;
         }
 
+        public static void DamageNearby(
+            float3 position,
+            float radius,
+            float damage,
+            Option<Faction> attackingFactionOpt,
+            Option<Entity> ignoreOpt,
+            ref BuildPhysicsWorldData buildPhysicsWorldData,
+            ref ComponentLookup<Health> healthLookup,
+            ref ComponentLookup<Faction> factionLookup
+        )
+        {
+            var targets = TryGetAllOverlapSphere<Health>(
+                ref buildPhysicsWorldData,
+                position,
+                radius,
+                ref healthLookup
+            );
+            
+            foreach (var (targetPos, entity, healthRw) in targets)
+            {
+                if (ignoreOpt.TryGet(out var ignore) && ignore == entity)
+                {
+                    continue;
+                }
+
+                if (attackingFactionOpt.TryGet(out var attackingFaction) &&
+                    factionLookup.TryGetComponent(entity, out var faction) &&
+                    attackingFaction.Value == faction.Value)
+                {
+                    continue;
+                }
+
+                var health = healthRw.ValueRO;
+                var damageNormal = math.normalize(position - targetPos);
+                health.HandleDamage(damage, position, damageNormal);
+                healthRw.ValueRW = health;
+            }
+            
+            targets.Dispose();
+        }
+
+        public static NativeList<(float3, Entity, RefRW<T0>)> TryGetAllOverlapSphere<T0>(
+            this ref BuildPhysicsWorldData buildPhysicsWorldData,
+            float3 point,
+            float radius,
+            ref ComponentLookup<T0> lookup0
+        ) where T0 : unmanaged, IComponentData
+        {
+            var overlapSphereResults = TryGetAllOverlapSphere(
+                ref buildPhysicsWorldData,
+                point,
+                radius
+            );
+            
+            var results = new NativeList<(float3, Entity, RefRW<T0>)>(Allocator.Temp);
+            
+            foreach (var (pos, entity) in overlapSphereResults)
+            {
+                if (lookup0.TryGetRw(entity, out var component0Rw))
+                {
+                    results.Add((pos, entity, component0Rw));
+                }
+            }
+            
+            overlapSphereResults.Dispose();
+            
+            return results;
+        }
+
+
+        public static NativeList<(float3, Entity)> TryGetAllOverlapSphere(
+            this ref BuildPhysicsWorldData buildPhysicsWorldData,
+            float3 point,
+            float radius
+        )
+        {
+            var results = new NativeList<(float3, Entity)>();
+            
+            var collisionWorld = buildPhysicsWorldData.PhysicsData.PhysicsWorld.CollisionWorld;
+            var collisionFilter = CollisionFilter.Default;
+            collisionFilter.BelongsTo = 0xffffffff;
+
+            
+            var hits = new NativeList<DistanceHit>(Allocator.Temp);
+            collisionWorld.OverlapSphere(point, radius, ref hits, collisionFilter);
+            
+            foreach (var hit in hits)
+            {
+                results.Add((hit.Position, hit.Entity));
+            }
+            hits.Dispose();
+
+            return results;
+        }
+        
         public static bool TryGetFirstOverlapSphere<T0>(
             this BuildPhysicsWorldData buildPhysicsWorldData,
             float3 point,
@@ -32,8 +131,7 @@ namespace DefaultNamespace
             ref ComponentLookup<T0> lookUp0,
             out Entity entity,
             out T0 component0
-        )
-            where T0 : unmanaged, IComponentData
+        ) where T0 : unmanaged, IComponentData
         {
             var collisionWorld = buildPhysicsWorldData.PhysicsData.PhysicsWorld.CollisionWorld;
             var collisionFilter = CollisionFilter.Default;

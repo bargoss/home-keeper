@@ -22,13 +22,13 @@ namespace _OnlyOneGame.Scripts.Components
                             new Item(ThrowableType.FlashBang)
                         },
                         ActionCommandOpt = Option<ActionCommand>.Some(new ActionCommand(new CommandCraftItem(){ItemToCraft = new Item(MinionType.Melee)})),
-                        OnGoingActionOpt = Option<OnGoingAction>.Some(new OnGoingAction(){Duration = 1.19f, StartTime = 0.12f, Data = new OnGoingActionData(new ActionUnbuilding(){})}),
+                        OnGoingActionOpt = Option<OnGoingAction>.Some(new OnGoingAction(){Duration = 1.19f, StartTime = 0.12f, Data = new OnGoingActionData(new ActionDismantling(){})}),
                         Events = new FixedList128Bytes<PlayerEvent>()
                         {
                             new PlayerEvent(new EventMeleeAttackStarted(){Direction = new float3(1.1f,2.1f,3.1f)}),
                             new PlayerEvent(new EventThrownItem(){Item = new Item(DeployableItemType.Landmine), ThrowVelocity = new float3(5.1f,6.1f,7.1f)}),
                         },
-                        SilencedDuration = 999.999f
+                        CommandsBlockedDuration = 999.999f
                     });
             }
         }

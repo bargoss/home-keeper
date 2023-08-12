@@ -7,13 +7,20 @@ namespace _OnlyOneGame.Scripts.Components
 {
     public struct OnPlayerCharacter : IComponentData
     {
+        // state:
         public FixedList512Bytes<Item> InventoryStack;
-        public Option<ActionCommand> ActionCommandOpt;
         public Option<OnGoingAction> OnGoingActionOpt;
-
         public FixedList128Bytes<PlayerEvent> Events;
+        public float CommandsBlockedDuration;
+        public float MovementBlockedDuration;
 
-        public float SilencedDuration;
+        // input:
+        public float MovementInput;
+        public float LookInput;
+        public Option<ActionCommand> ActionCommandOpt;
+
+        // stats:
+        public int InventoryCapacity;
     }
 
     [ValueVariant]
@@ -32,16 +39,19 @@ namespace _OnlyOneGame.Scripts.Components
     [ValueVariant]
     public partial struct OnGoingActionData : IValueVariant<OnGoingActionData
         , ActionMeleeAttacking
-        , ActionUnbuilding
+        , ActionDismantling
     > { }
 
     [ValueVariant]
     public partial struct ActionCommand : IValueVariant<ActionCommand,
-        CommandUnbuild, 
+        CommandDismantle, 
         CommandPickupItem, 
         CommandCraftItem, 
         CommandMineResource, 
-        CommandCycleStack
+        CommandCycleStack,
+        CommandMeleeAttack,
+        CommandThrowItem,
+        CommandDropItem
     > { }
 
     public struct OnGoingAction
@@ -49,28 +59,62 @@ namespace _OnlyOneGame.Scripts.Components
         public float StartTime;
         public float Duration;
         public OnGoingActionData Data;
+
+        public OnGoingAction(float startTime, float duration, OnGoingActionData data)
+        {
+            StartTime = startTime;
+            Duration = duration;
+            Data = data;
+        }
     }
 
     public struct CommandMeleeAttack
     {
         public float3 Direction;
+        
+        public CommandMeleeAttack(float3 direction)
+        {
+            Direction = direction;
+        }
     }
     public struct ActionMeleeAttacking
     {
         public float3 Direction;
+        
+        public ActionMeleeAttacking(float3 direction)
+        {
+            Direction = direction;
+        }
     }
     public struct EventMeleeAttackStarted
     {
         public float3 Direction;
     }
 
-    public struct CommandUnbuild { }
+    public struct CommandDismantle { }
 
-    public struct ActionUnbuilding { }
+    public struct ActionDismantling
+    {
+        public Entity Target;
+
+        public ActionDismantling(Entity target)
+        {
+            Target = target;
+        }
+    }
     public struct EventUnbuilt { }
     
     public struct CommandPickupItem { }
-    public struct EventItemPickedUp { public Item Item; }
+
+    public struct EventItemPickedUp
+    {
+        public Item Item;
+        
+        public EventItemPickedUp(Item item)
+        {
+            Item = item;
+        }
+    }
 
     public struct CommandCraftItem
     {
@@ -92,15 +136,31 @@ namespace _OnlyOneGame.Scripts.Components
     public struct EventDroppedItem
     {
         public Item Item;
+        
+        public EventDroppedItem(Item item)
+        {
+            Item = item;
+        }
     }
 
     public struct CommandThrowItem
     {
         public float3 ThrowVelocity;
+        
+        public CommandThrowItem(float3 throwVelocity)
+        {
+            ThrowVelocity = throwVelocity;
+        }
     }
     public struct EventThrownItem
     {
         public Item Item;
         public float3 ThrowVelocity;
+        
+        public EventThrownItem(Item item, float3 throwVelocity)
+        {
+            Item = item;
+            ThrowVelocity = throwVelocity;
+        }
     }
 }

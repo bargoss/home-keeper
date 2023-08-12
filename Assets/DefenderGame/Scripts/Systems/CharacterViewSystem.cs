@@ -33,7 +33,7 @@ namespace DefenderGame.Scripts.Systems
         }
         protected override void OnUpdate()
         {
-            var random = new Random((uint)(SystemAPI.Time.ElapsedTime * 10000));
+            var random = new Random((uint)(SystemAPI.Time.ElapsedTime * 10000 + 1));
             foreach (var characterViewAspect in SystemAPI.Query<CharacterViewAspect>())
             {
                 var characterView = characterViewAspect.CharacterView.ValueRO; 

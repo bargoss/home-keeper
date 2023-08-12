@@ -4,6 +4,7 @@ namespace _OnlyOneGame.Scripts.Components
 {
     public struct OnPrefabs : IComponentData
     {
-        //public ComponentRef<> PlayerCharacter;
+        public EntWithComponent<GroundItem> GroundItemPrefab;
+        public EntWithComponent<DeployingItem> DeployingItemPrefab;
     }
 }

@@ -1,9 +1,11 @@
 ﻿using Unity.Entities;
 
 
-public readonly struct ComponentRef<T> where T : unmanaged, IComponentData
+public readonly struct EntWithComponent<T> where T : unmanaged, IComponentData
 {
     private readonly Entity m_Entity;
+    
+    public Entity Entity => m_Entity;
     
     public RefRW<T> GetRW(ComponentLookup<T> componentLookup)
     {
@@ -20,7 +22,7 @@ public readonly struct ComponentRef<T> where T : unmanaged, IComponentData
         return componentLookup[m_Entity];
     }
     
-    public ComponentRef(Entity entity)
+    public EntWithComponent(Entity entity)
     {
         m_Entity = entity;
     }
