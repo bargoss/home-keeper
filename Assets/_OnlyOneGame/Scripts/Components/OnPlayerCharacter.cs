@@ -1,23 +1,53 @@
-﻿using Unity.Collections;
+﻿using DefaultNamespace;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.NetCode;
 using ValueVariant;
 
 namespace _OnlyOneGame.Scripts.Components
 {
     public struct OnPlayerCharacter : IComponentData
     {
+        [GhostField] public Data128Bytes InventoryStackData;
+        [GhostField] public Data32Bytes OnGoingActionOptData;
+        [GhostField] public Data128Bytes EventsData;
+        [GhostField] public Data32Bytes ActionCommandOptData;
+
+
+
         // state:
-        public FixedList512Bytes<Item> InventoryStack;
-        public Option<OnGoingAction> OnGoingActionOpt;
-        public FixedList128Bytes<PlayerEvent> Events;
-        public float CommandsBlockedDuration;
-        public float MovementBlockedDuration;
+        public FixedList128Bytes<Item> InventoryStack
+        {
+            get => SerializationUtils.Deserialize<FixedList128Bytes<Item>, Data128Bytes>(ref InventoryStackData);
+            set => SerializationUtils.Serialize(value, ref InventoryStackData);
+        }
+
+        public Option<OnGoingAction> OnGoingActionOpt
+        {
+            get => SerializationUtils.Deserialize<Option<OnGoingAction>, Data32Bytes>(ref OnGoingActionOptData);
+            set => SerializationUtils.Serialize(value, ref OnGoingActionOptData);
+        }
+
+        public FixedList128Bytes<PlayerEvent> Events
+        {
+            get => SerializationUtils.Deserialize<FixedList32Bytes<PlayerEvent>, Data128Bytes>(ref EventsData);
+            set => SerializationUtils.Serialize(value, ref EventsData);
+        }
+
+        [GhostField] public float CommandsBlockedDuration;
+        [GhostField] public float MovementBlockedDuration;
+
 
         // input:
-        public float MovementInput;
-        public float LookInput;
-        public Option<ActionCommand> ActionCommandOpt;
+        [GhostField] public float2 MovementInput;
+        [GhostField] public float2 LookInput;
+
+        public Option<ActionCommand> ActionCommandOpt
+        {
+            get => SerializationUtils.Deserialize<Option<ActionCommand>, Data32Bytes>(ref ActionCommandOptData);
+            set => SerializationUtils.Serialize(value, ref ActionCommandOptData);
+        }
 
         // stats:
         public int InventoryCapacity;

@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Runtime.InteropServices;
 using Components;
 using HomeKeeper.Components;
 using Unity.Collections;
@@ -20,7 +21,6 @@ namespace DefaultNamespace
         public static float3 Up => new float3(0, 1, 0);
         public static float3 Right => new float3(1, 0, 0);
         public static float3 Forward => new float3(0, 0, 1);
-
 
         public static void ControlVelocity(float3 currentVelocity, float3 targetVelocity, float maxAcceleration, float deltaTime, out float3 newVelocity)
         {
@@ -436,5 +436,57 @@ namespace DefaultNamespace
                 //}
             }
         }
+    }
+
+    //public struct Data32Bytes
+    //{
+    //    public int Value0;
+    //    public int Value1;
+    //    public int Value2;
+    //    public int Value3;
+    //}
+    
+    public interface IDataBytes
+    {
+
+    }
+    
+    // like that but with explicit layout
+    [StructLayout(LayoutKind.Explicit)]
+    public struct Data32Bytes : IDataBytes
+    {
+        [FieldOffset(0)] public int Value0;
+        [FieldOffset(4)] public int Value1;
+        [FieldOffset(8)] public int Value2;
+        [FieldOffset(12)] public int Value3;
+    }
+    
+    
+    [StructLayout(LayoutKind.Explicit)]
+    public struct Data64Bytes : IDataBytes
+    {
+        [FieldOffset(0)] public Data32Bytes Value0;
+        [FieldOffset(16)] public Data32Bytes Value1;
+    }
+    
+    [StructLayout(LayoutKind.Explicit)]
+    public struct Data128Bytes : IDataBytes
+    {
+        [FieldOffset(0)] public Data64Bytes Value0;
+        [FieldOffset(32)] public Data64Bytes Value1;
+    }
+    
+    [StructLayout(LayoutKind.Explicit)]
+    public struct Data256Bytes : IDataBytes
+    {
+        [FieldOffset(0)] public Data128Bytes Value0;
+        [FieldOffset(64)] public Data128Bytes Value1;
+    }
+    
+    [StructLayout(LayoutKind.Explicit)]
+    public struct Data512Bytes : IDataBytes
+    {
+        [FieldOffset(0)] public Data256Bytes Value0;
+        [FieldOffset(128)] public Data256Bytes Value1;
     }
 }

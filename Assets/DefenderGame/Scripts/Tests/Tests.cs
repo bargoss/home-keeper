@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using _OnlyOneGame.Scripts.Components;
 using DefaultNamespace;
 using DefenderGame.Scripts.Components;
@@ -8,6 +9,8 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Entities.Serialization;
 using Unity.Mathematics;
+using Unity.NetCode;
+using Unity.NetCode.Generators;
 using Unity.Transforms;
 using UnityEditor;
 using UnityEngine;
@@ -89,49 +92,121 @@ namespace DefenderGame.Scripts.Tests
             );
             int a = 3;
         }
-
-        /*
-        [MenuItem("DefenderGame/Tests/212412")]
-        public static void MyTest()
+        
+        
+        [MenuItem("DefenderGame/Tests/ss321fasd")]
+        public static void SerializationTests()
         {
-            SampleVariant2 b = new SampleVariant2(new SampleVariant(2));
-            // Q: how to get size of a struct
-            // A: yo
-            System.Runtime.InteropServices.Marshal.SizeOf(typeof(SampleVariant2));
-            Debug.Log("size : " + System.Runtime.InteropServices.Marshal.SizeOf(typeof(SampleVariant2)));
-            //b.Accept(new Visitor0());
+            var bytes = new FixedString64Bytes();
+            bytes.Add(1);
+            bytes.Add(2);
+            bytes.Add(3);
+            bytes.Add(4);
+            bytes.Add(5);
+            bytes.Add(6);
+            bytes.Add(7);
+            bytes.Add(8);
+            bytes.Add(9);
+            bytes.Add(10);
 
-            //SampleVariant2.DefaultConverter.Instance.Visit()
-            //b.Accept();
             
-            //SampleVariant2.IActionVisitor<SampleVariant, bool>
-            b.Switch(
-                (SampleVariant bb) =>
+            
+            
+            var data  = new MyReplicatedData()
+            {
+                MyInnerStruct = new MyInnerStruct(){A = 999, B = -999},
+                Data = bytes,
+                ActionCommand = new ActionCommand(new CommandThrowItem(new float3(99.99f,99.98f, 99.97f)))
+            };
+            
+            // interop size
+            var size = Marshal.SizeOf(data);
+            var size2 = Marshal.SizeOf(data.ActionCommand);
+            var size3 = Marshal.SizeOf(data.Data);
+            var size4 = Marshal.SizeOf(data.MyInnerStruct);
+            
+            var size5 = Marshal.SizeOf(new float3());
+
+            var serializedBytes = new Data512Bytes();
+            SerializationUtils.Serialize(data, ref serializedBytes);
+            
+            /*
+                public static unsafe T Deserialize<T, TDataBytes>(TDataBytes serializedData) 
+                    where T : struct where TDataBytes : unmanaged, IDataBytes
                 {
-                    bb.Switch(
-                        (int i) =>
-                        {
-                            var a = i;
-                        },
-                        (long l) => { 
-                        
-                        },
-                        (float f) =>
-                        {
-                            
-                        }
-                    );
-                },
-                (long b) =>
-                {
-                    
+                    var ptr = UnsafeUtility.AddressOf(ref serializedData);
+                    UnsafeUtility.CopyPtrToStructure(ptr, out T result);
+                    return result;
                 }
-            );
+             */
+            
+            var data2 = SerializationUtils.Deserialize<MyReplicatedData, Data512Bytes>(ref serializedBytes);
+            // Q: why do I have to explicitly specify the type "Data512Bytes" here?
+            // A: because the compiler can't infer the type from the method signature
+            // Q: why don't I already provide that information via ref serializedBytes paramater alone?
+            // A: well, I do, but the compiler doesn't know that the type of serializedBytes is Data512Bytes
+            
+            
+            int a = 3;
         }
-        */
-        
-        
+
+        [MenuItem("DefenderGame/Tests/3125asd132asd")]
+        public static void FixedListToDataBytesTest()
+        {
+            FixedList32Bytes<int> fixedList = new FixedList32Bytes<int>();
+            fixedList.Add(1);
+            fixedList.Add(2);
+            fixedList.Add(3);
+            fixedList.Add(4);
+            fixedList.Add(5);
+            fixedList.Add(6);
+            
+            
+            var dataBytes = new Data32Bytes();
+            
+            
+            SerializationUtils.Serialize(fixedList, ref dataBytes);
+            
+            var fixedList2 = SerializationUtils.Deserialize<FixedList32Bytes<int>, Data32Bytes>(ref dataBytes);
+
+            var a = 3;
+        }
     }
+    
+    public struct MyReplicatedData
+    {
+        public MyInnerStruct MyInnerStruct;
+        public FixedString64Bytes Data;
+
+        public ActionCommand ActionCommand;
+        //[GhostField] public SampleVariant SampleVariant;
+        //[GhostField] public MyUnion MyUnion;
+    }
+
+    [GhostComponent]
+    public struct MyReplicatedComponent : IComponentData
+    {
+        [GhostField] public MyInnerStruct MyInnerStruct;
+        [GhostField] public FixedString64Bytes Data;
+        //[GhostField] public SampleVariant SampleVariant;
+        //[GhostField] public MyUnion MyUnion;
+    }
+    
+    public struct MyInnerStruct
+    {
+        public int A;
+        public int B;
+        //public MyUnion MyUnion;
+    }
+    
+    [StructLayout(LayoutKind.Explicit)]
+    public struct MyUnion
+    {
+        [FieldOffset(0)] public int Item1;
+        [FieldOffset(0)] public float3 Item2;
+        [FieldOffset(0)] public FixedBytes16 Item3;
+    }
+    
     
     [ValueVariant]
     public readonly partial struct SampleVariant: IValueVariant<SampleVariant, int> { }
