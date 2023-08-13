@@ -160,8 +160,6 @@ namespace _OnlyOneGame.Scripts.Systems
                         }
                     );
                 }
-
-                playerCharacter.ActionCommandOpt = Option<ActionCommand>.None();
                 
                 playerCharacter.CommandsBlockedDuration -= deltaTime;
                 if (playerCharacter.CommandsBlockedDuration < 0) playerCharacter.CommandsBlockedDuration = 0;
