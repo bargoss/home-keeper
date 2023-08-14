@@ -13,12 +13,12 @@ namespace DefenderGame.Scripts.Components
         public float LastEnemySpawnTime;
     }
 
-    public readonly struct PlayerInput
+    public struct PlayerInput
     {
-        public readonly float3 MousePos;
-        public readonly bool Up;
-        public readonly bool Down;
-        public readonly bool Pressing;
+        public float3 MousePos;
+        public bool Up;
+        public bool Down;
+        public bool Pressing;
         
         // ctor
         public PlayerInput(float3 mousePos, bool up, bool down, bool pressing)
