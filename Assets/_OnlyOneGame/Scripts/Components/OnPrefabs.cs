@@ -6,5 +6,6 @@ namespace _OnlyOneGame.Scripts.Components
     {
         public EntWithComponent<GroundItem> GroundItemPrefab;
         public EntWithComponent<DeployingItem> DeployingItemPrefab;
+        public Entity SimplePlayerPrefab;
     }
 }

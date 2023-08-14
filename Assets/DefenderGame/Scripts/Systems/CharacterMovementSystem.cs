@@ -5,6 +5,7 @@ using HomeKeeper.Components;
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.NetCode;
 using Unity.Physics;
 using Unity.Physics.Systems;
 using Unity.Transforms;
@@ -12,6 +13,7 @@ using UnityEngine;
 
 namespace DefenderGame.Scripts.Systems
 {
+    [UpdateInGroup(typeof(PredictedSimulationSystemGroup))]
     public partial struct CharacterMovementSystem : ISystem
     {
         [BurstCompile]
@@ -26,7 +28,7 @@ namespace DefenderGame.Scripts.Systems
         {
             var buildPhysicsWorld = SystemAPI.GetSingleton<BuildPhysicsWorldData>();
             
-            foreach (var aspect in SystemAPI.Query<CharacterMovementAspect>())
+            foreach (var aspect in SystemAPI.Query<CharacterMovementAspect>().WithAll<Simulate>())
             {
                 var grounded = buildPhysicsWorld.Raycast(
                     aspect.Position + Utility.Up * 0.05f,

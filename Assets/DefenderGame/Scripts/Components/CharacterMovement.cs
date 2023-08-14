@@ -1,22 +1,23 @@
 ﻿using Unity.Entities;
 using Unity.Mathematics;
+using Unity.NetCode;
 
 namespace DefenderGame.Scripts.Components
 {
     public struct CharacterMovement : IComponentData
     {
         // stats
-        public float MaxSpeed;
-        public float MaxAcceleration;
+        [GhostField] public float MaxSpeed;
+        [GhostField] public float MaxAcceleration;
 
         // state
-        public float LastJumpTime;
-        public bool Jumped;
-        public bool IsGrounded;
+        [GhostField] public NetworkTick LastJumpTime;
+        [GhostField] public bool Jumped;
+        [GhostField] public bool IsGrounded;
         
         // input
-        public float3 MovementInput;
-        public float3 LookInput;
-        public bool JumpInput;
+        [GhostField] public float3 MovementInput;
+        [GhostField] public float3 LookInput;
+        [GhostField] public bool JumpInput;
     }
 }
