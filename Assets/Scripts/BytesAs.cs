@@ -4,7 +4,7 @@ using DefaultNamespace;
 [DebuggerTypeProxy(typeof(BytesAs<,>.DebuggerProxy))]
 public struct BytesAs<TField, TDataBytes> where TField : unmanaged where TDataBytes : unmanaged, IDataBytes
 {
-    public TDataBytes RawData;
+    public TDataBytes RawData; // it needs to be public so it can be serialized by Unity NetCode
     
     public TField Get() => SerializationUtils.Deserialize<TField, TDataBytes>(ref RawData);
     public void Set(TField value) => SerializationUtils.Serialize(value, ref RawData);
