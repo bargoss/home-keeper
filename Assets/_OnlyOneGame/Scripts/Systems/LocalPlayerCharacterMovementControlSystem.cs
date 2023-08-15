@@ -13,16 +13,17 @@ namespace _OnlyOneGame.Scripts.Systems
     {
         protected override void OnCreate()
         {
-            RequireForUpdate<CubeInput>();
+            RequireForUpdate<OnPlayerInput>();
         }
         
         protected override void OnUpdate()
         {
             foreach (var (localPlayerCharacterMovementControl, characterMovementRw, entity) 
-                     in SystemAPI.Query<CubeInput, RefRW<CharacterMovement>>().WithAll<Simulate>().WithEntityAccess())
+                     in SystemAPI.Query<OnPlayerInput, RefRW<CharacterMovement>>().WithAll<Simulate>().WithEntityAccess())
             {
                 var characterMovement = characterMovementRw.ValueRW;
-                characterMovement.MovementInput = localPlayerCharacterMovementControl.Value;
+                
+                characterMovement.MovementInput = localPlayerCharacterMovementControl.MovementInput;
                 characterMovementRw.ValueRW = characterMovement;
             }
         }

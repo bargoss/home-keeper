@@ -68,7 +68,7 @@ namespace DefenderGame.Scripts.Systems
         
         private float3 GetSafeLookDirection()
         {
-            var lookDirection = m_CharacterMovement.ValueRO.MovementInput;
+            var lookDirection = m_CharacterMovement.ValueRO.MovementInputAsXZ;
             if (math.lengthsq(lookDirection) < 0.0001f)
             {
                 return m_LocalTransform.ValueRO.Forward();

@@ -52,5 +52,18 @@ public struct Option<T>
     {
         return Some(value);
     }
-        
+    
+    // implicit conversion from T
+    public static implicit operator T(Option<T> option)
+    {
+        return option.m_Value;
+    }
+    
+    public override string ToString()
+    {
+        return Match(
+            some: value => $"Some({value})",
+            none: () => "None"
+        );
+    }
 }

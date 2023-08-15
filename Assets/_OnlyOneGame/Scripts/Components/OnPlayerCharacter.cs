@@ -7,47 +7,33 @@ using ValueVariant;
 
 namespace _OnlyOneGame.Scripts.Components
 {
+    
+    //[DebuggerDisplay("{ToString()}")]
     public struct OnPlayerCharacter : IComponentData
     {
-        [GhostField] public Data128Bytes InventoryStackData;
-        [GhostField] public Data32Bytes OnGoingActionOptData;
-        [GhostField] public Data128Bytes EventsData;
-        [GhostField] public Data32Bytes ActionCommandOptData;
-
+        //[GhostField] public Data128Bytes InventoryStackData;
+        //[GhostField] public Data32Bytes OnGoingActionOptData;
+        //[GhostField] public Data128Bytes EventsData;
+        //[GhostField] public Data32Bytes ActionCommandOptData;
+        
 
 
         // state:
-        public FixedList128Bytes<Item> InventoryStack
-        {
-            get => SerializationUtils.Deserialize<FixedList128Bytes<Item>, Data128Bytes>(ref InventoryStackData);
-            set => SerializationUtils.Serialize(value, ref InventoryStackData);
-        }
-
-        public Option<OnGoingAction> OnGoingActionOpt
-        {
-            get => SerializationUtils.Deserialize<Option<OnGoingAction>, Data32Bytes>(ref OnGoingActionOptData);
-            set => SerializationUtils.Serialize(value, ref OnGoingActionOptData);
-        }
-
-        public FixedList128Bytes<PlayerEvent> Events
-        {
-            get => SerializationUtils.Deserialize<FixedList32Bytes<PlayerEvent>, Data128Bytes>(ref EventsData);
-            set => SerializationUtils.Serialize(value, ref EventsData);
-        }
+        [GhostField] public BytesAs<FixedList128Bytes<Item>, Data128Bytes> InventoryStack;
+        [GhostField] public BytesAs<Option<OnGoingAction>, Data32Bytes> OnGoingActionOpt;
+        [GhostField] public BytesAs<FixedList128Bytes<PlayerEvent>, Data128Bytes> Events;
 
         [GhostField] public float CommandsBlockedDuration;
         [GhostField] public float MovementBlockedDuration;
 
 
+        // these fields can be removed if we be careful about execution order
         // input:
         [GhostField] public float2 MovementInput;
         [GhostField] public float2 LookInput;
-
-        public Option<ActionCommand> ActionCommandOpt
-        {
-            get => SerializationUtils.Deserialize<Option<ActionCommand>, Data32Bytes>(ref ActionCommandOptData);
-            set => SerializationUtils.Serialize(value, ref ActionCommandOptData);
-        }
+        [GhostField] public BytesAs<Option<ActionCommand>, Data32Bytes> ActionCommandOpt;
+        
+        
 
         // stats:
         public int InventoryCapacity;

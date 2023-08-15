@@ -40,7 +40,7 @@ namespace DefenderGame.Scripts.Systems
 
                 if (grounded)
                 {
-                    var movementInput = aspect.CharacterMovement.ValueRO.MovementInput;
+                    var movementInput = aspect.CharacterMovement.ValueRO.MovementInputAsXZ;
                     var maxMovementSpeed = aspect.CharacterMovement.ValueRO.MaxSpeed;
                     var maxAcceleration = aspect.CharacterMovement.ValueRO.MaxAcceleration;
                     var targetVelocity = movementInput * maxMovementSpeed;

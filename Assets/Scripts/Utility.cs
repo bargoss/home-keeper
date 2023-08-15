@@ -448,7 +448,7 @@ namespace DefaultNamespace
     
     public interface IDataBytes
     {
-
+        
     }
     
     // like that but with explicit layout

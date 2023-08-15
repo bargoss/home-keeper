@@ -59,14 +59,14 @@ namespace _OnlyOneGame.Scripts.Systems
                 var characterMovement = characterMovementRw.ValueRO;
                 
                 
-                playerCharacter.Events.Clear();
+                playerCharacter.Events.Edit((ref FixedList128Bytes<PlayerEvent> value) => value.Clear());
                 
                 var playerPosition = localTransform.Position;
                 
                 var silenced = playerCharacter.CommandsBlockedDuration > 0;
                 
                 // process action
-                if (!silenced && playerCharacter.ActionCommandOpt.TryGet(out var actionCommand))
+                if (!silenced && playerCharacter.ActionCommandOpt.Get().TryGet(out var actionCommand))
                 {
                     actionCommand.Switch(
                         dismantle => ProcessDismantleCommand(
@@ -91,22 +91,24 @@ namespace _OnlyOneGame.Scripts.Systems
                         cycleStack => { },
                         meleeAttack =>
                         {
-                            playerCharacter.OnGoingActionOpt = new OnGoingAction(time,
-                                2, new OnGoingActionData(new ActionMeleeAttacking(meleeAttack.Direction)));
+                            playerCharacter.OnGoingActionOpt.Set(new OnGoingAction(time,
+                                2, new OnGoingActionData(new ActionMeleeAttacking(meleeAttack.Direction))));
                             playerCharacter.CommandsBlockedDuration += 2;
                         },
                         throwItem =>
                         {
-                            if(playerCharacter.InventoryStack.Length == 0)
+                            if(playerCharacter.InventoryStack.Get().Length == 0)
                                 return;
                             
-                            var item = playerCharacter.InventoryStack[^1];
+                            var item = playerCharacter.InventoryStack.Get()[^1];
                             var throwVelocity = throwItem.ThrowVelocity;
                             var throwDirection = throwVelocity / (math.length(throwVelocity) + 0.001f);
                             var throwPosition = playerPosition + throwDirection * 0.5f + Utility.Up;
 
-                            playerCharacter.InventoryStack.RemoveAt(playerCharacter.InventoryStack.Length - 1);
-                            playerCharacter.Events.Add(new PlayerEvent(new EventThrownItem(item, throwItem.ThrowVelocity)));
+                            //playerCharacter.InventoryStack.Value.RemoveAt(playerCharacter.InventoryStack.Value.Length - 1);
+                            playerCharacter.InventoryStack.Edit((ref FixedList128Bytes<Item> value) => value.RemoveAt(value.Length - 1));
+                            //playerCharacter.Events.Value.Add(new PlayerEvent(new EventThrownItem(item, throwItem.ThrowVelocity)));
+                            playerCharacter.Events.Edit((ref FixedList128Bytes<PlayerEvent> value) => value.Add(new PlayerEvent(new EventThrownItem(item, throwItem.ThrowVelocity))));
 
                             if(item.TryGetValue(out DeployableItemType deployableItemType))
                             {
@@ -120,21 +122,24 @@ namespace _OnlyOneGame.Scripts.Systems
                         },
                         dropItem =>
                         {
-                            if(playerCharacter.InventoryStack.Length == 0)
+                            if(playerCharacter.InventoryStack.Get().Length == 0)
                                 return;
                             
-                            var item = playerCharacter.InventoryStack[^1];
-                            playerCharacter.InventoryStack.RemoveAt(playerCharacter.InventoryStack.Length - 1);
+                            //var item = playerCharacter.InventoryStack.Value[^1];
+                            var item = playerCharacter.InventoryStack.Get()[^1];
+                            //playerCharacter.InventoryStack.Value.RemoveAt(playerCharacter.InventoryStack.Value.Length - 1);
+                            playerCharacter.InventoryStack.Edit((ref FixedList128Bytes<Item> value) => value.RemoveAt(value.Length - 1));
                             
                             var dropPosition = playerPosition + Utility.Up * 0.5f + localTransform.Forward();
-                            playerCharacter.Events.Add(new PlayerEvent(new EventDroppedItem(item)));
+                            //playerCharacter.Events.Value.Add(new PlayerEvent(new EventDroppedItem(item)));
+                            playerCharacter.Events.Edit((ref FixedList128Bytes<PlayerEvent> value) => value.Add(new PlayerEvent(new EventDroppedItem(item))));
                             
                             ThrowItem(dropPosition, Utility.Up * 2f, item, in prefabs, ref ecb, time);
                         } 
                     );
                 }
 
-                if (playerCharacter.OnGoingActionOpt.TryGet(out var onGoingAction))
+                if (playerCharacter.OnGoingActionOpt.Get().TryGet(out var onGoingAction))
                 {
                     onGoingAction.Data.Switch(
                         meleeAttacking =>
@@ -225,13 +230,15 @@ namespace _OnlyOneGame.Scripts.Systems
                 ))
             {
                 var item = groundItem.Item;
-                if (playerCharacter.InventoryCapacity > playerCharacter.InventoryStack.Length)
+                if (playerCharacter.InventoryCapacity > playerCharacter.InventoryStack.Get().Length)
                 {
-                    playerCharacter.InventoryStack.Add(item);
+                    //playerCharacter.InventoryStack.Value.Add(item);
+                    playerCharacter.InventoryStack.Edit((ref FixedList128Bytes<Item> value) => value.Add(item));
                     ecb.DestroyEntity(groundItemEntity);
 
                     // todo: not too sure if this will modify the player character
-                    playerCharacter.Events.Add(new PlayerEvent(new EventItemPickedUp(item)));
+                    //playerCharacter.Events.Value.Add(new PlayerEvent(new EventItemPickedUp(item)));
+                    playerCharacter.Events.Edit((ref FixedList128Bytes<PlayerEvent> value) => value.Add(new PlayerEvent(new EventItemPickedUp(item))));
                     
                     playerCharacter.CommandsBlockedDuration += 0.5f;
                 }
@@ -241,7 +248,7 @@ namespace _OnlyOneGame.Scripts.Systems
         private static void ProcessDismantleCommand(ref OnPlayerCharacter playerCharacter, ComponentLookup<LocalTransform> localTransformLookup,
             float3 playerPosition, float interactionRadius, ref BuildPhysicsWorldData buildPhysicsWorld, float time, ref ComponentLookup<DeployedItem> deployedItemLookup)
         {
-            if (playerCharacter.OnGoingActionOpt.TryGet(out var onGoingAction) &&
+            if (playerCharacter.OnGoingActionOpt.Get().TryGet(out var onGoingAction) &&
                 onGoingAction.Data.TryGetValue(out ActionDismantling dismantling))
             {
                 // still unbuilding
@@ -261,9 +268,12 @@ namespace _OnlyOneGame.Scripts.Systems
                         out var deployedItem
                     ))
                 {
-                    playerCharacter.OnGoingActionOpt = new OnGoingAction(
+                    //playerCharacter.OnGoingActionOpt.Value = new OnGoingAction(
+                    //    time, 2, new OnGoingActionData(new ActionDismantling(deployedItemEntity))
+                    //);
+                    playerCharacter.OnGoingActionOpt = Option<OnGoingAction>.Some(new OnGoingAction(
                         time, 2, new OnGoingActionData(new ActionDismantling(deployedItemEntity))
-                    );
+                    ));
                 }
             }
         }

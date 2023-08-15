@@ -61,7 +61,7 @@ namespace DefenderGame.Scripts.Systems
                 var movementDirection = math.normalize(targetPosition - localTransformRo.ValueRO.Position);
                 //movementDirection = new float3(1, 0, 0);
                 var characterMovement = characterMovementRw.ValueRO;
-                characterMovement.MovementInput = movementDirection;
+                characterMovement.MovementInput = new float2(movementDirection.x, movementDirection.z);
                 characterMovementRw.ValueRW = characterMovement;
             }
 

@@ -36,8 +36,10 @@ namespace DefenderGame.Scripts.Tests
             worldSource.EntityManager.AddComponent<OnPlayerCharacter>(eSource);
             var playerCharacter = new OnPlayerCharacter();
             playerCharacter.Events = new FixedList128Bytes<PlayerEvent>();
-            playerCharacter.Events.Add(new EventItemPickedUp(){Item = MinionType.Tank });
-            playerCharacter.Events.Add(new EventMeleeAttackStarted() { Direction = new float3(0.15f, 0.25f, 0.35f) });
+            //playerCharacter.Events.Value.Add(new EventItemPickedUp(){Item = MinionType.Tank });
+            playerCharacter.Events.Edit((ref FixedList128Bytes<PlayerEvent> value) => value.Add(new EventMeleeAttackStarted() { Direction = new float3(0.15f, 0.25f, 0.35f) })); 
+            //playerCharacter.Events.Value.Add(new EventMeleeAttackStarted() { Direction = new float3(0.15f, 0.25f, 0.35f) });
+            playerCharacter.Events.Edit((ref FixedList128Bytes<PlayerEvent> value) => value.Add(new EventThrownItem() { Item = new Item() }));
             //playerCharacter.OnGoingAction = Option<OnGoingAction>.Some(new ItemPickedUpEvent(){Item = new Item()});
             worldSource.EntityManager.SetComponentData(eSource, playerCharacter);
 
@@ -52,7 +54,7 @@ namespace DefenderGame.Scripts.Tests
             // get the first entity
             var eDestination = worldDestination.EntityManager.CreateEntityQuery(typeof(OnPlayerCharacter)).GetSingletonEntity();
             var playerCharacterDestination = worldDestination.EntityManager.GetComponentData<OnPlayerCharacter>(eDestination);
-            var playerEvent = playerCharacterDestination.Events[0];
+            var playerEvent = playerCharacterDestination.Events.Get()[0];
             
             var a = 3;
         }

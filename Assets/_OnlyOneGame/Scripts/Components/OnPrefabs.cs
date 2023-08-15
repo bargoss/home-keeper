@@ -1,4 +1,5 @@
 ﻿using Unity.Entities;
+using Unity.Mathematics;
 
 namespace _OnlyOneGame.Scripts.Components
 {
@@ -7,5 +8,6 @@ namespace _OnlyOneGame.Scripts.Components
         public EntWithComponent<GroundItem> GroundItemPrefab;
         public EntWithComponent<DeployingItem> DeployingItemPrefab;
         public Entity SimplePlayerPrefab;
+        public Entity PlayerPrefab;
     }
 }

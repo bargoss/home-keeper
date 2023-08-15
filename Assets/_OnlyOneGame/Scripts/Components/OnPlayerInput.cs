@@ -6,9 +6,10 @@ using UnityEngine;
 namespace _OnlyOneGame.Scripts.Components
 {
     [GhostComponent(PrefabType=GhostPrefabType.AllPredicted)]
-    public struct CubeInput : IInputComponentData
+    public struct OnPlayerInput : IInputComponentData
     {
-        public float3 Value;
+        public float2 MovementInput;
+        
     }
     
     [UpdateInGroup(typeof(GhostInputSystemGroup))]
@@ -22,11 +23,11 @@ namespace _OnlyOneGame.Scripts.Components
         
         protected override void OnUpdate()
         {
-            foreach (var playerInputRw in SystemAPI.Query<RefRW<CubeInput>>().WithAll<GhostOwnerIsLocal>())
+            foreach (var (onPlayerRw, onPlayerInputRw) in SystemAPI.Query<RefRW<OnPlayer>, RefRW<OnPlayerInput>>().WithAll<GhostOwnerIsLocal>())
             {
-                var playerInput = playerInputRw.ValueRO;
-                playerInput.Value = new float3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
-                playerInputRw.ValueRW = playerInput;
+                var playerInput = onPlayerInputRw.ValueRO;
+                playerInput.MovementInput = new float2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+                onPlayerInputRw.ValueRW = playerInput;
             }
         }
     }

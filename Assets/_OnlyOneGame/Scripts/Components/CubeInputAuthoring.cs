@@ -10,7 +10,7 @@ namespace _OnlyOneGame.Scripts.Components
             public override void Bake(CubeInputAuthoring authoring)
             {
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
-                AddComponent(entity, new CubeInput());
+                AddComponent(entity, new OnPlayerInput());
             }
         }
     }

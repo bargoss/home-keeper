@@ -16,8 +16,10 @@ namespace DefenderGame.Scripts.Components
         [GhostField] public bool IsGrounded;
         
         // input
-        [GhostField] public float3 MovementInput;
+        [GhostField] public float2 MovementInput;
         [GhostField] public float3 LookInput;
         [GhostField] public bool JumpInput;
+        
+        public float3 MovementInputAsXZ => new float3(MovementInput.x, 0, MovementInput.y);
     }
 }
