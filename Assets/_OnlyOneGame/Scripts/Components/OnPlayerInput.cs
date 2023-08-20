@@ -1,4 +1,5 @@
-﻿using Unity.Entities;
+﻿using DefaultNamespace;
+using Unity.Entities;
 using Unity.Mathematics;
 using Unity.NetCode;
 using UnityEngine;
@@ -9,6 +10,7 @@ namespace _OnlyOneGame.Scripts.Components
     public struct OnPlayerInput : IInputComponentData
     {
         public float2 MovementInput;
+        public BytesAs<Option<ActionCommand>, Data32Bytes> ActionCommandOpt;
         
     }
     
@@ -27,6 +29,10 @@ namespace _OnlyOneGame.Scripts.Components
             {
                 var playerInput = onPlayerInputRw.ValueRO;
                 playerInput.MovementInput = new float2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+                playerInput.ActionCommandOpt = Input.GetKeyDown(KeyCode.Space)
+                    ? Option<ActionCommand>.Some(new CommandMeleeAttack(Utility.Forward))
+                    : Option<ActionCommand>.None();
+                
                 onPlayerInputRw.ValueRW = playerInput;
             }
         }

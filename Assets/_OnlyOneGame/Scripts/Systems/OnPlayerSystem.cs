@@ -8,6 +8,7 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.NetCode;
 using Unity.Physics.Systems;
 using Unity.Transforms;
 using UnityEngine;
@@ -16,6 +17,7 @@ using ValueVariant;
 
 namespace _OnlyOneGame.Scripts.Systems
 {
+    [UpdateInGroup(typeof(PredictedSimulationSystemGroup))]
     public partial struct OnPlayerSystem : ISystem
     {
         [BurstCompile]

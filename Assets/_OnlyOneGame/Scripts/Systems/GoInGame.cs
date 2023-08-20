@@ -65,8 +65,8 @@ public partial struct GoInGameServerSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        var prefab = SystemAPI.GetSingleton<OnPrefabs>().SimplePlayerPrefab;
-        state.EntityManager.GetName(prefab, out var prefabName);
+        var playerPrefab = SystemAPI.GetSingleton<OnPrefabs>().PlayerPrefab;
+        state.EntityManager.GetName(playerPrefab, out var prefabName);
         var worldName = state.WorldUnmanaged.Name;
 
         var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
@@ -79,7 +79,7 @@ public partial struct GoInGameServerSystem : ISystem
 
             UnityEngine.Debug.Log($"'{worldName}' setting connection '{networkId.Value}' to in game, spawning a Ghost '{prefabName}' for them!");
 
-            var player = commandBuffer.Instantiate(prefab);
+            var player = commandBuffer.Instantiate(playerPrefab);
             commandBuffer.SetComponent(player, new GhostOwner { NetworkId = networkId.Value});
 
             // Add the player to the linked entity group so it is destroyed automatically on disconnect

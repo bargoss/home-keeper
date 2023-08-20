@@ -8,6 +8,8 @@ namespace _OnlyOneGame.Scripts.Components
         public GameObject GroundItemPrefab;
         public GameObject DeployingItemPrefab;
         public GameObject SimplePlayerPrefab;
+        public GameObject PlayerPrefab;
+        public GameObject PlayerCharacterPrefab;
 
         public class OnPrefabsBaker : Baker<OnPrefabsAuthoring>
         {
@@ -22,7 +24,8 @@ namespace _OnlyOneGame.Scripts.Components
                         DeployingItemPrefab =
                             new EntWithComponent<DeployingItem>(GetEntity(authoring.DeployingItemPrefab,
                                 TransformUsageFlags.Dynamic)),
-                        SimplePlayerPrefab = GetEntity(authoring.SimplePlayerPrefab, TransformUsageFlags.Dynamic)
+                        PlayerPrefab = GetEntity(authoring.PlayerPrefab, TransformUsageFlags.Dynamic),
+                        PlayerCharacterPrefab = GetEntity(authoring.PlayerCharacterPrefab, TransformUsageFlags.Dynamic),
                     }
                 );
             }

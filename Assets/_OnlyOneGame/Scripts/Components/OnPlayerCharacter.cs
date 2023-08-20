@@ -6,18 +6,9 @@ using Unity.NetCode;
 using ValueVariant;
 
 namespace _OnlyOneGame.Scripts.Components
-{
-    
-    //[DebuggerDisplay("{ToString()}")]
+{ 
     public struct OnPlayerCharacter : IComponentData
     {
-        //[GhostField] public Data128Bytes InventoryStackData;
-        //[GhostField] public Data32Bytes OnGoingActionOptData;
-        //[GhostField] public Data128Bytes EventsData;
-        //[GhostField] public Data32Bytes ActionCommandOptData;
-        
-
-
         // state:
         [GhostField] public BytesAs<FixedList128Bytes<Item>, Data128Bytes> InventoryStack;
         [GhostField] public BytesAs<Option<OnGoingAction>, Data32Bytes> OnGoingActionOpt;

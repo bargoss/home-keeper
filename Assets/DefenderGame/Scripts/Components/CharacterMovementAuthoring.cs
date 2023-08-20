@@ -1,12 +1,13 @@
 ﻿using Unity.Entities;
+using Unity.NetCode;
 using UnityEngine;
 
 namespace DefenderGame.Scripts.Components
 {
     public class CharacterMovementAuthoring : MonoBehaviour
     {
-        public float MaxSpeed;
-        public float MaxAcceleration;
+        [GhostField] public float MaxSpeed;
+        [GhostField] public float MaxAcceleration;
 
         public class CharacterMovementBaker : Baker<CharacterMovementAuthoring>
         {
