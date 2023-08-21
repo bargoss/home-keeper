@@ -25,7 +25,7 @@ namespace _OnlyOneGame.Scripts.Systems
             //return;
             var prefabs = SystemAPI.GetSingleton<OnPrefabs>();
             var playerCharacterPrefab = prefabs.PlayerCharacterPrefab;
-            var ghostIdToEntityMap = SystemAPI.ManagedAPI.GetSingleton<GhostIdToEntityMap>();
+            var ghostIdToEntityMap = SystemAPI.ManagedAPI.GetSingleton<SyncedIdToEntityMap>();
 
             var random = Random.CreateFromIndex((uint)(SystemAPI.Time.ElapsedTime * 1000));
 
@@ -37,16 +37,19 @@ namespace _OnlyOneGame.Scripts.Systems
             foreach (var (onPlayerRw, ghostOwner, entity) in SystemAPI.Query<RefRW<OnPlayer>, GhostOwner>().WithEntityAccess())
             {
                 var onPlayer = onPlayerRw.ValueRO;
-                var controlledCharacterGhostId = onPlayer.ControlledCharacterGhostIdOpt;
 
-                if (!ghostIdToEntityMap.TryGet(controlledCharacterGhostId, out var controlledCharacterEntity))
+                if (!ghostIdToEntityMap.TryGet(onPlayer.ControlledCharacterSyncedId, out _))
                 {
-                    var spawnPos = random.NextFloat3Direction() * random.NextFloat(1, 3);
+                    var spawnPos = random.NextFloat3Direction() * random.NextFloat(0, 1f);
 
                     var spawnedCharacter = EntityManager.Instantiate(playerCharacterPrefab);
                     ecb.SetLocalPositionRotation(spawnedCharacter, spawnPos, quaternion.identity);
                     ecb.SetComponent(spawnedCharacter, ghostOwner);
+                    var syncedId = new SyncedId(random.NextInt());
+                    ecb.SetComponent(spawnedCharacter, syncedId);
                     onPlayerAndNewCharacter.Add((entity, spawnedCharacter));
+                    
+                    onPlayer.ControlledCharacterSyncedId = syncedId;
                 }
             }
             
@@ -56,13 +59,13 @@ namespace _OnlyOneGame.Scripts.Systems
             foreach (var (onPlayerEntity, onPlayerCharacterEntity) in onPlayerAndNewCharacter)
             {
                 var onPlayerRw = SystemAPI.GetComponentRW<OnPlayer>(onPlayerEntity);
-                var characterGhostId = EntityManager.GetComponentData<GhostInstance>(onPlayerCharacterEntity).ghostId;
+                var characterSyncedId = EntityManager.GetComponentData<SyncedId>(onPlayerCharacterEntity);
 
                 var onPlayer = onPlayerRw.ValueRO;
-                onPlayer.ControlledCharacterGhostIdOpt = characterGhostId;
+                onPlayer.ControlledCharacterSyncedId = characterSyncedId;
                 onPlayerRw.ValueRW = onPlayer;
                 
-                Debug.Log("Spawned new character for player " + onPlayerEntity + " with ghostId " + characterGhostId);
+                Debug.Log("Spawned new character for player " + onPlayerEntity + " with syncedId " + characterSyncedId.Value);
             }
         }
     }

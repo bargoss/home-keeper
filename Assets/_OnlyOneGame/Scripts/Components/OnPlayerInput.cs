@@ -10,6 +10,7 @@ namespace _OnlyOneGame.Scripts.Components
     public struct OnPlayerInput : IInputComponentData
     {
         public float2 MovementInput;
+        public float2 LookInput;
         public BytesAs<Option<ActionCommand>, Data32Bytes> ActionCommandOpt;
         
     }
@@ -29,6 +30,7 @@ namespace _OnlyOneGame.Scripts.Components
             {
                 var playerInput = onPlayerInputRw.ValueRO;
                 playerInput.MovementInput = new float2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+                playerInput.LookInput = new float2(0,1);
                 playerInput.ActionCommandOpt = Input.GetKeyDown(KeyCode.Space)
                     ? Option<ActionCommand>.Some(new CommandMeleeAttack(Utility.Forward))
                     : Option<ActionCommand>.None();

@@ -1,4 +1,5 @@
 ﻿using _OnlyOneGame.Scripts.Components;
+using DefaultNamespace;
 using DefenderGame.Scripts.Components;
 using Unity.Burst;
 using Unity.Entities;
@@ -14,19 +15,26 @@ namespace _OnlyOneGame.Scripts.Systems
         protected override void OnCreate()
         {
             RequireForUpdate<OnPlayerInput>();
+            RequireForUpdate<SyncedIdToEntityMap>();
         }
-        
+
         protected override void OnUpdate()
         {
-            foreach (var (localPlayerCharacterMovementControl, characterMovementRw, entity) 
-                     in SystemAPI.Query<OnPlayerInput, RefRW<CharacterMovement>>().WithAll<Simulate>().WithEntityAccess())
+            var syncedIdToEntityMap = SystemAPI.ManagedAPI.GetSingleton<SyncedIdToEntityMap>();
+
+            foreach (var (playerInput, playerRo, entity)
+                     in SystemAPI.Query<OnPlayerInput, RefRO<OnPlayer>>().WithAll<Simulate>().WithEntityAccess())
             {
-                var characterMovement = characterMovementRw.ValueRW;
-                
-                characterMovement.MovementInput = localPlayerCharacterMovementControl.MovementInput;
-                characterMovementRw.ValueRW = characterMovement;
+                if (syncedIdToEntityMap.TryGet(playerRo.ValueRO.ControlledCharacterSyncedId, out var controlledCharacterEntity))
+                {
+                    if (SystemAPI.GetComponentLookup<OnPlayerCharacter>().TryGetRw(controlledCharacterEntity, out var controlledCharacterRw))
+                    {
+                        controlledCharacterRw.ValueRW.SetMovementInput(playerInput.MovementInput);
+                        controlledCharacterRw.ValueRW.SetLookInput(playerInput.LookInput);
+                        controlledCharacterRw.ValueRW.SetActionCommandOpt(playerInput.ActionCommandOpt);
+                    }
+                }
             }
         }
-        
     }
 }

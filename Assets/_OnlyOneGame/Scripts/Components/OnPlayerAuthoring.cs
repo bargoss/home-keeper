@@ -14,7 +14,7 @@ namespace _OnlyOneGame.Scripts.Components
                 AddComponent(entity,
                     new OnPlayer
                     {
-                        ControlledCharacterGhostIdOpt = -1
+                        ControlledCharacterSyncedId = default
                     });
             }
         }

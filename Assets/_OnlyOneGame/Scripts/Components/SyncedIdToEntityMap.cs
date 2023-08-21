@@ -5,11 +5,11 @@ using Unity.NetCode;
 
 namespace _OnlyOneGame.Scripts.Components
 {
-    public class GhostIdToEntityMap : IComponentData
+    public class SyncedIdToEntityMap : IComponentData
     {
-        private Dictionary<int, Entity> m_Value;
+        private Dictionary<SyncedId, Entity> m_Value;
 
-        private Dictionary<int, Entity> Value => m_Value ??= new Dictionary<int, Entity>(100);
+        private Dictionary<SyncedId, Entity> Value => m_Value ??= new Dictionary<SyncedId, Entity>(100);
 
 
         public void Clear()
@@ -17,12 +17,12 @@ namespace _OnlyOneGame.Scripts.Components
             Value.Clear();
         }
         
-        public void Set(int ghostId, Entity entity)
+        public void Set(SyncedId ghostId, Entity entity)
         {
             Value[ghostId] = entity;
         }
         
-        public bool TryGet(int ghostId, out Entity entity)
+        public bool TryGet(SyncedId ghostId, out Entity entity)
         {
             return Value.TryGetValue(ghostId, out entity);
         }
@@ -34,7 +34,7 @@ namespace _OnlyOneGame.Scripts.Components
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<GhostInstance>();
-            state.RequireForUpdate<GhostIdToEntityMap>();
+            state.RequireForUpdate<SyncedIdToEntityMap>();
         }
         public void OnDestroy(ref SystemState state)
         {
@@ -42,13 +42,13 @@ namespace _OnlyOneGame.Scripts.Components
         }
         public void OnUpdate(ref SystemState state)
         {
-            var ghostIdToEntityMap = SystemAPI.ManagedAPI.GetSingleton<GhostIdToEntityMap>();
+            var ghostIdToEntityMap = SystemAPI.ManagedAPI.GetSingleton<SyncedIdToEntityMap>();
 
             ghostIdToEntityMap.Clear();
             
-            foreach (var (ghostInstance, entity) in SystemAPI.Query<GhostInstance>().WithEntityAccess())
+            foreach (var (syncedId, entity) in SystemAPI.Query<SyncedId>().WithEntityAccess())
             {
-                ghostIdToEntityMap.Set(ghostInstance.ghostId, entity);
+                ghostIdToEntityMap.Set(syncedId, entity);
             }
         }
     }

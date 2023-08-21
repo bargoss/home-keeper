@@ -10,7 +10,7 @@ namespace _OnlyOneGame.Scripts.Components
             public override void Bake(GhostIdToEntityMapAuthoring authoring)
             {
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
-                AddComponentObject(entity, new GhostIdToEntityMap());
+                AddComponentObject(entity, new SyncedIdToEntityMap());
             }
         }
     }

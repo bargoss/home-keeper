@@ -24,6 +24,21 @@ namespace _OnlyOneGame.Scripts.Components
         [GhostField] public float2 LookInput;
         [GhostField] public BytesAs<Option<ActionCommand>, Data32Bytes> ActionCommandOpt;
         
+        public void SetMovementInput(float2 movementInput)
+        {
+            MovementInput = movementInput;
+        }
+        
+        public void SetLookInput(float2 lookInput)
+        {
+            LookInput = lookInput;
+        }
+        
+        public void SetActionCommandOpt(Option<ActionCommand> actionCommandOpt)
+        {
+            ActionCommandOpt = actionCommandOpt;
+        }
+        
         
 
         // stats:

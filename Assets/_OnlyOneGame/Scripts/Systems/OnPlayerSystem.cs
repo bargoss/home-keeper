@@ -55,7 +55,7 @@ namespace _OnlyOneGame.Scripts.Systems
                              RefRW<CharacterMovement>,
                              Faction
                          >()
-                         .WithEntityAccess())
+                         .WithEntityAccess().WithAll<Simulate>())
             {
                 var playerCharacter = playerCharacterRw.ValueRO;
                 var characterMovement = characterMovementRw.ValueRO;

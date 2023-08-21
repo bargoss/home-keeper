@@ -5,6 +5,6 @@ namespace _OnlyOneGame.Scripts.Components
 {
     public struct OnPlayer : IComponentData
     {
-        [GhostField] public int ControlledCharacterGhostIdOpt;
+        [GhostField] public SyncedId ControlledCharacterSyncedId;
     }
 }
