@@ -29,6 +29,7 @@ namespace _OnlyOneGame.Scripts.Systems
                 {
                     if (SystemAPI.GetComponentLookup<OnPlayerCharacter>().TryGetRw(controlledCharacterEntity, out var controlledCharacterRw))
                     {
+                        input is not correct here, its just the default input
                         controlledCharacterRw.ValueRW.SetMovementInput(playerInput.MovementInput);
                         controlledCharacterRw.ValueRW.SetLookInput(playerInput.LookInput);
                         controlledCharacterRw.ValueRW.SetActionCommandOpt(playerInput.ActionCommandOpt);
