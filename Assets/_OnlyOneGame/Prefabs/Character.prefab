@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5939168505204800699}
   - component: {fileID: 4679334280374368872}
+  - component: {fileID: -1871886699904861338}
   - component: {fileID: 7848279814663024574}
   - component: {fileID: 4383042254478246078}
   - component: {fileID: -4186892843011361347}
@@ -53,6 +54,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MaxSpeed: 4.34
   MaxAcceleration: 48.7
+--- !u!114 &-1871886699904861338
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4249010765192164894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13e90a96fa5c443c864664d4a0f6d36a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &7848279814663024574
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -83,7 +96,7 @@ MonoBehaviour:
   Importance: 1
   prefabId: d2eba1fdf99c21342890a662a96c0d81
   HasOwner: 1
-  SupportAutoCommandTarget: 1
+  SupportAutoCommandTarget: 0
   TrackInterpolationDelay: 0
   GhostGroup: 0
   UsePreSerialization: 0

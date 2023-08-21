@@ -7,7 +7,6 @@ namespace _OnlyOneGame.Scripts.Components
     {
         public GameObject GroundItemPrefab;
         public GameObject DeployingItemPrefab;
-        public GameObject SimplePlayerPrefab;
         public GameObject PlayerPrefab;
         public GameObject PlayerCharacterPrefab;
 

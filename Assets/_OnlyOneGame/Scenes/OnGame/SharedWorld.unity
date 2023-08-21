@@ -169,7 +169,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GroundItemPrefab: {fileID: 0}
   DeployingItemPrefab: {fileID: 0}
-  SimplePlayerPrefab: {fileID: 4249010765192164894, guid: d2eba1fdf99c21342890a662a96c0d81,
+  PlayerPrefab: {fileID: 6291673049368011209, guid: 5410ada3912b9be49aa117db7c0788c7,
+    type: 3}
+  PlayerCharacterPrefab: {fileID: 4249010765192164894, guid: d2eba1fdf99c21342890a662a96c0d81,
     type: 3}
 --- !u!1 &1698150786
 GameObject:

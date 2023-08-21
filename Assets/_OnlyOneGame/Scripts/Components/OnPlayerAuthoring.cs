@@ -14,7 +14,7 @@ namespace _OnlyOneGame.Scripts.Components
                 AddComponent(entity,
                     new OnPlayer
                     {
-                        ControlledCharacterOpt = new NetworkId()
+                        ControlledCharacterGhostIdOpt = -1
                     });
             }
         }
