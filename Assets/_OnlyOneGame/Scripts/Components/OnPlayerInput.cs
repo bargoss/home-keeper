@@ -37,8 +37,6 @@ namespace _OnlyOneGame.Scripts.Components
                     : Option<ActionCommand>.None();
 
                 onPlayerInputRw.ValueRW = playerInput;
-                
-                Debug.Log("input set: " + playerInput.MovementInput);
             }
         }
     }

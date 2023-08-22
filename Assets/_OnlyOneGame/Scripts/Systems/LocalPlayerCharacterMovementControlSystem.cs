@@ -32,7 +32,6 @@ namespace _OnlyOneGame.Scripts.Systems
                     {
                         //input is not correct here, its just the default input
                         controlledCharacterRw.ValueRW.SetMovementInput(playerInput.MovementInput);
-                        Debug.Log("input got: " + playerInput.MovementInput);
                         controlledCharacterRw.ValueRW.SetLookInput(playerInput.LookInput);
                         controlledCharacterRw.ValueRW.SetActionCommandOpt(playerInput.ActionCommandOpt);
                     }
