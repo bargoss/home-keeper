@@ -60,6 +60,10 @@ namespace _OnlyOneGame.Scripts.Systems
                 var playerCharacter = playerCharacterRw.ValueRO;
                 var characterMovement = characterMovementRw.ValueRO;
                 
+                characterMovement.MovementInput = playerCharacter.MovementInput;
+                var look2 = playerCharacter.LookInput;
+                characterMovement.LookInput = new float3(look2.x, 0, look2.y);
+                
                 
                 playerCharacter.Events.Edit((ref FixedList128Bytes<PlayerEvent> value) => value.Clear());
                 

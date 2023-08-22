@@ -6,16 +6,17 @@ using UnityEngine;
 
 namespace _OnlyOneGame.Scripts.Components
 {
-    [GhostComponent(PrefabType=GhostPrefabType.AllPredicted)]
+    [GhostComponent(PrefabType=GhostPrefabType.AllPredicted, OwnerSendType = SendToOwnerType.SendToOwner)]
     public struct OnPlayerInput : IInputComponentData
     {
-        public float2 MovementInput;
-        public float2 LookInput;
-        public BytesAs<Option<ActionCommand>, Data32Bytes> ActionCommandOpt;
+        [GhostField] public float2 MovementInput;
+        [GhostField] public float2 LookInput;
+        [GhostField] public BytesAs<Option<ActionCommand>, Data32Bytes> ActionCommandOpt;
         
     }
     
     [UpdateInGroup(typeof(GhostInputSystemGroup))]
+    [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
     public partial class SampleCubeInput : SystemBase
     {
         public void OnCreate(ref SystemState state)
@@ -34,8 +35,10 @@ namespace _OnlyOneGame.Scripts.Components
                 playerInput.ActionCommandOpt = Input.GetKeyDown(KeyCode.Space)
                     ? Option<ActionCommand>.Some(new CommandMeleeAttack(Utility.Forward))
                     : Option<ActionCommand>.None();
-                
+
                 onPlayerInputRw.ValueRW = playerInput;
+                
+                Debug.Log("input set: " + playerInput.MovementInput);
             }
         }
     }

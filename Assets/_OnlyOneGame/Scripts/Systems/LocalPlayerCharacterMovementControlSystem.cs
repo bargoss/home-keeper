@@ -10,6 +10,7 @@ using UnityEngine;
 namespace _OnlyOneGame.Scripts.Systems
 {
     [UpdateInGroup(typeof(PredictedSimulationSystemGroup))]
+    //[UpdateAfter(typeof(SampleCubeInput))]
     public partial class LocalPlayerCharacterMovementControlSystem : SystemBase
     {
         protected override void OnCreate()
@@ -29,8 +30,9 @@ namespace _OnlyOneGame.Scripts.Systems
                 {
                     if (SystemAPI.GetComponentLookup<OnPlayerCharacter>().TryGetRw(controlledCharacterEntity, out var controlledCharacterRw))
                     {
-                        input is not correct here, its just the default input
+                        //input is not correct here, its just the default input
                         controlledCharacterRw.ValueRW.SetMovementInput(playerInput.MovementInput);
+                        Debug.Log("input got: " + playerInput.MovementInput);
                         controlledCharacterRw.ValueRW.SetLookInput(playerInput.LookInput);
                         controlledCharacterRw.ValueRW.SetActionCommandOpt(playerInput.ActionCommandOpt);
                     }
