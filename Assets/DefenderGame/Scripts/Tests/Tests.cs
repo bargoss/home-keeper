@@ -21,6 +21,8 @@ namespace DefenderGame.Scripts.Tests
 #if UNITY_EDITOR
     public static class Tests
     {
+        test BytesAs<Optional<ActionCommand>, Data32Bytes>, None and Some works weirdly. It seems to appear as None but has a correct value, maybe 32 bytes are not enough to hold the thing
+        
         [MenuItem("DefenderGame/Tests/EntityMappingValueVariant")]
         public static void EntityMappingValueVariant()
         {

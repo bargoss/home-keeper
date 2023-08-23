@@ -7,8 +7,11 @@ public struct BytesAs<TField, TDataBytes> where TField : unmanaged where TDataBy
     public TDataBytes RawData; // it needs to be public so it can be serialized by Unity NetCode
     
     public TField Get() => SerializationUtils.Deserialize<TField, TDataBytes>(ref RawData);
-    public void Set(TField value) => SerializationUtils.Serialize(value, ref RawData);
-    
+    public void Set(TField value)
+    {
+        SerializationUtils.Serialize(value, ref RawData);
+    }
+
     public delegate void EditAction(ref TField value);
     public void Edit(EditAction editAction)
     {

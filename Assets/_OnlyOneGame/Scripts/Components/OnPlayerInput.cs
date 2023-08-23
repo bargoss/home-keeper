@@ -17,11 +17,11 @@ namespace _OnlyOneGame.Scripts.Components
     
     [UpdateInGroup(typeof(GhostInputSystemGroup))]
     [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
-    public partial class SampleCubeInput : SystemBase
+    public partial class OnPlayerInputSystem : SystemBase
     {
-        public void OnCreate(ref SystemState state)
+        protected override void OnCreate()
         {
-            state.RequireForUpdate<NetworkStreamInGame>();
+            RequireForUpdate<NetworkStreamInGame>();
             //state.RequireForUpdate<NetCubeSpawner>();
         }
         
@@ -32,10 +32,11 @@ namespace _OnlyOneGame.Scripts.Components
                 var playerInput = onPlayerInputRw.ValueRO;
                 playerInput.MovementInput = new float2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
                 playerInput.LookInput = new float2(0,0);
-                playerInput.ActionCommandOpt = Input.GetKeyDown(KeyCode.Space)
-                    ? Option<ActionCommand>.Some(new CommandMeleeAttack(Utility.Forward))
-                    : Option<ActionCommand>.None();
-
+                playerInput.ActionCommandOpt.Set(Input.GetKey(KeyCode.Space) // todo getkeydown
+                    ? Option<ActionCommand>.Some(new CommandMeleeAttack(playerInput.MovementInput.X0Y()))
+                    : Option<ActionCommand>.None()
+                );
+                
                 onPlayerInputRw.ValueRW = playerInput;
             }
         }
