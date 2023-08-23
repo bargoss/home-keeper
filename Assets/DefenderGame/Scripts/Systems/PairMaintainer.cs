@@ -34,17 +34,21 @@ namespace DefenderGame.Scripts.Systems
             }
         }
 
-        public void DisposeAndClearUntouchedViews()
+        public int DisposeAndClearUntouchedViews()
         {
+            int disposedCount = 0;
             foreach (var logical in m_LogicalToView.Keys.ToList())
             {
                 if (!m_Touched.Contains(logical))
                 {
                     m_DisposeView(m_LogicalToView[logical]);
                     m_LogicalToView.Remove(logical);
+                    disposedCount++;
                 }
             }
             m_Touched.Clear();
+            
+            return disposedCount;
         }
     }
 }

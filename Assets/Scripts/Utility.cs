@@ -21,6 +21,11 @@ namespace DefaultNamespace
         public static float3 Up => new float3(0, 1, 0);
         public static float3 Right => new float3(1, 0, 0);
         public static float3 Forward => new float3(0, 0, 1);
+        
+        public static float3 X0Y(this float2 input)
+        {
+            return new float3(input.x, 0, input.y);
+        }
 
         public static void ControlVelocity(float3 currentVelocity, float3 targetVelocity, float maxAcceleration, float deltaTime, out float3 newVelocity)
         {

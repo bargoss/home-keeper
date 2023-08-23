@@ -9,6 +9,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.NetCode;
+using Unity.Physics;
 using Unity.Physics.Systems;
 using Unity.Transforms;
 using UnityEngine;
@@ -48,6 +49,7 @@ namespace _OnlyOneGame.Scripts.Systems
             
             var ecb = new EntityCommandBuffer(Allocator.Temp);
             
+            // update logic
             foreach (var (playerCharacterRw, localTransform, characterMovementRw, faction, entity) 
                      in SystemAPI.Query<
                              RefRW<OnPlayerCharacter>, 
@@ -61,8 +63,17 @@ namespace _OnlyOneGame.Scripts.Systems
                 var characterMovement = characterMovementRw.ValueRO;
                 
                 characterMovement.MovementInput = playerCharacter.MovementInput;
-                var look2 = playerCharacter.LookInput;
-                characterMovement.LookInput = new float3(look2.x, 0, look2.y);
+                
+                if(math.lengthsq(playerCharacter.LookDirection) < 0.5f)
+                {
+                    playerCharacter.LookDirection = new float2(0, 1); // init
+                }
+
+                if (math.lengthsq(playerCharacter.MovementInput) > 0.5f)
+                {
+                    playerCharacter.LookDirection = math.normalize(math.lerp(playerCharacter.LookDirection,  playerCharacter.MovementInput, 0.1f));
+                }
+                
                 
                 
                 playerCharacter.Events.Edit((ref FixedList128Bytes<PlayerEvent> value) => value.Clear());
@@ -179,6 +190,46 @@ namespace _OnlyOneGame.Scripts.Systems
 
                 playerCharacterRw.ValueRW = playerCharacter;
                 characterMovementRw.ValueRW = characterMovement;
+            }
+            
+            // update view
+            foreach (var (characterViewRw, onPlayerCharacterRo, localTransform, characterMovementRo, healthRo, physicsVelocityRo) in
+                     SystemAPI.Query<
+                         RefRW<CharacterView>,
+                         RefRO<OnPlayerCharacter>,
+                         LocalTransform,
+                         RefRO<CharacterMovement>,
+                         RefRO<Health>,
+                         RefRO<PhysicsVelocity>
+                     >().WithAll<Simulate>()
+                    )
+            {
+                var characterView = characterViewRw.ValueRO;
+                characterView.Attacked = false;
+                characterView.ItemThrown = false;
+
+                var events = onPlayerCharacterRo.ValueRO.Events.Get();
+                foreach (var playerEvent in events)
+                {
+                    playerEvent.Switch(
+                        meleeAttackStarted => characterView.Attacked = true,
+                        itemPickedUp => { },
+                        crafted => { },
+                        unbuilt => { },
+                        resourceGathered => { },
+                        itemStackChanged => { },
+                        droppedItem => characterView.ItemThrown = true,
+                        thrownItem => characterView.ItemThrown = true);
+                }
+                
+                characterView.MovementVelocity = physicsVelocityRo.ValueRO.Linear.xz;
+                characterView.LookDirection = onPlayerCharacterRo.ValueRO.LookDirection.X0Y();
+
+                characterView.Dead = healthRo.ValueRO.Status.TryGetValue(out HealthStatus.Dead _);
+
+                characterView.IsGrounded = characterMovementRo.ValueRO.IsGrounded;
+
+                characterViewRw.ValueRW = characterView;
             }
         }
 

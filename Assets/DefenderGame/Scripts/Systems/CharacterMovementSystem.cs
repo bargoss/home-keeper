@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using DefaultNamespace;
+﻿using DefaultNamespace;
 using DefenderGame.Scripts.Components;
 using HomeKeeper.Components;
 using Unity.Burst;
@@ -54,14 +53,14 @@ namespace DefenderGame.Scripts.Systems
                 
                 aspect.AngularVelocity = float3.zero;
                 
-                 //aspect.Rotation = Quaternion.identity;
-                 var targetRotation =
-                     Quaternion.LookRotation(
-                         math.normalize(aspect.CharacterMovement.ValueRO.MovementInputAsXZ +
-                          aspect.LocalTransform.ValueRO.Forward() * 0.1f),
-                         Utility.Up
-                     );
-                 aspect.Rotation = Quaternion.Slerp(aspect.Rotation, targetRotation, 0.3f);
+                 aspect.Rotation = Quaternion.identity;
+                 //var targetRotation =
+                 //    Quaternion.LookRotation(
+                 //        math.normalize(aspect.CharacterMovement.ValueRO.MovementInputAsXZ +
+                 //         aspect.LocalTransform.ValueRO.Forward() * 0.1f),
+                 //        Utility.Up
+                 //    );
+                 //aspect.Rotation = Quaternion.Slerp(aspect.Rotation, targetRotation, 0.3f);
 
             }
         }
@@ -98,21 +97,6 @@ namespace DefenderGame.Scripts.Systems
             get => PhysicsVelocity.ValueRO.Angular;
             set => PhysicsVelocity.ValueRW.Angular = value;
         }
-        
-        public float3 LookInput
-        {
-            get
-            {
-                var lookInput = CharacterMovement.ValueRO.LookInput;
-                if (math.lengthsq(lookInput) < 0.5f)
-                {
-                    lookInput = math.mul(Rotation.value, Utility.Forward);
-                }
-                
-                return lookInput;
-            }
-        }
-        
         
         public bool TryGetHealth(out Health health)
         {

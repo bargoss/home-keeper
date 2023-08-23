@@ -17,6 +17,7 @@ namespace DefenderGame.Scripts.GoViews
         
         [SerializeField] [HideInInspector] private List<Rigidbody> m_Limbs = new List<Rigidbody>();
         
+        public bool Dead { get; private set; }
 
         public void HandleFixedUpdate(Vector3 position, Vector3 movementVelocity, Vector3 lookDirection, bool grounded, bool attacked, bool itemThrown)
         {
@@ -49,7 +50,7 @@ namespace DefenderGame.Scripts.GoViews
 
         public void Restore()
         {
-            SetRagdoll(false);
+            SetDead(false);
             m_Animator.SetBool(AnimatorParamMoving, false);
             m_Animator.SetBool(AnimatorParamJump, true);
             
@@ -65,12 +66,17 @@ namespace DefenderGame.Scripts.GoViews
             m_Limbs = new List<Rigidbody>(GetComponentsInChildren<Rigidbody>());
         }
 
-        public void SetRagdoll(bool active)
+        /// <summary>
+        /// goes ragdoll
+        /// </summary>
+        public void SetDead(bool dead)
         {
-            m_Animator.enabled = !active;
+            if(Dead == dead) return;
+            Dead = dead;
+            m_Animator.enabled = !dead;
             foreach (var limb in m_Limbs)
             {
-                limb.isKinematic = !active;
+                limb.isKinematic = !dead;
             }
         }
         

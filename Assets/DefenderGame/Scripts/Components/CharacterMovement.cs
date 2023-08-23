@@ -17,7 +17,6 @@ namespace DefenderGame.Scripts.Components
         
         // input
         [GhostField] public float2 MovementInput;
-        [GhostField] public float3 LookInput;
         [GhostField] public bool JumpInput;
         
         public float3 MovementInputAsXZ => new float3(MovementInput.x, 0, MovementInput.y);

@@ -14,14 +14,15 @@ namespace _OnlyOneGame.Scripts.Components
         [GhostField] public BytesAs<Option<OnGoingAction>, Data32Bytes> OnGoingActionOpt;
         [GhostField] public BytesAs<FixedList128Bytes<PlayerEvent>, Data128Bytes> Events;
 
-        [GhostField] public float CommandsBlockedDuration;
-        [GhostField] public float MovementBlockedDuration;
+        [GhostField(Quantization = 10)] public float CommandsBlockedDuration;
+        [GhostField(Quantization = 10)] public float MovementBlockedDuration;
+        [GhostField(Quantization = 100)] public float2 LookDirection;
 
 
         // these fields can be removed if we be careful about execution order
         // input:
-        [GhostField] public float2 MovementInput;
-        [GhostField] public float2 LookInput;
+        [GhostField(Quantization = 10)] public float2 MovementInput;
+        [GhostField(Quantization = 10)] public float2 LookInput;
         [GhostField] public BytesAs<Option<ActionCommand>, Data32Bytes> ActionCommandOpt;
         
         public void SetMovementInput(float2 movementInput)

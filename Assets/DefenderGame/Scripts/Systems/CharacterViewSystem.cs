@@ -1,4 +1,5 @@
-﻿using DefenderGame.Scripts.Components;
+﻿using DefaultNamespace;
+using DefenderGame.Scripts.Components;
 using DefenderGame.Scripts.GoViews;
 using HomeKeeper.Components;
 using Unity.Entities;
@@ -15,7 +16,7 @@ namespace DefenderGame.Scripts.Systems
     [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
     public partial class CharacterViewSystem : SystemBase
     {
-        private readonly PairMaintainer<CharacterView, CharacterGOView> m_PairMaintainer = new(
+        private readonly PairMaintainer<CharacterViewId, CharacterGOView> m_PairMaintainer = new(
             logical =>
             {
                 var characterView = Object.Instantiate(GameResources.Instance.CharacterGOViewPrefab);
@@ -32,6 +33,40 @@ namespace DefenderGame.Scripts.Systems
         {
             //RequireForUpdate<CharacterView>(); // this line creates problems when disposing the views
         }
+        protected override void OnUpdate()
+        {
+            var random = new Random((uint)(SystemAPI.Time.ElapsedTime * 10000 + 1));
+            
+            foreach (var (characterViewRw, localTransform) in SystemAPI.Query<RefRW<CharacterView>, LocalTransform>())
+            {
+                var characterView = characterViewRw.ValueRO;
+                if (characterView.ViewIdAssigned == false)
+                {
+                    characterView.AssignViewId(new CharacterViewId(random.NextInt()));
+                }
+                
+                characterViewRw.ValueRW = characterView;
+                
+                
+                var viewPair = m_PairMaintainer.GetOrCreateView(characterView.ViewId);
+
+                viewPair.SetDead(characterView.Dead);
+                viewPair.HandleFixedUpdate(
+                    localTransform.Position,
+                    characterView.MovementVelocity.X0Y(),
+                    characterView.LookDirection,
+                    characterView.IsGrounded,
+                    characterView.Attacked,
+                    characterView.ItemThrown
+                );
+
+                //Debug.Log("character view update happening, view id: " + characterView.ViewId);
+            }
+            
+            m_PairMaintainer.DisposeAndClearUntouchedViews();
+        }
+        
+        /*
         protected override void OnUpdate()
         {
             var random = new Random((uint)(SystemAPI.Time.ElapsedTime * 10000 + 1));
@@ -55,8 +90,10 @@ namespace DefenderGame.Scripts.Systems
             
             m_PairMaintainer.DisposeAndClearUntouchedViews();
         }
+        */
     }
 
+    /*
     public readonly partial struct CharacterViewAspect : IAspect
     {
         public readonly Entity Self;
@@ -116,4 +153,5 @@ namespace DefenderGame.Scripts.Systems
         
         
     }
+    */
 }
