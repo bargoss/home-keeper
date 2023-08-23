@@ -48,6 +48,8 @@ namespace DefenderGame.Scripts.Systems
                 var viewPair = m_PairMaintainer.GetOrCreateView(characterViewAspect.CharacterView.ValueRO);
                 
                 characterViewAspect.HandleFixedUpdateOfView(viewPair);
+                
+                Debug.Log("character view update happening, view id: " + characterView.ViewId);
             }
             
             m_PairMaintainer.DisposeAndClearUntouchedViews();

@@ -20,6 +20,8 @@ GameObject:
   - component: {fileID: 4506231980230563271}
   - component: {fileID: -6235919315975363031}
   - component: {fileID: 6961175815170550097}
+  - component: {fileID: 2149628428900066419}
+  - component: {fileID: 6373881567315910078}
   m_Layer: 0
   m_Name: Character
   m_TagString: Untagged
@@ -67,7 +69,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MaxSpeed: 4.34
-  MaxAcceleration: 48.7
+  MaxAcceleration: 216.5
 --- !u!114 &-1871886699904861338
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -147,7 +149,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4249010765192164894}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -253,31 +255,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b275e5f92732148048d7b77e264ac30e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_ShapeType: 0
+  m_ShapeType: 1
   m_PrimitiveCenter:
     x: 0.0000011920929
     y: 0.9022649
     z: 0.021623284
   m_PrimitiveSize:
-    x: 1.9468495
-    y: 1.8047342
-    z: 0.36426845
+    x: 0.75092566
+    y: 0.75092566
+    z: 1.7493868
   m_PrimitiveOrientation:
     Value:
-      x: -0
+      x: 90
       y: 0
       z: 0
     RotationOrder: 4
   m_Capsule:
-    Height: 1.9468495
-    Radius: 0.9023671
-    Axis: 0
+    Height: 1.7493868
+    Radius: 0.37546283
+    Axis: 2
   m_Cylinder:
-    Height: 0.36426845
-    Radius: 0.97342473
+    Height: 1.7493868
+    Radius: 0.37546283
     Axis: 2
   m_CylinderSideCount: 20
-  m_SphereRadius: 0.97342473
+  m_SphereRadius: 0.8746934
   m_MinimumSkinnedVertexWeight: 0.1
   m_ConvexHullGenerationParameters:
     m_SimplificationTolerance: 0.029202746
@@ -384,3 +386,29 @@ MonoBehaviour:
         Tag07: 0
     m_SerializedVersion: 1
   m_SerializedVersion: 1
+--- !u!114 &2149628428900066419
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4249010765192164894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e28521d3b704cbf9440f1c32e59068c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6373881567315910078
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4249010765192164894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 740f9aed6fa040ddb2c980424b5bbd4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MaxHitPoints: 10
+  DestroyOnDeath: 0
