@@ -91,7 +91,8 @@ namespace DefenderGame.Scripts.Systems
                     m_PhysicsVelocity.ValueRO.Linear,
                     GetSafeLookDirection(),
                     m_CharacterMovement.ValueRO.IsGrounded,
-                    m_CharacterMeleeCombat is { IsValid: true, ValueRO: { Attacked: true } }
+                    m_CharacterMeleeCombat is { IsValid: true, ValueRO: { Attacked: true } },
+                    false
                 );
             }
             else if (m_Health is { IsValid: true, ValueRO: { DiedNow: true } })

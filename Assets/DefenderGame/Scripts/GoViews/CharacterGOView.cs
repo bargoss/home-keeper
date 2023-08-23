@@ -13,11 +13,12 @@ namespace DefenderGame.Scripts.GoViews
         private static readonly int AnimatorParamAttack = Animator.StringToHash("Attack");
         private static readonly int AnimatorParamMoving = Animator.StringToHash("Moving");
         private static readonly int AnimatorParamJump = Animator.StringToHash("Jump");
+        private static readonly int AnimatorParamThrow = Animator.StringToHash("Throw");
         
         [SerializeField] [HideInInspector] private List<Rigidbody> m_Limbs = new List<Rigidbody>();
         
 
-        public void HandleFixedUpdate(Vector3 position, Vector3 movementVelocity, Vector3 lookDirection, bool grounded, bool attacked)
+        public void HandleFixedUpdate(Vector3 position, Vector3 movementVelocity, Vector3 lookDirection, bool grounded, bool attacked, bool itemThrown)
         {
             var moving = movementVelocity.sqrMagnitude > 0.5f;
             
@@ -28,17 +29,21 @@ namespace DefenderGame.Scripts.GoViews
             {
                 // set animator params
                 m_Animator.SetBool(AnimatorParamMoving, moving);
+                
                 if (attacked)
                 {
                     m_Animator.SetTrigger(AnimatorParamAttack);
+                }
+
+                if (itemThrown)
+                {
+                    m_Animator.SetTrigger(AnimatorParamThrow);
                 }
             }
             catch (Exception e)
             {
                 Debug.LogError("error setting animator params: " + e);
             }
-            
-            
         }
         
 
