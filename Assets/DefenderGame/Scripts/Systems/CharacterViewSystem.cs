@@ -12,6 +12,7 @@ using Random = Unity.Mathematics.Random;
 namespace DefenderGame.Scripts.Systems
 {
     [UpdateInGroup(typeof(SimulationSystemGroup))]
+    [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
     public partial class CharacterViewSystem : SystemBase
     {
         private readonly PairMaintainer<CharacterView, CharacterGOView> m_PairMaintainer = new(
@@ -70,7 +71,8 @@ namespace DefenderGame.Scripts.Systems
         
         private float3 GetSafeLookDirection()
         {
-            var lookDirection = m_CharacterMovement.ValueRO.MovementInputAsXZ;
+            //var lookDirection = m_CharacterMovement.ValueRO.MovementInputAsXZ;
+            var lookDirection = m_CharacterMovement.ValueRO.LookInput;
             if (math.lengthsq(lookDirection) < 0.0001f)
             {
                 return m_LocalTransform.ValueRO.Forward();

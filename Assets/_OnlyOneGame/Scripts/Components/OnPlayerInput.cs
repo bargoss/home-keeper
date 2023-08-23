@@ -31,7 +31,7 @@ namespace _OnlyOneGame.Scripts.Components
             {
                 var playerInput = onPlayerInputRw.ValueRO;
                 playerInput.MovementInput = new float2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-                playerInput.LookInput = new float2(0,1);
+                playerInput.LookInput = new float2(0,0);
                 playerInput.ActionCommandOpt = Input.GetKeyDown(KeyCode.Space)
                     ? Option<ActionCommand>.Some(new CommandMeleeAttack(Utility.Forward))
                     : Option<ActionCommand>.None();

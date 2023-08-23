@@ -54,7 +54,15 @@ namespace DefenderGame.Scripts.Systems
                 
                 aspect.AngularVelocity = float3.zero;
                 
-                aspect.Rotation = Quaternion.identity;
+                 //aspect.Rotation = Quaternion.identity;
+                 var targetRotation =
+                     Quaternion.LookRotation(
+                         math.normalize(aspect.CharacterMovement.ValueRO.MovementInputAsXZ +
+                          aspect.LocalTransform.ValueRO.Forward() * 0.1f),
+                         Utility.Up
+                     );
+                 aspect.Rotation = Quaternion.Slerp(aspect.Rotation, targetRotation, 0.3f);
+
             }
         }
 
