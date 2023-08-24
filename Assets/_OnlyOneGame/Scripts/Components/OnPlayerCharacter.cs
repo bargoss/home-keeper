@@ -12,18 +12,19 @@ namespace _OnlyOneGame.Scripts.Components
         // state:
         [GhostField] public BytesAs<FixedList128Bytes<Item>, Data128Bytes> InventoryStack;
         [GhostField] public BytesAs<Option<OnGoingAction>, Data32Bytes> OnGoingActionOpt;
-        [GhostField] public BytesAs<FixedList128Bytes<PlayerEvent>, Data128Bytes> Events;
+        
+        public BytesAs<FixedList128Bytes<PlayerEvent>, Data128Bytes> Events; // [GhostField] 
 
-        [GhostField(Quantization = 10)] public float CommandsBlockedDuration;
-        [GhostField(Quantization = 10)] public float MovementBlockedDuration;
-        [GhostField(Quantization = 100)] public float2 LookDirection;
+        [GhostField] public int CommandsBlockedDuration;
+        [GhostField] public int MovementBlockedDuration;
+        [GhostField] public float2 LookDirection;
 
 
         // these fields can be removed if we be careful about execution order
         // input:
-        [GhostField(Quantization = 10)] public float2 MovementInput;
-        [GhostField(Quantization = 10)] public float2 LookInput;
-        [GhostField] public BytesAs<Option<ActionCommand>, Data32Bytes> ActionCommandOpt;
+        public float2 MovementInput; // [GhostField(Quantization = 1000)]
+        public float2 LookInput; // [GhostField(Quantization = 1000)]
+        public BytesAs<Option<ActionCommand>, Data32Bytes> ActionCommandOpt; // [GhostField]
         
         public void SetMovementInput(float2 movementInput)
         {

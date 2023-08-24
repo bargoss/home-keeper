@@ -37,7 +37,8 @@ namespace _OnlyOneGame.Scripts.Components
                         ActionCommandOpt = Option<ActionCommand>.Some(new ActionCommand(new CommandCraftItem(){ItemToCraft = new Item(MinionType.Melee)})),
                         OnGoingActionOpt = Option<OnGoingAction>.Some(new OnGoingAction(){Duration = 1.19f, StartTime = 0.12f, Data = new OnGoingActionData(new ActionDismantling(){})}),
                         Events = events,
-                        CommandsBlockedDuration = 0f
+                        CommandsBlockedDuration = 0,
+                        MovementBlockedDuration = 0,
                     });
             }
         }

@@ -10,7 +10,7 @@ using UnityEngine;
 namespace _OnlyOneGame.Scripts.Systems
 {
     [UpdateInGroup(typeof(PredictedSimulationSystemGroup))]
-    //[UpdateAfter(typeof(SampleCubeInput))]
+    [UpdateBefore(typeof(OnPlayerSystem))]
     public partial class LocalPlayerCharacterMovementControlSystem : SystemBase
     {
         protected override void OnCreate()

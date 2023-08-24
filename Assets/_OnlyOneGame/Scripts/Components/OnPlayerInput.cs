@@ -32,7 +32,7 @@ namespace _OnlyOneGame.Scripts.Components
                 var playerInput = onPlayerInputRw.ValueRO;
                 playerInput.MovementInput = new float2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
                 playerInput.LookInput = new float2(0,0);
-                playerInput.ActionCommandOpt.Set(Input.GetKey(KeyCode.Space) // todo getkeydown
+                playerInput.ActionCommandOpt.Set(Input.GetKeyDown(KeyCode.Space) // todo getkeydown
                     ? Option<ActionCommand>.Some(new CommandMeleeAttack(playerInput.MovementInput.X0Y()))
                     : Option<ActionCommand>.None()
                 );

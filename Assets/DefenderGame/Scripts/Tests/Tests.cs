@@ -21,7 +21,21 @@ namespace DefenderGame.Scripts.Tests
 #if UNITY_EDITOR
     public static class Tests
     {
-        test BytesAs<Optional<ActionCommand>, Data32Bytes>, None and Some works weirdly. It seems to appear as None but has a correct value, maybe 32 bytes are not enough to hold the thing
+        //test BytesAs<Optional<ActionCommand>, Data32Bytes>, None and Some works weirdly. It seems to appear as None but has a correct value, maybe 32 bytes are not enough to hold the thing
+
+        [MenuItem("DefenderGame/Tests/251321321690fkdf")]
+        public static void BytesAsVVSerializationTest()
+        {
+            var bytesAs = new BytesAs<Option<ActionCommand>, Data32Bytes>(
+                Option<ActionCommand>.Some(new ActionCommand(new CommandMeleeAttack(new float3(0.5f, 0.5f, 0.5f))))
+            );
+
+            var innerValue = bytesAs.Get();
+            innerValue.TryGet(out var innerValue2);
+            innerValue2.TryGetValue(out CommandMeleeAttack innerValue3);
+
+            var a = 3;
+        }
         
         [MenuItem("DefenderGame/Tests/EntityMappingValueVariant")]
         public static void EntityMappingValueVariant()

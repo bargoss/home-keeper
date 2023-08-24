@@ -13,7 +13,7 @@ using Random = Unity.Mathematics.Random;
 namespace DefenderGame.Scripts.Systems
 {
     [UpdateInGroup(typeof(SimulationSystemGroup))]
-    [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
+    //[WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
     public partial class CharacterViewSystem : SystemBase
     {
         private readonly PairMaintainer<CharacterViewId, CharacterGOView> m_PairMaintainer = new(
@@ -51,8 +51,10 @@ namespace DefenderGame.Scripts.Systems
                 var viewPair = m_PairMaintainer.GetOrCreateView(characterView.ViewId);
 
                 viewPair.SetDead(characterView.Dead);
+
+                var offsetForServer = World.Flags.HasFlag(WorldFlags.GameServer) ? new float3(0, 2f, 0) : float3.zero;
                 viewPair.HandleFixedUpdate(
-                    localTransform.Position,
+                    localTransform.Position + offsetForServer,
                     characterView.MovementVelocity.X0Y(),
                     characterView.LookDirection,
                     characterView.IsGrounded,

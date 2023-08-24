@@ -110,7 +110,7 @@ namespace DefaultNamespace
             float radius
         )
         {
-            var results = new NativeList<(float3, Entity)>();
+            var results = new NativeList<(float3, Entity)>(Allocator.Temp);
             
             var collisionWorld = buildPhysicsWorldData.PhysicsData.PhysicsWorld.CollisionWorld;
             var collisionFilter = CollisionFilter.Default;
@@ -458,12 +458,18 @@ namespace DefaultNamespace
     
     // like that but with explicit layout
     [StructLayout(LayoutKind.Explicit)]
-    public struct Data32Bytes : IDataBytes
+    public struct Data16Bytes : IDataBytes
     {
         [FieldOffset(0)] public int Value0;
         [FieldOffset(4)] public int Value1;
         [FieldOffset(8)] public int Value2;
         [FieldOffset(12)] public int Value3;
+    }
+    [StructLayout(LayoutKind.Explicit)]
+    public struct Data32Bytes : IDataBytes
+    {
+        [FieldOffset(0)] public Data16Bytes Value0;
+        [FieldOffset(16)] public Data16Bytes Value1;
     }
     
     
@@ -471,27 +477,27 @@ namespace DefaultNamespace
     public struct Data64Bytes : IDataBytes
     {
         [FieldOffset(0)] public Data32Bytes Value0;
-        [FieldOffset(16)] public Data32Bytes Value1;
+        [FieldOffset(32)] public Data32Bytes Value1;
     }
     
     [StructLayout(LayoutKind.Explicit)]
     public struct Data128Bytes : IDataBytes
     {
         [FieldOffset(0)] public Data64Bytes Value0;
-        [FieldOffset(32)] public Data64Bytes Value1;
+        [FieldOffset(64)] public Data64Bytes Value1;
     }
     
     [StructLayout(LayoutKind.Explicit)]
     public struct Data256Bytes : IDataBytes
     {
         [FieldOffset(0)] public Data128Bytes Value0;
-        [FieldOffset(64)] public Data128Bytes Value1;
+        [FieldOffset(128)] public Data128Bytes Value1;
     }
     
     [StructLayout(LayoutKind.Explicit)]
     public struct Data512Bytes : IDataBytes
     {
         [FieldOffset(0)] public Data256Bytes Value0;
-        [FieldOffset(128)] public Data256Bytes Value1;
+        [FieldOffset(256)] public Data256Bytes Value1;
     }
 }

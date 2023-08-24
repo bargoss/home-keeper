@@ -3,6 +3,7 @@ using _OnlyOneGame.Scripts.Components;
 using Components;
 using DefaultNamespace;
 using DefenderGame.Scripts.Components;
+using DefenderGame.Scripts.Systems;
 using HomeKeeper.Components;
 using Unity.Burst;
 using Unity.Collections;
@@ -19,6 +20,7 @@ using ValueVariant;
 namespace _OnlyOneGame.Scripts.Systems
 {
     [UpdateInGroup(typeof(PredictedSimulationSystemGroup))]
+    [UpdateBefore(typeof(CharacterMovementSystem))]
     public partial struct OnPlayerSystem : ISystem
     {
         [BurstCompile]
@@ -27,6 +29,7 @@ namespace _OnlyOneGame.Scripts.Systems
             state.RequireForUpdate<OnPrefabs>();
             state.RequireForUpdate<BuildPhysicsWorldData>();
             state.RequireForUpdate<OnPlayerCharacter>();
+            state.RequireForUpdate<NetworkTime>();
         }
         
         
@@ -44,9 +47,13 @@ namespace _OnlyOneGame.Scripts.Systems
             
             var interactionRadius = 1f;
 
-            var time = (float)SystemAPI.Time.ElapsedTime;
-            var deltaTime = SystemAPI.Time.DeltaTime;
+            var networkTime = SystemAPI.GetSingleton<NetworkTime>();
             
+            var deltaTime = 0.02f;
+            var tick = networkTime.ServerTick.TickIndexForValidTick;
+            var time = (float)tick * deltaTime;
+            
+
             var ecb = new EntityCommandBuffer(Allocator.Temp);
             
             // update logic
@@ -66,7 +73,7 @@ namespace _OnlyOneGame.Scripts.Systems
                 
                 if(math.lengthsq(playerCharacter.LookDirection) < 0.5f)
                 {
-                    playerCharacter.LookDirection = new float2(0, 1); // init
+                    //playerCharacter.LookDirection = new float2(0, 1); // init
                 }
 
                 if (math.lengthsq(playerCharacter.MovementInput) > 0.5f)
@@ -77,6 +84,7 @@ namespace _OnlyOneGame.Scripts.Systems
                 
                 
                 playerCharacter.Events.Edit((ref FixedList128Bytes<PlayerEvent> value) => value.Clear());
+                var playerCharacterEvents = playerCharacter.Events.Get();  
                 
                 var playerPosition = localTransform.Position;
                 
@@ -110,7 +118,8 @@ namespace _OnlyOneGame.Scripts.Systems
                         {
                             playerCharacter.OnGoingActionOpt.Set(new OnGoingAction(time,
                                 2, new OnGoingActionData(new ActionMeleeAttacking(meleeAttack.Direction))));
-                            playerCharacter.CommandsBlockedDuration += 2;
+                            playerCharacter.CommandsBlockedDuration += (int)(2f / deltaTime);
+                            playerCharacterEvents.Add(new PlayerEvent(new EventMeleeAttackStarted()));
                         },
                         throwItem =>
                         {
@@ -183,10 +192,12 @@ namespace _OnlyOneGame.Scripts.Systems
                     );
                 }
                 
-                playerCharacter.CommandsBlockedDuration -= deltaTime;
+                playerCharacter.CommandsBlockedDuration -= 1;
                 if (playerCharacter.CommandsBlockedDuration < 0) playerCharacter.CommandsBlockedDuration = 0;
-                playerCharacter.MovementBlockedDuration -= deltaTime;
+                playerCharacter.MovementBlockedDuration -= 1;
                 if (playerCharacter.MovementBlockedDuration < 0) playerCharacter.MovementBlockedDuration = 0;
+
+                playerCharacter.Events.Set(playerCharacterEvents); // write back
 
                 playerCharacterRw.ValueRW = playerCharacter;
                 characterMovementRw.ValueRW = characterMovement;
@@ -297,7 +308,7 @@ namespace _OnlyOneGame.Scripts.Systems
                     //playerCharacter.Events.Value.Add(new PlayerEvent(new EventItemPickedUp(item)));
                     playerCharacter.Events.Edit((ref FixedList128Bytes<PlayerEvent> value) => value.Add(new PlayerEvent(new EventItemPickedUp(item))));
                     
-                    playerCharacter.CommandsBlockedDuration += 0.5f;
+                    playerCharacter.CommandsBlockedDuration += (int)(0.5f / 0.02f);
                 }
             }
         }
