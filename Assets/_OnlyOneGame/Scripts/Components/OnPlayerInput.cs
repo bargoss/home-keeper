@@ -11,8 +11,12 @@ namespace _OnlyOneGame.Scripts.Components
     {
         [GhostField] public float2 MovementInput;
         [GhostField] public float2 LookInput;
-        [GhostField] public BytesAs<Option<ActionCommand>, Data32Bytes> ActionCommandOpt;
+        [GhostField] public InputEvent Action0;
+        [GhostField] public InputEvent Action1;
+        [GhostField] public InputEvent Action2;
         
+        //[GhostField] public BytesAs<Option<ActionCommand>, Data32Bytes> ActionCommandOpt;
+
     }
     
     [UpdateInGroup(typeof(GhostInputSystemGroup))]
@@ -30,12 +34,19 @@ namespace _OnlyOneGame.Scripts.Components
             foreach (var (onPlayerRw, onPlayerInputRw) in SystemAPI.Query<RefRW<OnPlayer>, RefRW<OnPlayerInput>>().WithAll<GhostOwnerIsLocal>())
             {
                 var playerInput = onPlayerInputRw.ValueRO;
+                playerInput = default;
                 playerInput.MovementInput = new float2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
                 playerInput.LookInput = new float2(0,0);
-                playerInput.ActionCommandOpt.Set(Input.GetKey(KeyCode.Space) // todo getkeydown
-                    ? Option<ActionCommand>.Some(new CommandMeleeAttack(playerInput.MovementInput.X0Y()))
-                    : Option<ActionCommand>.None()
-                );
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    playerInput.Action0.Set();
+                }
+                
+                
+                //playerInput.ActionCommandOpt.Set(Input.GetKey(KeyCode.Space) // todo getkeydown
+                //    ? Option<ActionCommand>.Some(new CommandMeleeAttack(playerInput.MovementInput.X0Y()))
+                //    : Option<ActionCommand>.None()
+                //);
                 
                 onPlayerInputRw.ValueRW = playerInput;
             }

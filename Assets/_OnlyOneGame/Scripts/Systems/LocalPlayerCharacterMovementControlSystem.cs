@@ -33,7 +33,14 @@ namespace _OnlyOneGame.Scripts.Systems
                         //input is not correct here, its just the default input
                         controlledCharacterRw.ValueRW.SetMovementInput(playerInput.MovementInput);
                         controlledCharacterRw.ValueRW.SetLookInput(playerInput.LookInput);
-                        controlledCharacterRw.ValueRW.SetActionCommandOpt(playerInput.ActionCommandOpt);
+                        if (playerInput.Action0.IsSet)
+                        {
+                            controlledCharacterRw.ValueRW.SetActionCommandOpt(Option<ActionCommand>.Some(new CommandMeleeAttack(playerInput.MovementInput.X0Y())));                            
+                        }
+                        else
+                        {
+                            controlledCharacterRw.ValueRW.SetActionCommandOpt(Option<ActionCommand>.None());
+                        }
                     }
                 }
             }
