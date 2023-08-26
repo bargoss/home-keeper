@@ -6,6 +6,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Entities.Content;
 using Unity.Mathematics;
+using Unity.NetCode;
 using Unity.Transforms;
 using UnityEngine;
 using ValueVariant;
@@ -29,9 +30,9 @@ namespace HomeKeeper.Components
     }
     public struct Health : IComponentData
     {
-        public float HitPoints { get; private set; }
-        public float MaxHitPoints;
-        public bool DestroyOnDeath;
+        [GhostField] public float HitPoints;
+        [GhostField] public float MaxHitPoints;
+        [GhostField] public bool DestroyOnDeath;
         public bool IsDead => HitPoints <= 0;
         public float DeathTime { get; private set; }
         public bool DiedNow { get; private set; }
