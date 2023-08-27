@@ -10,5 +10,6 @@ namespace _OnlyOneGame.Scripts.Components
         //public Entity SimplePlayerPrefab;
         public Entity PlayerPrefab;
         public Entity PlayerCharacterPrefab;
+        public Entity ProjectilePrefab;
     }
 }

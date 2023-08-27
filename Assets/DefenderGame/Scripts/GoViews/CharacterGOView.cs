@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Unity.NetCode;
 using UnityEngine;
 
 namespace DefenderGame.Scripts.GoViews
@@ -19,7 +20,10 @@ namespace DefenderGame.Scripts.GoViews
         
         public bool Dead { get; private set; }
 
-        public void HandleFixedUpdate(Vector3 position, Vector3 movementVelocity, Vector3 lookDirection, bool grounded, bool attacked, bool itemThrown)
+        private NetworkTick m_LastAttack;
+        private NetworkTick m_LastThrow;
+
+        public void HandleFixedUpdate(Vector3 position, Vector3 movementVelocity, Vector3 lookDirection, bool grounded, NetworkTick lastAttacked, NetworkTick lastThrown)
         {
             var moving = movementVelocity.sqrMagnitude > 0.5f;
             
@@ -31,13 +35,15 @@ namespace DefenderGame.Scripts.GoViews
                 // set animator params
                 m_Animator.SetBool(AnimatorParamMoving, moving);
                 
-                if (attacked)
+                if (lastAttacked != m_LastAttack)
                 {
+                    m_LastAttack = lastAttacked;
                     m_Animator.SetTrigger(AnimatorParamAttack);
                 }
-
-                if (itemThrown)
+                
+                if (lastThrown != m_LastThrow)
                 {
+                    m_LastThrow = lastThrown;
                     m_Animator.SetTrigger(AnimatorParamThrow);
                 }
             }

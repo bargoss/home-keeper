@@ -14,7 +14,7 @@ namespace _OnlyOneGame.Scripts.Systems
                 NetworkTickRate = 10,
             };
 
-            SystemAPI.SetSingleton(tickRate);
+            //SystemAPI.SetSingleton(tickRate);
         }
 
         public void OnUpdate(ref SystemState state)
@@ -25,7 +25,7 @@ namespace _OnlyOneGame.Scripts.Systems
                 NetworkTickRate = 10,
             };
 
-            SystemAPI.SetSingleton(tickRate);
+            //SystemAPI.SetSingleton(tickRate);
         }
 
         public void OnDestroy(ref SystemState state)

@@ -82,27 +82,51 @@ namespace DefaultNamespace
             ref ComponentLookup<T0> lookup0
         ) where T0 : unmanaged, IComponentData
         {
-            var overlapSphereResults = TryGetAllOverlapSphere(
+            var results = new NativeList<(float3, Entity, RefRW<T0>)>(Allocator.Temp);
+            var tempResults = new NativeList<(float3, Entity)>(Allocator.Temp);
+            
+            TryGetAllOverlapSphereNoAlloc(
                 ref buildPhysicsWorldData,
                 point,
-                radius
+                radius,
+                ref lookup0,
+                ref results,
+                ref tempResults
             );
             
-            var results = new NativeList<(float3, Entity, RefRW<T0>)>(Allocator.Temp);
+            tempResults.Dispose();
+
+            return results;
+        }
+
+        public static void TryGetAllOverlapSphereNoAlloc<T0>(
+            this ref BuildPhysicsWorldData buildPhysicsWorldData,
+            float3 point,
+            float radius,
+            ref ComponentLookup<T0> lookup0,
+            ref NativeList<(float3, Entity, RefRW<T0>)> results,
+            ref NativeList<(float3, Entity)> tempResults
+        ) where T0 : unmanaged, IComponentData
+        {
+            results.Clear();
+            tempResults.Clear();
+            TryGetAllOverlapSphereNoAlloc(
+                ref buildPhysicsWorldData,
+                point,
+                radius,
+                ref tempResults
+            );
             
-            foreach (var (pos, entity) in overlapSphereResults)
+            foreach (var (pos, entity) in tempResults)
             {
                 if (lookup0.TryGetRw(entity, out var component0Rw))
                 {
                     results.Add((pos, entity, component0Rw));
                 }
             }
-            
-            overlapSphereResults.Dispose();
-            
-            return results;
+            tempResults.Clear();
         }
-
+        
 
         public static NativeList<(float3, Entity)> TryGetAllOverlapSphere(
             this ref BuildPhysicsWorldData buildPhysicsWorldData,
@@ -112,6 +136,24 @@ namespace DefaultNamespace
         {
             var results = new NativeList<(float3, Entity)>(Allocator.Temp);
             
+            TryGetAllOverlapSphereNoAlloc(
+                ref buildPhysicsWorldData,
+                point,
+                radius,
+                ref results
+            );
+            
+            return results;
+        }
+        
+        public static void TryGetAllOverlapSphereNoAlloc(
+            this ref BuildPhysicsWorldData buildPhysicsWorldData,
+            float3 point,
+            float radius,
+            ref NativeList<(float3, Entity)> results
+        )
+        {
+            results.Clear();
             var collisionWorld = buildPhysicsWorldData.PhysicsData.PhysicsWorld.CollisionWorld;
             var collisionFilter = CollisionFilter.Default;
             collisionFilter.BelongsTo = 0xffffffff;
@@ -125,8 +167,6 @@ namespace DefaultNamespace
                 results.Add((hit.Position, hit.Entity));
             }
             hits.Dispose();
-
-            return results;
         }
         
         public static bool TryGetFirstOverlapSphere<T0>(

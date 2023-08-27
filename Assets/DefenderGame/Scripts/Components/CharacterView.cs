@@ -12,8 +12,8 @@ namespace DefenderGame.Scripts.Components
         [GhostField(Quantization = 10)] public float2 MovementVelocity;
         [GhostField(Quantization = 10)] public float3 LookDirection;
         [GhostField] public bool IsGrounded;
-        [GhostField] public bool Attacked;
-        [GhostField] public bool ItemThrown;
+        [GhostField] public NetworkTick LastAttacked;
+        [GhostField] public NetworkTick LastItemThrown;
         [GhostField] public bool Dead;
         
         

@@ -216,21 +216,25 @@ namespace _OnlyOneGame.Scripts.Systems
                     )
             {
                 var characterView = characterViewRw.ValueRO;
-                characterView.Attacked = false;
-                characterView.ItemThrown = false;
+                
+                //characterView.Attacked = false;
+                characterView.LastAttacked = networkTime.ServerTick;
+                //characterView.ItemThrown = false;
+                characterView.LastItemThrown = networkTime.ServerTick;
 
                 var events = onPlayerCharacterRo.ValueRO.Events.Get();
                 foreach (var playerEvent in events)
                 {
                     playerEvent.Switch(
-                        meleeAttackStarted => characterView.Attacked = true,
+                        meleeAttackStarted => characterView.LastAttacked = networkTime.ServerTick,
                         itemPickedUp => { },
                         crafted => { },
                         unbuilt => { },
                         resourceGathered => { },
                         itemStackChanged => { },
-                        droppedItem => characterView.ItemThrown = true,
-                        thrownItem => characterView.ItemThrown = true);
+                        droppedItem => characterView.LastItemThrown = networkTime.ServerTick,
+                        thrownItem => characterView.LastItemThrown = networkTime.ServerTick
+                    );
                 }
                 
                 characterView.MovementVelocity = physicsVelocityRo.ValueRO.Linear.xz;
