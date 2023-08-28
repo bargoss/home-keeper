@@ -58,8 +58,8 @@ namespace DefenderGame.Scripts.Systems
                     characterView.MovementVelocity.X0Y(),
                     characterView.LookDirection,
                     characterView.IsGrounded,
-                    characterView.Attacked,
-                    characterView.ItemThrown
+                    characterView.LastAttacked,
+                    characterView.LastItemThrown
                 );
 
                 //Debug.Log("character view update happening, view id: " + characterView.ViewId);

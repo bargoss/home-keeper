@@ -176,7 +176,7 @@ namespace _OnlyOneGame.Scripts.Systems
                                 Utility.DamageNearby(
                                     playerPosition + meleeAttacking.Direction * 0.5f, 
                                     1.5f, 
-                                    0.3f,
+                                    5.5f,
                                     Option<Faction>.Some(faction), 
                                     Option<Entity>.Some(entity),
                                     ref buildPhysicsWorld,
@@ -217,10 +217,8 @@ namespace _OnlyOneGame.Scripts.Systems
             {
                 var characterView = characterViewRw.ValueRO;
                 
-                //characterView.Attacked = false;
-                characterView.LastAttacked = networkTime.ServerTick;
-                //characterView.ItemThrown = false;
-                characterView.LastItemThrown = networkTime.ServerTick;
+                //characterView.LastAttacked = networkTime.ServerTick;
+                //characterView.LastItemThrown = networkTime.ServerTick;
 
                 var events = onPlayerCharacterRo.ValueRO.Events.Get();
                 foreach (var playerEvent in events)

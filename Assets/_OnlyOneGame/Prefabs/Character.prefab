@@ -142,9 +142,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ComponentOverrides:
-  - FullTypeName: _OnlyOneGame.Scripts.Components.OnPlayerCharacter
+  - FullTypeName: DefenderGame.Scripts.Components.CharacterMovement
+    EntityIndex: 0
+    PrefabType: 6
+    SendTypeOptimization: -1
+    VariantHash: 0
+  - FullTypeName: DefenderGame.Scripts.Components.CharacterView
     EntityIndex: 0
     PrefabType: -1
+    SendTypeOptimization: 1
+    VariantHash: 0
+  - FullTypeName: Unity.Physics.PhysicsVelocity
+    EntityIndex: 0
+    PrefabType: 7
+    SendTypeOptimization: -1
+    VariantHash: 0
+  - FullTypeName: _OnlyOneGame.Scripts.Components.OnPlayerCharacter
+    EntityIndex: 0
+    PrefabType: 6
     SendTypeOptimization: 2
     VariantHash: 0
 --- !u!23 &8460477330073712240

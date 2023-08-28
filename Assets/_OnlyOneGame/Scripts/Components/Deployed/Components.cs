@@ -12,14 +12,14 @@ namespace _OnlyOneGame.Scripts.Components.Deployed
     }
     public struct OnTurretView : IComponentData
     {
-        [GhostField] public float3 LookDirection { get; set; }
-        [GhostField] public NetworkTick LastShot { get; set; }
+        [GhostField] public float3 LookDirection;
+        [GhostField] public NetworkTick LastShot;
     }
     
     public struct MeleeMinion : IComponentData
     {
-        public float3 LookDirection { get; set; }
-        public float LastAttack { get; set; }
-        public bool AttackInput { get; set; }
+        public float3 LookDirection;
+        public float LastAttack;
+        public bool AttackInput;
     }
 }
