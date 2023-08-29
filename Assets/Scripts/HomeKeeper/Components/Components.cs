@@ -115,8 +115,7 @@ namespace HomeKeeper.Components
     }
     public struct Projectile : IComponentData
     {
-        public float BaseDamage;
-        public float Penetration;
+        [GhostField] public float BaseDamage;
     }
 
     public struct FlakDetonation : IComponentData
