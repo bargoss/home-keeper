@@ -5,6 +5,7 @@ using HomeKeeper.Systems;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.NetCode;
 using Unity.Physics;
 using Unity.Physics.Stateful;
 using Unity.Transforms;
@@ -12,7 +13,8 @@ using UnityEngine;
 
 namespace Systems
 {
-    [UpdateInGroup(typeof(SimulationSystemGroup))]
+    [UpdateInGroup(typeof(PredictedSimulationSystemGroup))]
+    [UpdateBefore(typeof(HealthSystem))]
     public partial struct ProjectileSystem : ISystem
     {
         public void OnCreate(ref SystemState state)
@@ -21,7 +23,7 @@ namespace Systems
         }
         public void OnUpdate(ref SystemState state)
         {
-            foreach (var (statefulCollisionEvents, projectile, projectilePhysicsVelocity, localTransform, entity) in SystemAPI.Query<DynamicBuffer<StatefulCollisionEvent>, Projectile, PhysicsVelocity, LocalTransform>().WithEntityAccess())
+            foreach (var (statefulCollisionEvents, projectile, projectilePhysicsVelocity, localTransform, entity) in SystemAPI.Query<DynamicBuffer<StatefulCollisionEvent>, Projectile, PhysicsVelocity, LocalTransform>().WithAll<Simulate>().WithEntityAccess())
             {
                 foreach (var collision in statefulCollisionEvents)
                 {
@@ -32,10 +34,10 @@ namespace Systems
                     
                     if(healthRwOpt.IsValid)
                     {
-                        //if (!collision.CollisionDetails.IsValid)
-                        //{
-                        //    Debug.LogError("Invalid collision details, adjust the component so this is calculated");
-                        //}
+                        if (!collision.CollisionDetails.IsValid)
+                        {
+                            Debug.LogError("Invalid collision details, adjust the component so this is calculated");
+                        }
                         
                         //var damage = projectile.BaseDamage * collision.CollisionDetails.EstimatedImpulse;
                         var damage = projectile.BaseDamage; // * collision.CollisionDetails.EstimatedImpulse;

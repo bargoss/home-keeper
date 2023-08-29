@@ -5,6 +5,7 @@ using DefaultNamespace;
 using DefenderGame.Scripts.Components;
 using DefenderGame.Scripts.Systems;
 using HomeKeeper.Components;
+using Systems;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -21,6 +22,7 @@ namespace _OnlyOneGame.Scripts.Systems
 {
     [UpdateInGroup(typeof(PredictedSimulationSystemGroup))]
     [UpdateBefore(typeof(CharacterMovementSystem))]
+    [UpdateAfter(typeof(HealthSystem))]
     public partial struct OnPlayerSystem : ISystem
     {
         [BurstCompile]
@@ -49,6 +51,7 @@ namespace _OnlyOneGame.Scripts.Systems
 
             var networkTime = SystemAPI.GetSingleton<NetworkTime>();
             
+            // todo: just use the "networkTime.ServerTick"
             var deltaTime = 0.02f;
             var tick = networkTime.ServerTick.TickIndexForValidTick;
             var time = (float)tick * deltaTime;
@@ -57,17 +60,25 @@ namespace _OnlyOneGame.Scripts.Systems
             var ecb = new EntityCommandBuffer(Allocator.Temp);
             
             // update logic
-            foreach (var (playerCharacterRw, localTransform, characterMovementRw, faction, entity) 
+            foreach (var (playerCharacterRw, localTransform, characterMovementRw, faction, health, entity) 
                      in SystemAPI.Query<
                              RefRW<OnPlayerCharacter>, 
                              LocalTransform,
                              RefRW<CharacterMovement>,
-                             Faction
+                             Faction,
+                             Health
                          >()
                          .WithEntityAccess().WithAll<Simulate>())
             {
                 var playerCharacter = playerCharacterRw.ValueRO;
                 var characterMovement = characterMovementRw.ValueRO;
+                
+                
+                if (health.IsDead)
+                {
+                    characterMovement.MovementInput = float2.zero;
+                    continue;
+                }
                 
                 characterMovement.MovementInput = playerCharacter.MovementInput;
                 

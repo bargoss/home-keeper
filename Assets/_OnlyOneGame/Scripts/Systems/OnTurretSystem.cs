@@ -3,6 +3,7 @@ using _OnlyOneGame.Scripts.Components.Deployed;
 using Components;
 using DefaultNamespace;
 using HomeKeeper.Components;
+using Systems;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -13,6 +14,8 @@ using Unity.Transforms;
 
 namespace _OnlyOneGame.Scripts.Systems
 {
+    [UpdateInGroup(typeof(PredictedSimulationSystemGroup))]
+    [UpdateAfter(typeof(HealthSystem))]
     public partial struct OnTurretSystem : ISystem
     {
         //private NativeList<(float3, Entity, RefRW<Health>)> m_OverlapSphereResults;
@@ -41,6 +44,12 @@ namespace _OnlyOneGame.Scripts.Systems
             
             foreach (var (onTurretRw, localTransform, entity) in SystemAPI.Query<RefRW<OnTurret>, LocalTransform>().WithEntityAccess())
             {
+                if (healthLookup.TryGetComponent(entity, out var myHealth) && myHealth.IsDead)
+                {
+                    continue;
+                }
+                
+                
                 onTurretRw.ValueRW.ShootInput = false;
                 onTurretRw.ValueRW.LookDirection = math.normalizesafe(onTurretRw.ValueRW.LookDirection -
                                                                       onTurretRw.ValueRW.LookDirection.y * Utility.Up);
