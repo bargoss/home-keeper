@@ -36,6 +36,7 @@ namespace DefenderGame.Scripts.Systems
         protected override void OnUpdate()
         {
             var random = new Random((uint)(SystemAPI.Time.ElapsedTime * 10000 + 1));
+            var deltaTime = SystemAPI.Time.DeltaTime;
             
             foreach (var (characterViewRw, localTransform) in SystemAPI.Query<RefRW<CharacterView>, LocalTransform>())
             {
@@ -53,13 +54,15 @@ namespace DefenderGame.Scripts.Systems
                 viewPair.SetDead(characterView.Dead);
 
                 var offsetForServer = World.Flags.HasFlag(WorldFlags.GameServer) ? new float3(0, 2f, 0) : float3.zero;
+                Debug.Log("look direction: " + characterView.LookDirection);
                 viewPair.HandleFixedUpdate(
                     localTransform.Position + offsetForServer,
                     characterView.MovementVelocity.X0Y(),
                     characterView.LookDirection,
                     characterView.IsGrounded,
                     characterView.LastAttacked,
-                    characterView.LastItemThrown
+                    characterView.LastItemThrown,
+                    deltaTime
                 );
 
                 //Debug.Log("character view update happening, view id: " + characterView.ViewId);

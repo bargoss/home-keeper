@@ -84,7 +84,7 @@ namespace _OnlyOneGame.Scripts.Systems
                 
                 if(math.lengthsq(playerCharacter.LookDirection) < 0.5f)
                 {
-                    //playerCharacter.LookDirection = new float2(0, 1); // init
+                    playerCharacter.LookDirection = new float2(1, 0); // init
                 }
 
                 if (math.lengthsq(playerCharacter.MovementInput) > 0.5f)

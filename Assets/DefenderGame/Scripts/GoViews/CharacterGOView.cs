@@ -23,24 +23,45 @@ namespace DefenderGame.Scripts.GoViews
         private NetworkTick m_LastAttack;
         private NetworkTick m_LastThrow;
 
-        public void HandleFixedUpdate(Vector3 position, Vector3 movementVelocity, Vector3 lookDirection, bool grounded, NetworkTick lastAttacked, NetworkTick lastThrown)
+        private Vector3 m_PreviousVelocity;
+        private Vector3 m_SmoothUpTilt;
+
+        public void HandleFixedUpdate(Vector3 position, Vector3 movementVelocity, Vector3 lookDirection, bool grounded, NetworkTick lastAttacked, NetworkTick lastThrown, float deltaTime)
         {
             var moving = movementVelocity.sqrMagnitude > 0.5f;
             
-            m_CharacterParent.transform.rotation = Quaternion.LookRotation(lookDirection - lookDirection.y * Vector3.up);
+            var velocityDelta = movementVelocity - m_PreviousVelocity;
+            var acceleration = velocityDelta / deltaTime;
+            
+            var upTilt = Vector3.ProjectOnPlane(acceleration * 0.1f, Vector3.up);
+            m_SmoothUpTilt = Vector3.Lerp(m_SmoothUpTilt, upTilt, deltaTime *0.5f);
+            print("m_SmoothUpTilt: " + m_SmoothUpTilt);
+            var right = Vector3.Cross(lookDirection, Vector3.up);
+            var up = (Vector3.up + m_SmoothUpTilt).normalized;
+            var forward = Vector3.Cross(up, right);
+            m_CharacterParent.transform.rotation = Quaternion.LookRotation(forward, up);
+            //m_CharacterParent.transform.rotation = Quaternion.LookRotation(lookDirection - lookDirection.y * Vector3.up);
             transform.position = position;
+            
+            
+            m_PreviousVelocity = movementVelocity;
+            
+            HandleAnimations(lastAttacked, lastThrown, moving);
+        }
 
+        private void HandleAnimations(NetworkTick lastAttacked, NetworkTick lastThrown, bool moving)
+        {
             try
             {
                 // set animator params
                 m_Animator.SetBool(AnimatorParamMoving, moving);
-                
+
                 if (lastAttacked != m_LastAttack)
                 {
                     m_LastAttack = lastAttacked;
                     m_Animator.SetTrigger(AnimatorParamAttack);
                 }
-                
+
                 if (lastThrown != m_LastThrow)
                 {
                     m_LastThrow = lastThrown;
@@ -52,10 +73,12 @@ namespace DefenderGame.Scripts.GoViews
                 Debug.LogError("error setting animator params: " + e);
             }
         }
-        
+
 
         public void Restore()
         {
+            m_PreviousVelocity = Vector3.zero;
+            m_SmoothUpTilt = Vector3.zero;
             SetDead(false);
             m_Animator.SetBool(AnimatorParamMoving, false);
             m_Animator.SetBool(AnimatorParamJump, true);
