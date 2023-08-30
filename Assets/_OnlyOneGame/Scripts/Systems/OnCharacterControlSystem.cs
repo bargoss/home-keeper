@@ -11,7 +11,7 @@ namespace _OnlyOneGame.Scripts.Systems
 {
     [UpdateInGroup(typeof(PredictedSimulationSystemGroup))]
     [UpdateBefore(typeof(OnPlayerSystem))]
-    public partial class LocalPlayerCharacterMovementControlSystem : SystemBase
+    public partial class OnCharacterControlSystem : SystemBase
     {
         protected override void OnCreate()
         {
