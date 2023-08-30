@@ -87,10 +87,11 @@ namespace _OnlyOneGame.Scripts.Systems
                     playerCharacter.LookDirection = new float2(1, 0); // init
                 }
 
-                if (math.lengthsq(playerCharacter.MovementInput) > 0.5f)
-                {
-                    playerCharacter.LookDirection = math.normalize(math.lerp(playerCharacter.LookDirection,  playerCharacter.MovementInput, 0.1f));
-                }
+                //if (math.lengthsq(playerCharacter.MovementInput) > 0.5f)
+                //{
+                //    playerCharacter.LookDirection = math.normalize(math.lerp(playerCharacter.LookDirection,  playerCharacter.MovementInput, 0.1f));
+                //}
+                playerCharacter.LookDirection = math.normalizesafe(math.lerp(playerCharacter.LookDirection,  playerCharacter.LookInput, 0.1f));
                 
                 
                 
@@ -318,7 +319,6 @@ namespace _OnlyOneGame.Scripts.Systems
                     ecb.DestroyEntity(groundItemEntity);
 
                     // todo: not too sure if this will modify the player character
-                    //playerCharacter.Events.Value.Add(new PlayerEvent(new EventItemPickedUp(item)));
                     playerCharacter.Events.Edit((ref FixedList128Bytes<PlayerEvent> value) => value.Add(new PlayerEvent(new EventItemPickedUp(item))));
                     
                     playerCharacter.CommandsBlockedDuration += (int)(0.5f / 0.02f);

@@ -45,7 +45,7 @@ namespace DefaultNamespace
             ref ComponentLookup<Faction> factionLookup
         )
         {
-            var targets = TryGetAllOverlapSphere<Health>(
+            var targets = GetAllOverlapSphere<Health>(
                 ref buildPhysicsWorldData,
                 position,
                 radius,
@@ -75,7 +75,7 @@ namespace DefaultNamespace
             targets.Dispose();
         }
 
-        public static NativeList<(float3, Entity, RefRW<T0>)> TryGetAllOverlapSphere<T0>(
+        public static NativeList<(float3, Entity, RefRW<T0>)> GetAllOverlapSphere<T0>(
             this ref BuildPhysicsWorldData buildPhysicsWorldData,
             float3 point,
             float radius,
@@ -85,7 +85,7 @@ namespace DefaultNamespace
             var results = new NativeList<(float3, Entity, RefRW<T0>)>(Allocator.Temp);
             var tempResults = new NativeList<(float3, Entity)>(Allocator.Temp);
             
-            TryGetAllOverlapSphereNoAlloc(
+            GetAllOverlapSphereNoAlloc(
                 ref buildPhysicsWorldData,
                 point,
                 radius,
@@ -99,7 +99,7 @@ namespace DefaultNamespace
             return results;
         }
 
-        public static void TryGetAllOverlapSphereNoAlloc<T0>(
+        public static void GetAllOverlapSphereNoAlloc<T0>(
             this ref BuildPhysicsWorldData buildPhysicsWorldData,
             float3 point,
             float radius,
@@ -110,7 +110,7 @@ namespace DefaultNamespace
         {
             results.Clear();
             tempResults.Clear();
-            TryGetAllOverlapSphereNoAlloc(
+            GetAllOverlapSphereNoAlloc(
                 ref buildPhysicsWorldData,
                 point,
                 radius,
@@ -128,7 +128,7 @@ namespace DefaultNamespace
         }
         
 
-        public static NativeList<(float3, Entity)> TryGetAllOverlapSphere(
+        public static NativeList<(float3, Entity)> GetAllOverlapSphere(
             this ref BuildPhysicsWorldData buildPhysicsWorldData,
             float3 point,
             float radius
@@ -136,7 +136,7 @@ namespace DefaultNamespace
         {
             var results = new NativeList<(float3, Entity)>(Allocator.Temp);
             
-            TryGetAllOverlapSphereNoAlloc(
+            GetAllOverlapSphereNoAlloc(
                 ref buildPhysicsWorldData,
                 point,
                 radius,
@@ -146,7 +146,7 @@ namespace DefaultNamespace
             return results;
         }
         
-        public static void TryGetAllOverlapSphereNoAlloc(
+        public static void GetAllOverlapSphereNoAlloc(
             this ref BuildPhysicsWorldData buildPhysicsWorldData,
             float3 point,
             float radius,

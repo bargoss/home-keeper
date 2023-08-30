@@ -56,7 +56,7 @@ namespace _OnlyOneGame.Scripts.Systems
                 
                 var iHaveFaction = factionLookup.TryGetComponent(entity, out var myFactionOpt);
                 
-                buildPhysicsWorld.TryGetAllOverlapSphereNoAlloc(
+                buildPhysicsWorld.GetAllOverlapSphereNoAlloc(
                     localTransform.Position,
                     5,
                     ref m_Cache

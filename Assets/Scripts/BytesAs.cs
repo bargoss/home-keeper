@@ -1,11 +1,13 @@
 using System.Diagnostics;
 using DefaultNamespace;
+using JetBrains.Annotations;
 
 [DebuggerTypeProxy(typeof(BytesAs<,>.DebuggerProxy))]
 public struct BytesAs<TField, TDataBytes> where TField : unmanaged where TDataBytes : unmanaged, IDataBytes
 {
     public TDataBytes RawData; // it needs to be public so it can be serialized by Unity NetCode
     
+    [Pure]
     public TField Get() => SerializationUtils.Deserialize<TField, TDataBytes>(ref RawData);
     public void Set(TField value)
     {

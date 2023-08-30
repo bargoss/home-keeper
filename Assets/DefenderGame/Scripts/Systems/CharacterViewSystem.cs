@@ -54,7 +54,7 @@ namespace DefenderGame.Scripts.Systems
                 viewPair.SetDead(characterView.Dead);
 
                 var offsetForServer = World.Flags.HasFlag(WorldFlags.GameServer) ? new float3(0, 2f, 0) : float3.zero;
-                Debug.Log("look direction: " + characterView.LookDirection);
+                //Debug.Log("look direction: " + characterView.LookDirection);
                 viewPair.HandleFixedUpdate(
                     localTransform.Position + offsetForServer,
                     characterView.MovementVelocity.X0Y(),
