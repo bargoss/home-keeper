@@ -3,9 +3,15 @@ using ValueVariant;
 namespace _OnlyOneGame.Scripts.Components
 {
     [ValueVariant]
-    public partial struct Item : IValueVariant<Item, DeployableItemType, MinionType, ThrowableType>
+    public partial struct Item : IValueVariant<Item, DeployableItemType, MinionType, ThrowableType, ResourceItemType>
     {
     };
+
+    public enum ResourceItemType
+    {
+        Metal,
+        Energy,
+    }
     
     public enum DeployableItemType
     {

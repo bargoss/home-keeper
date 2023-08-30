@@ -1,36 +1,24 @@
+using DefaultNamespace;
 using Unity.Entities;
-using Unity.Mathematics;
+using Unity.NetCode;
 
 namespace _OnlyOneGame.Scripts.Components
 {
     public struct GroundItem : IComponentData
     {
-        public Item Item;
-        public float PlacementTime;
-        
+        [GhostField] public BytesAs<Item, Data16Bytes> Item;
+
         //ctor
-        public GroundItem(Item item, float placementTime)
+        public GroundItem(Item item)
         {
             Item = item;
-            PlacementTime = placementTime;
         }
     }
 
-    public struct DeployingItem : IComponentData
+    public struct ActivatedGroundItem : IComponentData
     {
-        public float DeploymentStartedTime;
-        public float DeployDuration;
-        public DeployableItemType Item;
-        public float3 DeploymenmtDirection;
         
-        //ctor
-        public DeployingItem(DeployableItemType item, float3 deploymenmtDirection, float deployDuration, float time)
-        {
-            Item = item;
-            DeployDuration = deployDuration;
-            DeploymentStartedTime = 0;
-            DeploymenmtDirection = deploymenmtDirection;
-        }
     }
+
     public struct DeployedItem : IComponentData { }
 }

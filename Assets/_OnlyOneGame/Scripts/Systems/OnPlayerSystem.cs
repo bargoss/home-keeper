@@ -143,36 +143,23 @@ namespace _OnlyOneGame.Scripts.Systems
                             var throwDirection = throwVelocity / (math.length(throwVelocity) + 0.001f);
                             var throwPosition = playerPosition + throwDirection * 0.5f + Utility.Up;
 
-                            //playerCharacter.InventoryStack.Value.RemoveAt(playerCharacter.InventoryStack.Value.Length - 1);
                             playerCharacter.InventoryStack.Edit((ref FixedList128Bytes<Item> value) => value.RemoveAt(value.Length - 1));
-                            //playerCharacter.Events.Value.Add(new PlayerEvent(new EventThrownItem(item, throwItem.ThrowVelocity)));
                             playerCharacter.Events.Edit((ref FixedList128Bytes<PlayerEvent> value) => value.Add(new PlayerEvent(new EventThrownItem(item, throwItem.ThrowVelocity))));
 
-                            if(item.TryGetValue(out DeployableItemType deployableItemType))
-                            {
-                                ThrowActivatedDeployable(throwPosition, throwVelocity, deployableItemType, in prefabs,
-                                    ref ecb, time);
-                            }
-                            else
-                            {
-                                ThrowItem(throwPosition, throwVelocity, item, in prefabs, ref ecb, time);
-                            }
+                            ThrowItem(throwPosition, throwVelocity, item, in prefabs, ref ecb, true);
                         },
                         dropItem =>
                         {
                             if(playerCharacter.InventoryStack.Get().Length == 0)
                                 return;
                             
-                            //var item = playerCharacter.InventoryStack.Value[^1];
                             var item = playerCharacter.InventoryStack.Get()[^1];
-                            //playerCharacter.InventoryStack.Value.RemoveAt(playerCharacter.InventoryStack.Value.Length - 1);
                             playerCharacter.InventoryStack.Edit((ref FixedList128Bytes<Item> value) => value.RemoveAt(value.Length - 1));
                             
                             var dropPosition = playerPosition + Utility.Up * 0.5f + localTransform.Forward();
-                            //playerCharacter.Events.Value.Add(new PlayerEvent(new EventDroppedItem(item)));
                             playerCharacter.Events.Edit((ref FixedList128Bytes<PlayerEvent> value) => value.Add(new PlayerEvent(new EventDroppedItem(item))));
                             
-                            ThrowItem(dropPosition, Utility.Up * 2f, item, in prefabs, ref ecb, time);
+                            ThrowItem(dropPosition, Utility.Up * 2f, item, in prefabs, ref ecb, false);
                         } 
                     );
                 }
@@ -258,36 +245,41 @@ namespace _OnlyOneGame.Scripts.Systems
             }
         }
 
-        private static Entity ThrowActivatedDeployable(float3 position, float3 velocity, DeployableItemType deployableItemType, in OnPrefabs prefabs, ref EntityCommandBuffer ecb, float time)
-        {
-            var instance = CreateAndThrow(position, velocity, prefabs.DeployingItemPrefab.Entity, ref ecb);
-            var deployDuration = deployableItemType switch
-            {
-                DeployableItemType.Wall => 10,
-                DeployableItemType.Turret => 10,
-                DeployableItemType.AutoRepairModule => 10,
-                DeployableItemType.BubbleShieldModule => 10,
-                DeployableItemType.MiningModule => 10,
-                DeployableItemType.SpawnPoint => 10,
-                DeployableItemType.Landmine => 2,
-                DeployableItemType.BarbedWire => 5,
-                _ => 0
-            };
-            if(deployDuration == 0) Debug.LogError("Deployable item type not supported: " + deployableItemType);
-
-            ecb.SetComponent(instance,
-                new DeployingItem(
-                    deployableItemType,
-                    math.normalizesafe(velocity, Utility.Forward), 3, time
-                )
-            );
-            return instance;
-        }
+        //private static Entity ThrowActivatedDeployable(float3 position, float3 velocity, DeployableItemType deployableItemType, in OnPrefabs prefabs, ref EntityCommandBuffer ecb, float time)
+        //{
+        //    var instance = CreateAndThrow(position, velocity, prefabs.DeployingItemPrefab.Entity, ref ecb);
+        //    var deployDuration = deployableItemType switch
+        //    {
+        //        DeployableItemType.Wall => 10,
+        //        DeployableItemType.Turret => 10,
+        //        DeployableItemType.AutoRepairModule => 10,
+        //        DeployableItemType.BubbleShieldModule => 10,
+        //        DeployableItemType.MiningModule => 10,
+        //        DeployableItemType.SpawnPoint => 10,
+        //        DeployableItemType.Landmine => 2,
+        //        DeployableItemType.BarbedWire => 5,
+        //        _ => 0
+        //    };
+        //    if(deployDuration == 0) Debug.LogError("Deployable item type not supported: " + deployableItemType);
+        //    ecb.SetComponent(instance,
+        //        new DeployingItem(
+        //            deployableItemType,
+        //            math.normalizesafe(velocity, Utility.Forward), 3, time
+        //        )
+        //    );
+        //    return instance;
+        //}
         
-        private static Entity ThrowItem(float3 position, float3 velocity, Item item, in OnPrefabs prefabs, ref EntityCommandBuffer ecb, float time)
+        private static Entity ThrowItem(float3 position, float3 velocity, Item item, in OnPrefabs prefabs, ref EntityCommandBuffer ecb, bool activated)
         {
             var instance = CreateAndThrow(position, velocity, prefabs.GroundItemPrefab.Entity, ref ecb);
-            ecb.SetComponent(instance, new GroundItem(item, time));
+            ecb.SetComponent(instance, new GroundItem(item));
+            
+            if (activated)
+            {
+                ecb.AddComponent<ActivatedGroundItem>(instance);
+            }
+            
             return instance;
         }
         
