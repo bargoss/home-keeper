@@ -3,10 +3,11 @@ using HomeKeeper.Components;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.NetCode;
 
 namespace Systems
 {
-    [UpdateInGroup(typeof(SimulationSystemGroup))]
+    [UpdateInGroup(typeof(PredictedSimulationSystemGroup))]
     public partial struct LifeSpanSystem : ISystem
     {
         [BurstCompile]

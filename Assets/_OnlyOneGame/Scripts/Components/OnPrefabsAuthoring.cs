@@ -6,9 +6,10 @@ namespace _OnlyOneGame.Scripts.Components
     public class OnPrefabsAuthoring : MonoBehaviour
     {
         public GameObject GroundItemPrefab;
-        public GameObject DeployingItemPrefab;
         public GameObject PlayerPrefab;
         public GameObject PlayerCharacterPrefab;
+        public GameObject ProjectilePrefab;
+        public GameObject TurretPrefab;
 
         public class OnPrefabsBaker : Baker<OnPrefabsAuthoring>
         {
@@ -20,11 +21,10 @@ namespace _OnlyOneGame.Scripts.Components
                     {
                         GroundItemPrefab = new EntWithComponent<GroundItem>(GetEntity(authoring.GroundItemPrefab,
                             TransformUsageFlags.Dynamic)),
-                        DeployingItemPrefab =
-                            new EntWithComponent<DeployingItem>(GetEntity(authoring.DeployingItemPrefab,
-                                TransformUsageFlags.Dynamic)),
                         PlayerPrefab = GetEntity(authoring.PlayerPrefab, TransformUsageFlags.Dynamic),
                         PlayerCharacterPrefab = GetEntity(authoring.PlayerCharacterPrefab, TransformUsageFlags.Dynamic),
+                        ProjectilePrefab = GetEntity(authoring.ProjectilePrefab, TransformUsageFlags.Dynamic),
+                        TurretPrefab = GetEntity(authoring.TurretPrefab, TransformUsageFlags.Dynamic)
                     }
                 );
             }

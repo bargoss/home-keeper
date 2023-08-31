@@ -16,7 +16,7 @@ namespace _OnlyOneGame.Scripts.Components
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
                 var events = new FixedList128Bytes<PlayerEvent>();
                 var event0 = new PlayerEvent(new EventMeleeAttackStarted(){Direction = new float3(1.1f,2.1f,3.1f)});
-                var event1 = new PlayerEvent(new EventThrownItem(){Item = new Item(DeployableItemType.Landmine), ThrowVelocity = new float3(5.1f,6.1f,7.1f)});
+                var event1 = new PlayerEvent(new EventThrownItem(){Item = new Item(ItemTypeDeployable.Landmine), ThrowVelocity = new float3(5.1f,6.1f,7.1f)});
                 var sizeOfEvent0A = UnsafeUtility.SizeOf<PlayerEvent>();
                 var sizeOfEvent0B = Marshal.SizeOf<PlayerEvent>();
                 var sizeOfEvent1A = UnsafeUtility.SizeOf<PlayerEvent>();
@@ -30,11 +30,11 @@ namespace _OnlyOneGame.Scripts.Components
                     {
                         InventoryStack = new FixedList128Bytes<Item>()
                         {
-                            new Item(DeployableItemType.Landmine),
-                            new Item(MinionType.Healer),
-                            new Item(ThrowableType.FlashBang)
+                            new Item(ItemTypeDeployable.Landmine),
+                            new Item(ItemTypeMinion.Healer),
+                            new Item(ItemTypeThrowable.FlashBang)
                         },
-                        ActionCommandOpt = Option<ActionCommand>.Some(new ActionCommand(new CommandCraftItem(){ItemToCraft = new Item(MinionType.Melee)})),
+                        ActionCommandOpt = Option<ActionCommand>.Some(new ActionCommand(new CommandCraftItem(){ItemToCraft = new Item(ItemTypeMinion.Melee)})),
                         OnGoingActionOpt = Option<OnGoingAction>.Some(new OnGoingAction(){Duration = 1.19f, StartTime = 0.12f, Data = new OnGoingActionData(new ActionDismantling(){})}),
                         Events = events,
                         CommandsBlockedDuration = 0,

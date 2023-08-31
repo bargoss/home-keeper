@@ -35,13 +35,18 @@ namespace DefenderGame.Scripts.GoViews
             
             var upTilt = Vector3.ProjectOnPlane(acceleration * 0.1f, Vector3.up);
             m_SmoothUpTilt = Vector3.Lerp(m_SmoothUpTilt, upTilt, deltaTime *0.5f);
-            print("m_SmoothUpTilt: " + m_SmoothUpTilt);
+            //print("m_SmoothUpTilt: " + m_SmoothUpTilt);
             var right = Vector3.Cross(lookDirection, Vector3.up);
             var up = (Vector3.up + m_SmoothUpTilt).normalized;
             var forward = Vector3.Cross(up, right);
-            m_CharacterParent.transform.rotation = Quaternion.LookRotation(forward, up);
-            //m_CharacterParent.transform.rotation = Quaternion.LookRotation(lookDirection - lookDirection.y * Vector3.up);
-            transform.position = position;
+            
+            
+            if (!Dead)
+            {
+                m_CharacterParent.transform.rotation = Quaternion.LookRotation(forward, up);
+                transform.position = position;
+            }
+            
             
             
             m_PreviousVelocity = movementVelocity;

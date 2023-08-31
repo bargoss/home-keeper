@@ -3,17 +3,17 @@ using ValueVariant;
 namespace _OnlyOneGame.Scripts.Components
 {
     [ValueVariant]
-    public partial struct Item : IValueVariant<Item, DeployableItemType, MinionType, ThrowableType, ResourceItemType>
+    public partial struct Item : IValueVariant<Item, ItemTypeDeployable, ItemTypeMinion, ItemTypeThrowable, ItemTypeResource>
     {
     };
 
-    public enum ResourceItemType
+    public enum ItemTypeResource
     {
         Metal,
         Energy,
     }
     
-    public enum DeployableItemType
+    public enum ItemTypeDeployable
     {
         Wall,
         Turret,
@@ -25,14 +25,14 @@ namespace _OnlyOneGame.Scripts.Components
         BarbedWire,
     }
 
-    public enum ThrowableType
+    public enum ItemTypeThrowable
     {
         Grenade,
         Arrows,
         FlashBang,
     }
     
-    public enum MinionType
+    public enum ItemTypeMinion
     {
         Melee,
         Ranged,

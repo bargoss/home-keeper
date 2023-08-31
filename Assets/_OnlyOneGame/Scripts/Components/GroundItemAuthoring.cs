@@ -10,7 +10,7 @@ namespace _OnlyOneGame.Scripts.Components
             public override void Bake(GroundItemAuthoring authoring)
             {
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
-                AddComponent(entity, new GroundItem(new Item(ResourceItemType.Metal), false));
+                AddComponent(entity, new GroundItem(new Item(ItemTypeResource.Metal)));
             }
         }
     }

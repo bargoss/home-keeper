@@ -1,4 +1,5 @@
 ﻿using Unity.Entities;
+using Unity.NetCode;
 using UnityEngine;
 
 namespace _OnlyOneGame.Scripts.Components.Deployed
@@ -10,7 +11,7 @@ namespace _OnlyOneGame.Scripts.Components.Deployed
             public override void Bake(OnTurretAuthoring authoring)
             {
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
-                AddComponent(entity, new OnTurret());
+                AddComponent(entity, new OnTurret(){LastShot = new NetworkTick(1)});
             }
         }
     }

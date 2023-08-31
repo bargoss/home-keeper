@@ -1,4 +1,6 @@
-﻿using Unity.Entities;
+﻿using DefaultNamespace;
+using DefenderGame.Scripts.Components;
+using Unity.Entities;
 using Unity.Mathematics;
 using Unity.NetCode;
 
@@ -8,5 +10,7 @@ namespace _OnlyOneGame.Scripts.Components.Deployed
     {
         [GhostField] public float3 LookDirection;
         [GhostField] public NetworkTick LastShot;
+        public NetworkTick LastShotDisplayed;
+        public ViewId ViewId;
     }
 }

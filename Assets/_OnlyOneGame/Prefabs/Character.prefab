@@ -149,7 +149,7 @@ MonoBehaviour:
     VariantHash: 0
   - FullTypeName: DefenderGame.Scripts.Components.CharacterView
     EntityIndex: 0
-    PrefabType: -1
+    PrefabType: 7
     SendTypeOptimization: 1
     VariantHash: 0
   - FullTypeName: Unity.Physics.PhysicsVelocity

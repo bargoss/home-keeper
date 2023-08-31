@@ -111,7 +111,7 @@ namespace HomeKeeper.Components
     }
     public struct LifeSpan : IComponentData
     {
-        public float SecondsToLive;
+        [GhostField] public float SecondsToLive;
     }
     public struct Projectile : IComponentData
     {

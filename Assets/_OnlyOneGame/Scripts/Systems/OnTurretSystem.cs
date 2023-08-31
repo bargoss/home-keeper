@@ -29,6 +29,8 @@ namespace _OnlyOneGame.Scripts.Systems
             state.RequireForUpdate<OnPrefabs>();
             state.RequireForUpdate<BuildPhysicsWorldData>();
             state.RequireForUpdate<OnTurret>();
+            
+            m_Cache = new NativeList<(float3, Entity)>(Allocator.Persistent);
         }
 
         [BurstCompile]
@@ -40,9 +42,12 @@ namespace _OnlyOneGame.Scripts.Systems
             
             var healthLookup = state.GetComponentLookup<Health>(true);
             var factionLookup = state.GetComponentLookup<Faction>(true);
+            var turretViewLookup = state.GetComponentLookup<OnTurretView>();
+            
+            
 
             
-            foreach (var (onTurretRw, localTransform, entity) in SystemAPI.Query<RefRW<OnTurret>, LocalTransform>().WithEntityAccess())
+            foreach (var (onTurretRw, localTransform, entity) in SystemAPI.Query<RefRW<OnTurret>, LocalTransform>().WithAll<Simulate>().WithEntityAccess())
             {
                 if (healthLookup.TryGetComponent(entity, out var myHealth) && myHealth.IsDead)
                 {
@@ -58,7 +63,7 @@ namespace _OnlyOneGame.Scripts.Systems
                 
                 buildPhysicsWorld.GetAllOverlapSphereNoAlloc(
                     localTransform.Position,
-                    5,
+                    15,
                     ref m_Cache
                 );
 
@@ -95,6 +100,11 @@ namespace _OnlyOneGame.Scripts.Systems
                     onTurretRw.ValueRW.ShootInput = true;
                 }
                 
+                if(turretViewLookup.TryGetRw(entity, out var turretViewRw))
+                {
+                    turretViewRw.ValueRW.LookDirection = onTurretRw.ValueRW.LookDirection;
+                }
+                
             }
 
 
@@ -102,11 +112,13 @@ namespace _OnlyOneGame.Scripts.Systems
             
             // handle shooting
             foreach (var (onTurretRw, localTransform, entity) in SystemAPI.Query<RefRW<OnTurret>, LocalTransform>()
+                         .WithAll<Simulate>()
+                         .WithAny<OnTurretView>()
                          .WithEntityAccess())
             {
                 var projectilePrefab = prefabs.ProjectilePrefab;
 
-                if (onTurretRw.ValueRO.ShootInput && onTurretRw.ValueRO.LastShot.TicksSince(networkTime.ServerTick) > 10)
+                if (onTurretRw.ValueRO.ShootInput && networkTime.ServerTick.TicksSince(onTurretRw.ValueRO.LastShot) > 50)
                 {
                     onTurretRw.ValueRW.LastShot = networkTime.ServerTick;
                     var projectile = ecb.Instantiate(projectilePrefab);
@@ -116,6 +128,11 @@ namespace _OnlyOneGame.Scripts.Systems
                         quaternion.LookRotationSafe(onTurretRw.ValueRO.LookDirection, Utility.Up));
                     
                     ecb.SetVelocity(projectile, onTurretRw.ValueRO.LookDirection * 20.0f);
+                }
+                
+                if(turretViewLookup.TryGetRw(entity, out var turretViewRw))
+                {
+                    turretViewRw.ValueRW.LastShot = onTurretRw.ValueRO.LastShot;
                 }
             }
             

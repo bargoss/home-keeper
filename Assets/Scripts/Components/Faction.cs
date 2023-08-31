@@ -1,10 +1,11 @@
 ﻿using Unity.Entities;
+using Unity.NetCode;
 
 namespace Components
 {
     public struct Faction : IComponentData
     {
-        public int Value;
+        [GhostField] public int Value;
         
         public bool IsNeutral => Value == 0;
         

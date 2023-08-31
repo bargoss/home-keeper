@@ -23,7 +23,7 @@ namespace _OnlyOneGame.Scripts.Systems
     [UpdateInGroup(typeof(PredictedSimulationSystemGroup))]
     [UpdateBefore(typeof(CharacterMovementSystem))]
     [UpdateAfter(typeof(HealthSystem))]
-    public partial struct OnPlayerSystem : ISystem
+    public partial struct OnPlayerCharacterSystem : ISystem
     {
         [BurstCompile]
         public void OnCreate(ref SystemState state)
@@ -53,8 +53,10 @@ namespace _OnlyOneGame.Scripts.Systems
             
             // todo: just use the "networkTime.ServerTick"
             var deltaTime = 0.02f;
-            var tick = networkTime.ServerTick.TickIndexForValidTick;
-            var time = (float)tick * deltaTime;
+
+            var tick = networkTime.ServerTick;
+            var tickInt = tick.TickIndexForValidTick;
+            var time = (float)tickInt * deltaTime;
             
 
             var ecb = new EntityCommandBuffer(Allocator.Temp);
@@ -146,7 +148,7 @@ namespace _OnlyOneGame.Scripts.Systems
                             playerCharacter.InventoryStack.Edit((ref FixedList128Bytes<Item> value) => value.RemoveAt(value.Length - 1));
                             playerCharacter.Events.Edit((ref FixedList128Bytes<PlayerEvent> value) => value.Add(new PlayerEvent(new EventThrownItem(item, throwItem.ThrowVelocity))));
 
-                            ThrowItem(throwPosition, throwVelocity, item, in prefabs, ref ecb, true);
+                            ThrowItem(throwPosition, throwVelocity, item, in prefabs, ref ecb, true, tick);
                         },
                         dropItem =>
                         {
@@ -159,7 +161,7 @@ namespace _OnlyOneGame.Scripts.Systems
                             var dropPosition = playerPosition + Utility.Up * 0.5f + localTransform.Forward();
                             playerCharacter.Events.Edit((ref FixedList128Bytes<PlayerEvent> value) => value.Add(new PlayerEvent(new EventDroppedItem(item))));
                             
-                            ThrowItem(dropPosition, Utility.Up * 2f, item, in prefabs, ref ecb, false);
+                            ThrowItem(dropPosition, Utility.Up * 2f, item, in prefabs, ref ecb, false, tick);
                         } 
                     );
                 }
@@ -223,14 +225,14 @@ namespace _OnlyOneGame.Scripts.Systems
                 foreach (var playerEvent in events)
                 {
                     playerEvent.Switch(
-                        meleeAttackStarted => characterView.LastAttacked = networkTime.ServerTick,
+                        meleeAttackStarted => characterView.LastAttacked = tick,
                         itemPickedUp => { },
                         crafted => { },
                         unbuilt => { },
                         resourceGathered => { },
                         itemStackChanged => { },
-                        droppedItem => characterView.LastItemThrown = networkTime.ServerTick,
-                        thrownItem => characterView.LastItemThrown = networkTime.ServerTick
+                        droppedItem => characterView.LastItemThrown = tick,
+                        thrownItem => characterView.LastItemThrown = tick
                     );
                 }
                 
@@ -245,39 +247,19 @@ namespace _OnlyOneGame.Scripts.Systems
             }
         }
 
-        //private static Entity ThrowActivatedDeployable(float3 position, float3 velocity, DeployableItemType deployableItemType, in OnPrefabs prefabs, ref EntityCommandBuffer ecb, float time)
-        //{
-        //    var instance = CreateAndThrow(position, velocity, prefabs.DeployingItemPrefab.Entity, ref ecb);
-        //    var deployDuration = deployableItemType switch
-        //    {
-        //        DeployableItemType.Wall => 10,
-        //        DeployableItemType.Turret => 10,
-        //        DeployableItemType.AutoRepairModule => 10,
-        //        DeployableItemType.BubbleShieldModule => 10,
-        //        DeployableItemType.MiningModule => 10,
-        //        DeployableItemType.SpawnPoint => 10,
-        //        DeployableItemType.Landmine => 2,
-        //        DeployableItemType.BarbedWire => 5,
-        //        _ => 0
-        //    };
-        //    if(deployDuration == 0) Debug.LogError("Deployable item type not supported: " + deployableItemType);
-        //    ecb.SetComponent(instance,
-        //        new DeployingItem(
-        //            deployableItemType,
-        //            math.normalizesafe(velocity, Utility.Forward), 3, time
-        //        )
-        //    );
-        //    return instance;
-        //}
         
-        private static Entity ThrowItem(float3 position, float3 velocity, Item item, in OnPrefabs prefabs, ref EntityCommandBuffer ecb, bool activated)
+        
+        private static Entity ThrowItem(float3 position, float3 velocity, Item item, in OnPrefabs prefabs, ref EntityCommandBuffer ecb, bool activated, NetworkTick currentTick)
         {
             var instance = CreateAndThrow(position, velocity, prefabs.GroundItemPrefab.Entity, ref ecb);
             ecb.SetComponent(instance, new GroundItem(item));
             
             if (activated)
             {
-                ecb.AddComponent<ActivatedGroundItem>(instance);
+                var deploymentDirection = velocity;
+                deploymentDirection.y = 0;
+                deploymentDirection = math.normalizesafe(deploymentDirection, Utility.Forward);
+                ecb.AddComponent(instance, new ActivatedItem(deploymentDirection, 10, currentTick));
             }
             
             return instance;

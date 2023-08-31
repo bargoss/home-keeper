@@ -1,6 +1,7 @@
 ﻿using Components;
 using HomeKeeper.Components;
 using Unity.Entities;
+using Unity.NetCode;
 using UnityEngine;
 
 namespace DefaultNamespace.Authoring

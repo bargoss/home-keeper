@@ -14,11 +14,11 @@ namespace _OnlyOneGame.Scripts.Components
             Item = item;
         }
     }
-
-    public struct ActivatedGroundItem : IComponentData
-    {
-        
-    }
+    
+    //public struct ActivatedGroundItem : IComponentData
+    //{
+    //    
+    //}
 
     public struct DeployedItem : IComponentData { }
 }

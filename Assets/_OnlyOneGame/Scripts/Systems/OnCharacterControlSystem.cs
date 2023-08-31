@@ -14,7 +14,7 @@ using UnityEngine;
 namespace _OnlyOneGame.Scripts.Systems
 {
     [UpdateInGroup(typeof(PredictedSimulationSystemGroup))]
-    [UpdateBefore(typeof(OnPlayerSystem))]
+    [UpdateBefore(typeof(OnPlayerCharacterSystem))]
     public partial class OnCharacterControlSystem : SystemBase
     {
         private NativeList<(float3, Entity)> m_OverlapSphereResultBuffer;

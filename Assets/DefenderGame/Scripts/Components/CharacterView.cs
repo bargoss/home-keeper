@@ -6,8 +6,7 @@ namespace DefenderGame.Scripts.Components
 {
     public struct CharacterView : IComponentData
     {
-        public bool ViewIdAssigned { get; private set; }
-        public CharacterViewId ViewId { get; private set; }
+        public ViewId ViewId;
         
         [GhostField(Quantization = 10)] public float2 MovementVelocity;
         [GhostField(Quantization = 10)] public float3 LookDirection;
@@ -17,21 +16,17 @@ namespace DefenderGame.Scripts.Components
         [GhostField] public bool Dead;
         
         
-        
-        public void AssignViewId(CharacterViewId viewId)
-        {
-            ViewId = viewId;
-            ViewIdAssigned = true;
-        }
     }
-    public struct CharacterViewId
+    public struct ViewId
     {
-        public int Value;
+        private int m_Value;
+        
+        public bool Assigned => m_Value != 0;
         
         //ctor
-        public CharacterViewId(int value)
+        public ViewId(int value)
         {
-            Value = value;
+            m_Value = value;
         }
     }
 }

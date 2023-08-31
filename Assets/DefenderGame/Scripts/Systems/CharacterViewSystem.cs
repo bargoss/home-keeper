@@ -13,10 +13,10 @@ using Random = Unity.Mathematics.Random;
 namespace DefenderGame.Scripts.Systems
 {
     [UpdateInGroup(typeof(SimulationSystemGroup))]
-    //[WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
+    [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
     public partial class CharacterViewSystem : SystemBase
     {
-        private readonly PairMaintainer<CharacterViewId, CharacterGOView> m_PairMaintainer = new(
+        private readonly PairMaintainer<ViewId, CharacterGOView> m_PairMaintainer = new(
             logical =>
             {
                 var characterView = Object.Instantiate(GameResources.Instance.CharacterGOViewPrefab);
@@ -41,10 +41,16 @@ namespace DefenderGame.Scripts.Systems
             foreach (var (characterViewRw, localTransform) in SystemAPI.Query<RefRW<CharacterView>, LocalTransform>())
             {
                 var characterView = characterViewRw.ValueRO;
-                if (characterView.ViewIdAssigned == false)
+                //if (characterView.ViewIdAssigned == false)
+                //{
+                //    characterView.AssignViewId(new ViewId(random.NextInt()));
+                //}
+                
+                if (!characterView.ViewId.Assigned)
                 {
-                    characterView.AssignViewId(new CharacterViewId(random.NextInt()));
+                    characterView.ViewId = new ViewId(random.NextInt());
                 }
+                
                 
                 characterViewRw.ValueRW = characterView;
                 

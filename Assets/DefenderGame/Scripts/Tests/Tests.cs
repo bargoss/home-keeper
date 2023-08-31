@@ -23,6 +23,17 @@ namespace DefenderGame.Scripts.Tests
     {
         //test BytesAs<Optional<ActionCommand>, Data32Bytes>, None and Some works weirdly. It seems to appear as None but has a correct value, maybe 32 bytes are not enough to hold the thing
 
+        //[MenuItem("DefenderGame/Tests/sdfag89sd")]
+        //public static void ViewIdTest()
+        //{
+        //    var viewId = new ViewId();
+        //    viewId.Assign(42);
+        //    
+        //    var characterView = new CharacterView();
+        //    characterView.ViewId.Assign(42);
+        //    int a = 3;
+        //}
+        
         [MenuItem("DefenderGame/Tests/251321321690fkdf")]
         public static void BytesAsVVSerializationTest()
         {
