@@ -39,6 +39,7 @@ namespace _OnlyOneGame.Scripts.Components
                         Events = events,
                         CommandsBlockedDuration = 0,
                         MovementBlockedDuration = 0,
+                        InventoryCapacity = 4,
                     });
             }
         }

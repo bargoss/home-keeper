@@ -46,6 +46,7 @@ namespace _OnlyOneGame.Scripts.Systems
             var localTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>();
             var healthLookup = SystemAPI.GetComponentLookup<Health>();
             var factionLookup = SystemAPI.GetComponentLookup<Faction>();
+            var ghostDestroyedLookup = SystemAPI.GetComponentLookup<DestroyableGhost>();
             
             var interactionRadius = 1f;
 
@@ -58,6 +59,9 @@ namespace _OnlyOneGame.Scripts.Systems
             var tickInt = tick.TickIndexForValidTick;
             var time = (float)tickInt * deltaTime;
             
+            if(!networkTime.IsFirstTimeFullyPredictingTick) return;
+            
+
 
             var ecb = new EntityCommandBuffer(Allocator.Temp);
             
@@ -94,12 +98,14 @@ namespace _OnlyOneGame.Scripts.Systems
                 //    playerCharacter.LookDirection = math.normalize(math.lerp(playerCharacter.LookDirection,  playerCharacter.MovementInput, 0.1f));
                 //}
                 playerCharacter.LookDirection = math.normalizesafe(math.lerp(playerCharacter.LookDirection,  playerCharacter.LookInput, 0.1f));
+
+
+                var playerCharacterEvents = playerCharacter.Events.Get();
+                var inventoryStack = playerCharacter.InventoryStack.Get();
                 
+                playerCharacterEvents.Clear();
                 
-                
-                playerCharacter.Events.Edit((ref FixedList128Bytes<PlayerEvent> value) => value.Clear());
-                var playerCharacterEvents = playerCharacter.Events.Get();  
-                
+
                 var playerPosition = localTransform.Position;
                 
                 var silenced = playerCharacter.CommandsBlockedDuration > 0;
@@ -118,12 +124,15 @@ namespace _OnlyOneGame.Scripts.Systems
                             ref deployedItemLookup
                         ),
                         pickupItem => ProcessPickupItemCommand(
-                            buildPhysicsWorld,
+                            ref buildPhysicsWorld,
                             playerPosition,
                             interactionRadius,
                             ref groundItemLookup,
-                            ref playerCharacter,
-                            ecb
+                            ref inventoryStack,
+                            playerCharacter.InventoryCapacity,
+                            ref playerCharacter.CommandsBlockedDuration,
+                            ref playerCharacterEvents,
+                            ref ghostDestroyedLookup
                         ),
                         craftItem => { },
                         mineResource => { },
@@ -137,29 +146,29 @@ namespace _OnlyOneGame.Scripts.Systems
                         },
                         throwItem =>
                         {
-                            if(playerCharacter.InventoryStack.Get().Length == 0)
+                            if(inventoryStack.Length == 0)
                                 return;
                             
-                            var item = playerCharacter.InventoryStack.Get()[^1];
+                            var item = inventoryStack[^1];
                             var throwVelocity = throwItem.ThrowVelocity;
                             var throwDirection = throwVelocity / (math.length(throwVelocity) + 0.001f);
                             var throwPosition = playerPosition + throwDirection * 0.5f + Utility.Up;
-
-                            playerCharacter.InventoryStack.Edit((ref FixedList128Bytes<Item> value) => value.RemoveAt(value.Length - 1));
-                            playerCharacter.Events.Edit((ref FixedList128Bytes<PlayerEvent> value) => value.Add(new PlayerEvent(new EventThrownItem(item, throwItem.ThrowVelocity))));
+                            
+                            inventoryStack.RemoveAt(inventoryStack.Length - 1);
+                            playerCharacterEvents.Add(new PlayerEvent(new EventThrownItem(item, throwItem.ThrowVelocity)));
 
                             ThrowItem(throwPosition, throwVelocity, item, in prefabs, ref ecb, true, tick);
                         },
                         dropItem =>
                         {
-                            if(playerCharacter.InventoryStack.Get().Length == 0)
+                            if(inventoryStack.Length == 0)
                                 return;
                             
-                            var item = playerCharacter.InventoryStack.Get()[^1];
-                            playerCharacter.InventoryStack.Edit((ref FixedList128Bytes<Item> value) => value.RemoveAt(value.Length - 1));
+                            var item = inventoryStack[^1];
+                            inventoryStack.RemoveAt(inventoryStack.Length - 1);
                             
                             var dropPosition = playerPosition + Utility.Up * 0.5f + localTransform.Forward();
-                            playerCharacter.Events.Edit((ref FixedList128Bytes<PlayerEvent> value) => value.Add(new PlayerEvent(new EventDroppedItem(item))));
+                            playerCharacterEvents.Add(new PlayerEvent(new EventDroppedItem(item)));
                             
                             ThrowItem(dropPosition, Utility.Up * 2f, item, in prefabs, ref ecb, false, tick);
                         } 
@@ -198,7 +207,10 @@ namespace _OnlyOneGame.Scripts.Systems
                 playerCharacter.MovementBlockedDuration -= 1;
                 if (playerCharacter.MovementBlockedDuration < 0) playerCharacter.MovementBlockedDuration = 0;
 
-                playerCharacter.Events.Set(playerCharacterEvents); // write back
+                // write back
+                playerCharacter.Events.Set(playerCharacterEvents);
+                playerCharacter.InventoryStack.Set(inventoryStack);
+                
 
                 playerCharacterRw.ValueRW = playerCharacter;
                 characterMovementRw.ValueRW = characterMovement;
@@ -245,6 +257,12 @@ namespace _OnlyOneGame.Scripts.Systems
 
                 characterViewRw.ValueRW = characterView;
             }
+
+            if (!ecb.IsEmpty && networkTime.IsFirstTimeFullyPredictingTick)
+            {
+                ecb.Playback(state.EntityManager);
+            }
+            ecb.Dispose();
         }
 
         
@@ -259,7 +277,7 @@ namespace _OnlyOneGame.Scripts.Systems
                 var deploymentDirection = velocity;
                 deploymentDirection.y = 0;
                 deploymentDirection = math.normalizesafe(deploymentDirection, Utility.Forward);
-                ecb.AddComponent(instance, new ActivatedItem(deploymentDirection, 10, currentTick));
+                //ecb.AddComponent(instance, new ActivatedItem(deploymentDirection, 10, currentTick));
             }
             
             return instance;
@@ -268,14 +286,17 @@ namespace _OnlyOneGame.Scripts.Systems
         private static Entity CreateAndThrow(float3 position, float3 velocity, Entity prefab, ref EntityCommandBuffer ecb)
         {
             var instance = ecb.Instantiate(prefab);
+            //ecb.AddComponent<PredictedGhostSpawnRequest>(instance);
             ecb.SetLocalPositionRotation(instance, position, quaternion.identity);
             ecb.SetVelocity(instance, velocity);
             return instance;
         }
 
-        private static void ProcessPickupItemCommand(BuildPhysicsWorldData buildPhysicsWorld, float3 playerPosition,
-            float interactionRadius, ref ComponentLookup<GroundItem> groundItemLookup, ref OnPlayerCharacter playerCharacter,
-            EntityCommandBuffer ecb)
+        private static void ProcessPickupItemCommand(ref BuildPhysicsWorldData buildPhysicsWorld, float3 playerPosition,
+            float interactionRadius, ref ComponentLookup<GroundItem> groundItemLookup, ref FixedList128Bytes<Item> inventoryStack, int inventoryCapacity,
+            ref int commandBlockedDuration,
+            ref FixedList128Bytes<PlayerEvent> playerEvents,
+            ref ComponentLookup<DestroyableGhost> ghostDestroyedLookup)
         {
             if (buildPhysicsWorld.TryGetFirstOverlapSphere(
                     playerPosition,
@@ -286,16 +307,26 @@ namespace _OnlyOneGame.Scripts.Systems
                 ))
             {
                 var item = groundItem.Item;
-                if (playerCharacter.InventoryCapacity > playerCharacter.InventoryStack.Get().Length)
+                if (inventoryCapacity > inventoryStack.Length)
                 {
-                    //playerCharacter.InventoryStack.Value.Add(item);
-                    playerCharacter.InventoryStack.Edit((ref FixedList128Bytes<Item> value) => value.Add(item));
-                    ecb.DestroyEntity(groundItemEntity);
-
-                    // todo: not too sure if this will modify the player character
-                    playerCharacter.Events.Edit((ref FixedList128Bytes<PlayerEvent> value) => value.Add(new PlayerEvent(new EventItemPickedUp(item))));
                     
-                    playerCharacter.CommandsBlockedDuration += (int)(0.5f / 0.02f);
+                    inventoryStack.Add(item);
+                    
+                    if(ghostDestroyedLookup.TryGetRw(groundItemEntity, out var ghostDestroyedRw))
+                    {
+                        var ghostDestroyed = ghostDestroyedRw.ValueRO;
+                        ghostDestroyed.Destroyed = true;
+                        ghostDestroyedRw.ValueRW = ghostDestroyed;
+                    }
+                    else
+                    {
+                        Debug.LogError("GhostDestroyed not found on GroundItem entity");
+                    }
+                    
+                    
+                    playerEvents.Add(new PlayerEvent(new EventItemPickedUp(item)));
+                    
+                    commandBlockedDuration += (int)(0.5f / 0.02f);
                 }
             }
         }

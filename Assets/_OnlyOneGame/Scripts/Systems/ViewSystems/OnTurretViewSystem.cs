@@ -56,6 +56,8 @@ namespace _OnlyOneGame.Scripts.Systems.ViewSystems
                 }
                 onTurretViewRw.ValueRW = onTurretView;
             }
+
+            m_TurretPairMaintainer.DisposeAndClearUntouchedViews();
         }
     }
 }

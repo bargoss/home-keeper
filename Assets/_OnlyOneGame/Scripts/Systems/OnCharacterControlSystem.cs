@@ -105,7 +105,7 @@ namespace _OnlyOneGame.Scripts.Systems
                         {
                             if (hasAnyItem)
                             {
-                                controlledCharacterRw.ValueRW.SetActionCommandOpt(Option<ActionCommand>.Some(new CommandThrowItem(playerInput.LookInput.X0Y())));
+                                controlledCharacterRw.ValueRW.SetActionCommandOpt(Option<ActionCommand>.Some(new CommandThrowItem(playerInput.LookInput.X0Y() * 5 + Utility.Up * 5)));
                             }
                         }
                     }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using _OnlyOneGame.Scripts.GoViewScripts;
 using BulletCircle.GoViews;
 using DefenderGame.Scripts.Components;
 using DefenderGame.Scripts.GoViews;
@@ -22,6 +23,7 @@ public class GameResources : ScriptableObject
     public MagazineGOView MagazineGOViewPrefab;
     public AmmoBoxGOView AmmoBoxGOViewPrefab;
     public BulletGOView BulletGoView;
+    public ItemGoView ItemGOViewPrefab;
 
     public CharacterGOView CharacterGOViewPrefab;
     
