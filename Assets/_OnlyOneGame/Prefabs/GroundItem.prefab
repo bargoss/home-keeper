@@ -16,7 +16,6 @@ GameObject:
   - component: {fileID: 561494081171650722}
   - component: {fileID: -6490074987895701093}
   - component: {fileID: -4506735353586233064}
-  - component: {fileID: -2294389223426465012}
   m_Layer: 0
   m_Name: GroundItem
   m_TagString: Untagged
@@ -304,16 +303,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ComponentOverrides: []
---- !u!114 &-2294389223426465012
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3701321777714772035}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 176ea6c95fb948ad8e8e6550e42d63fa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Ticks: 209

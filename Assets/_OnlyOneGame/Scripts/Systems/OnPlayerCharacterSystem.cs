@@ -273,7 +273,6 @@ namespace _OnlyOneGame.Scripts.Systems
         {
             var instance = CreateAndThrow(position, velocity, prefabs.GroundItemPrefab.Entity, ref ecb, ghostOwner);
             ecb.SetComponent(instance, new GroundItem(item));
-            ecb.AddComponent<PredictedGhost>(instance);
             
             if (activated)
             {
