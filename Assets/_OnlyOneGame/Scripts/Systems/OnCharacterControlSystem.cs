@@ -49,65 +49,12 @@ namespace _OnlyOneGame.Scripts.Systems
                 {
                     if (SystemAPI.GetComponentLookup<OnPlayerCharacter>().TryGetRw(controlledCharacterEntity, out var controlledCharacterRw))
                     {
-                        // reset:
-                        controlledCharacterRw.ValueRW.SetActionCommandOpt(Option<ActionCommand>.None());
-                        
-                        var characterPosition = m_LocalTransformLookup[controlledCharacterEntity].Position;
-                        
-                        //input is not correct here, its just the default input
                         controlledCharacterRw.ValueRW.SetMovementInput(playerInput.MovementInput);
                         controlledCharacterRw.ValueRW.SetLookInput(playerInput.LookInput);
-                        if (playerInput.Action0.IsSet)
-                        {
-                            controlledCharacterRw.ValueRW.SetActionCommandOpt(Option<ActionCommand>.Some(new CommandMeleeAttack(playerInput.MovementInput.X0Y())));                            
-                        }
-                        
-                        
-                        /*
-                        public static void GetAllOverlapSphereNoAlloc(
-                            this ref BuildPhysicsWorldData buildPhysicsWorldData,
-                            float3 point,
-                            float radius,
-                            ref NativeList<(float3, Entity)> results
-                        )
-                        */
-
-                        bool itemNearby = false;
-                        bool hasAnyItem = controlledCharacterRw.ValueRO.InventoryStack.Get().Length > 0;
-                        
-                        m_OverlapSphereResultBuffer.Clear();
-                        buildPhysicsWorld.GetAllOverlapSphereNoAlloc(characterPosition, 1.5f, ref m_OverlapSphereResultBuffer);
-                        foreach (var (qPos, qEntity) in m_OverlapSphereResultBuffer)
-                        {
-                            if (SystemAPI.HasComponent<GroundItem>(qEntity))
-                            {
-                                itemNearby = true;
-                            }
-                        }
-
-                        if (playerInput.PickupButtonTap.IsSet)
-                        {
-                            if (itemNearby)
-                            {
-                                controlledCharacterRw.ValueRW.SetActionCommandOpt(Option<ActionCommand>.Some(new CommandPickupItem()));
-                            }
-                        }
-
-                        if (playerInput.DropButtonTap.IsSet)
-                        {
-                            if (hasAnyItem)
-                            {
-                                controlledCharacterRw.ValueRW.SetActionCommandOpt(Option<ActionCommand>.Some(new CommandDropItem()));
-                            }
-                        }
-                        
-                        if (playerInput.DropButtonReleasedFromHold.IsSet)
-                        {
-                            if (hasAnyItem)
-                            {
-                                controlledCharacterRw.ValueRW.SetActionCommandOpt(Option<ActionCommand>.Some(new CommandThrowItem(playerInput.LookInput.X0Y() * 5 + Utility.Up * 5)));
-                            }
-                        }
+                        controlledCharacterRw.ValueRW.PickupButtonTap = playerInput.PickupButtonTap.IsSet;
+                        controlledCharacterRw.ValueRW.PickupButtonReleasedFromHold = playerInput.PickupButtonReleasedFromHold.IsSet;
+                        controlledCharacterRw.ValueRW.DropButtonTap = playerInput.DropButtonTap.IsSet;
+                        controlledCharacterRw.ValueRW.DropButtonReleasedFromHold = playerInput.DropButtonReleasedFromHold.IsSet;
                     }
                 }
             }

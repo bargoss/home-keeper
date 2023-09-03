@@ -24,8 +24,16 @@ namespace _OnlyOneGame.Scripts.Components
         // input:
         public float2 MovementInput; // [GhostField(Quantization = 1000)]
         public float2 LookInput; // [GhostField(Quantization = 1000)]
-        public BytesAs<Option<ActionCommand>, Data32Bytes> ActionCommandOpt; // [GhostField]
         
+        //public BytesAs<Option<ActionCommand>, Data32Bytes> ActionCommandOpt;
+        public bool DropButtonTap;
+        public bool DropButtonReleasedFromHold;
+        
+        public bool PickupButtonTap;
+        public bool PickupButtonReleasedFromHold;
+        
+        public bool ActionButton0Tap;
+
         public void SetMovementInput(float2 movementInput)
         {
             MovementInput = movementInput;
@@ -36,13 +44,6 @@ namespace _OnlyOneGame.Scripts.Components
             LookInput = lookInput;
         }
         
-        public void SetActionCommandOpt(Option<ActionCommand> actionCommandOpt)
-        {
-            ActionCommandOpt = actionCommandOpt;
-        }
-        
-        
-
         // stats:
         public int InventoryCapacity;
     }

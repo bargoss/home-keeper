@@ -25,6 +25,8 @@ namespace _OnlyOneGame.Scripts.Systems
     [UpdateAfter(typeof(HealthSystem))]
     public partial struct OnPlayerCharacterSystem : ISystem
     {
+        private NativeList<(float3, Entity)> m_OverlapSphereResultBuffer;
+        
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
@@ -32,6 +34,7 @@ namespace _OnlyOneGame.Scripts.Systems
             state.RequireForUpdate<BuildPhysicsWorldData>();
             state.RequireForUpdate<OnPlayerCharacter>();
             state.RequireForUpdate<NetworkTime>();
+            m_OverlapSphereResultBuffer = new NativeList<(float3, Entity)>(Allocator.Persistent);
         }
         
         
@@ -95,10 +98,7 @@ namespace _OnlyOneGame.Scripts.Systems
                     playerCharacter.LookDirection = new float2(1, 0); // init
                 }
 
-                //if (math.lengthsq(playerCharacter.MovementInput) > 0.5f)
-                //{
-                //    playerCharacter.LookDirection = math.normalize(math.lerp(playerCharacter.LookDirection,  playerCharacter.MovementInput, 0.1f));
-                //}
+                //Debug.Log("look direction input: " + playerCharacter.LookInput);
                 playerCharacter.LookDirection = math.normalizesafe(math.lerp(playerCharacter.LookDirection,  playerCharacter.LookInput, 0.1f));
 
 
@@ -112,70 +112,81 @@ namespace _OnlyOneGame.Scripts.Systems
                 
                 var silenced = playerCharacter.CommandsBlockedDuration > 0;
                 
-                // process action
-                if (!silenced && playerCharacter.ActionCommandOpt.Get().TryGet(out var actionCommand))
+                // handle action
+                bool itemNearby = false;
+                var characterPosition = localTransform.Position;
+                        
+                m_OverlapSphereResultBuffer.Clear();
+                buildPhysicsWorld.GetAllOverlapSphereNoAlloc(characterPosition, 1.5f, ref m_OverlapSphereResultBuffer);
+                foreach (var (qPos, qEntity) in m_OverlapSphereResultBuffer)
                 {
-                    actionCommand.Switch(
-                        dismantle => ProcessDismantleCommand(
-                            ref playerCharacter,
-                            localTransformLookup,
-                            playerPosition,
-                            interactionRadius,
-                            ref buildPhysicsWorld,
-                            time,
-                            ref deployedItemLookup
-                        ),
-                        pickupItem => ProcessPickupItemCommand(
-                            ref buildPhysicsWorld,
-                            playerPosition,
-                            interactionRadius,
-                            ref groundItemLookup,
-                            ref inventoryStack,
-                            playerCharacter.InventoryCapacity,
-                            ref playerCharacter.CommandsBlockedDuration,
-                            ref playerCharacterEvents,
-                            ref ghostDestroyedLookup
-                        ),
-                        craftItem => { },
-                        mineResource => { },
-                        cycleStack => { },
-                        meleeAttack =>
-                        {
-                            playerCharacter.OnGoingActionOpt.Set(new OnGoingAction(time,
-                                2, new OnGoingActionData(new ActionMeleeAttacking(meleeAttack.Direction))));
-                            playerCharacter.CommandsBlockedDuration += (int)(2f / deltaTime);
-                            playerCharacterEvents.Add(new PlayerEvent(new EventMeleeAttackStarted()));
-                        },
-                        throwItem =>
-                        {
-                            if(inventoryStack.Length == 0)
-                                return;
-                            
-                            var item = inventoryStack[^1];
-                            var throwVelocity = throwItem.ThrowVelocity;
-                            var throwDirection = throwVelocity / (math.length(throwVelocity) + 0.001f);
-                            var throwPosition = playerPosition + throwDirection * 0.5f + Utility.Up;
-                            
-                            inventoryStack.RemoveAt(inventoryStack.Length - 1);
-                            playerCharacterEvents.Add(new PlayerEvent(new EventThrownItem(item, throwItem.ThrowVelocity)));
+                    if (SystemAPI.HasComponent<GroundItem>(qEntity))
+                    {
+                        itemNearby = true;
+                    }
+                }
 
-                            ThrowItem(throwPosition, throwVelocity, item, in prefabs, ref ecb, true, tick, ghostOwner);
-                        },
-                        dropItem =>
+                // process action
+                if (!silenced)
+                {
+                    if (playerCharacter.PickupButtonTap)
+                    {
+                        if (itemNearby)
                         {
-                            if(inventoryStack.Length == 0)
-                                return;
-                            
+                            ProcessPickupItemCommand(
+                                ref buildPhysicsWorld,
+                                playerPosition,
+                                interactionRadius,
+                                ref groundItemLookup,
+                                ref inventoryStack,
+                                playerCharacter.InventoryCapacity,
+                                ref playerCharacter.CommandsBlockedDuration,
+                                ref playerCharacterEvents,
+                                ref ghostDestroyedLookup
+                            );
+                        }
+                    }
+                    else if (playerCharacter.DropButtonTap)
+                    {
+
+                        // drop Item
+                        if (inventoryStack.Length != 0)
+                        {
                             var item = inventoryStack[^1];
                             inventoryStack.RemoveAt(inventoryStack.Length - 1);
-                            
+
                             var dropPosition = playerPosition + Utility.Up * 0.5f + localTransform.Forward();
                             playerCharacterEvents.Add(new PlayerEvent(new EventDroppedItem(item)));
-                            
-                            ThrowItem(dropPosition, Utility.Up * 2f, item, in prefabs, ref ecb, false, tick, ghostOwner);
-                        } 
-                    );
+
+                            ThrowItem(dropPosition, Utility.Up * 2f, item, in prefabs, ref ecb, false, tick,
+                                ghostOwner);
+                        }
+                    }
+                    else if (playerCharacter.ActionButton0Tap)
+                    {
+                        playerCharacter.OnGoingActionOpt.Set(new OnGoingAction(time,
+                            2, new OnGoingActionData(new ActionMeleeAttacking(playerCharacter.LookDirection.X0Y()))));
+                        playerCharacter.CommandsBlockedDuration += (int)(2f / deltaTime);
+                        playerCharacterEvents.Add(new PlayerEvent(new EventMeleeAttackStarted()));
+                    }
+                    else if (playerCharacter.DropButtonReleasedFromHold)
+                    {
+                        if (inventoryStack.Length != 0)
+                        {
+                            var item = inventoryStack[^1];
+                            var throwVelocity = playerCharacter.LookInput.X0Y() * 5 + Utility.Up * 5;
+                            var throwDirection = throwVelocity / (math.length(throwVelocity) + 0.001f);
+                            var throwPosition = playerPosition + throwDirection * 0.5f + Utility.Up;
+
+                            inventoryStack.RemoveAt(inventoryStack.Length - 1);
+                            playerCharacterEvents.Add(new PlayerEvent(new EventThrownItem(item, throwVelocity)));
+
+                            ThrowItem(throwPosition, throwVelocity, item, in prefabs, ref ecb, true, tick,
+                                ghostOwner);
+                        }
+                    }
                 }
+
 
                 if (playerCharacter.OnGoingActionOpt.Get().TryGet(out var onGoingAction))
                 {
@@ -374,3 +385,72 @@ namespace _OnlyOneGame.Scripts.Systems
         }
     }
 }
+
+/*
+                
+                // process action
+                if (!silenced && playerCharacter.ActionCommandOpt.Get().TryGet(out var actionCommand))
+                {
+                    actionCommand.Switch(
+                        dismantle => ProcessDismantleCommand(
+                            ref playerCharacter,
+                            localTransformLookup,
+                            playerPosition,
+                            interactionRadius,
+                            ref buildPhysicsWorld,
+                            time,
+                            ref deployedItemLookup
+                        ),
+                        pickupItem => ProcessPickupItemCommand(
+                            ref buildPhysicsWorld,
+                            playerPosition,
+                            interactionRadius,
+                            ref groundItemLookup,
+                            ref inventoryStack,
+                            playerCharacter.InventoryCapacity,
+                            ref playerCharacter.CommandsBlockedDuration,
+                            ref playerCharacterEvents,
+                            ref ghostDestroyedLookup
+                        ),
+                        craftItem => { },
+                        mineResource => { },
+                        cycleStack => { },
+                        meleeAttack =>
+                        {
+                            playerCharacter.OnGoingActionOpt.Set(new OnGoingAction(time,
+                                2, new OnGoingActionData(new ActionMeleeAttacking(meleeAttack.Direction))));
+                            playerCharacter.CommandsBlockedDuration += (int)(2f / deltaTime);
+                            playerCharacterEvents.Add(new PlayerEvent(new EventMeleeAttackStarted()));
+                        },
+                        throwItem =>
+                        {
+                            if(inventoryStack.Length == 0)
+                                return;
+                            
+                            var item = inventoryStack[^1];
+                            var throwVelocity = throwItem.ThrowVelocity;
+                            var throwDirection = throwVelocity / (math.length(throwVelocity) + 0.001f);
+                            var throwPosition = playerPosition + throwDirection * 0.5f + Utility.Up;
+                            
+                            inventoryStack.RemoveAt(inventoryStack.Length - 1);
+                            playerCharacterEvents.Add(new PlayerEvent(new EventThrownItem(item, throwItem.ThrowVelocity)));
+
+                            ThrowItem(throwPosition, throwVelocity, item, in prefabs, ref ecb, true, tick, ghostOwner);
+                        },
+                        dropItem =>
+                        {
+                            if(inventoryStack.Length == 0)
+                                return;
+                            
+                            var item = inventoryStack[^1];
+                            inventoryStack.RemoveAt(inventoryStack.Length - 1);
+                            
+                            var dropPosition = playerPosition + Utility.Up * 0.5f + localTransform.Forward();
+                            playerCharacterEvents.Add(new PlayerEvent(new EventDroppedItem(item)));
+                            
+                            ThrowItem(dropPosition, Utility.Up * 2f, item, in prefabs, ref ecb, false, tick, ghostOwner);
+                        } 
+                    );
+                }
+                
+                */

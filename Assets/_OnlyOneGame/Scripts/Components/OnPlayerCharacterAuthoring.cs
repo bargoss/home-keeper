@@ -34,7 +34,6 @@ namespace _OnlyOneGame.Scripts.Components
                             new Item(ItemTypeMinion.Healer),
                             new Item(ItemTypeThrowable.FlashBang)
                         },
-                        ActionCommandOpt = Option<ActionCommand>.Some(new ActionCommand(new CommandCraftItem(){ItemToCraft = new Item(ItemTypeMinion.Melee)})),
                         OnGoingActionOpt = Option<OnGoingAction>.Some(new OnGoingAction(){Duration = 1.19f, StartTime = 0.12f, Data = new OnGoingActionData(new ActionDismantling(){})}),
                         Events = events,
                         CommandsBlockedDuration = 0,

@@ -122,7 +122,7 @@ MonoBehaviour:
   DefaultGhostMode: 2
   SupportedGhostModes: 3
   OptimizationMode: 0
-  Importance: 1
+  Importance: 2
   prefabId: d2eba1fdf99c21342890a662a96c0d81
   HasOwner: 1
   SupportAutoCommandTarget: 0
@@ -430,5 +430,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 740f9aed6fa040ddb2c980424b5bbd4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxHitPoints: 10
+  MaxHitPoints: 1.33
   DestroyOnDeath: 0

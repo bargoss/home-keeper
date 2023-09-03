@@ -20,7 +20,7 @@ namespace _OnlyOneGame.Scripts.Components
         [GhostField] public InputEvent DropButtonReleasedFromHold;
         
         [GhostField] public InputEvent PickupButtonTap;
-        [GhostField] public InputEvent PickupButtonReleasedFromHolding;
+        [GhostField] public InputEvent PickupButtonReleasedFromHold;
     }
     
     [UpdateInGroup(typeof(GhostInputSystemGroup))]
@@ -97,7 +97,7 @@ namespace _OnlyOneGame.Scripts.Components
                     }
                     else if (releasedAfterHoldPickup)
                     {
-                        playerInput.PickupButtonReleasedFromHolding.Set();
+                        playerInput.PickupButtonReleasedFromHold.Set();
                     }
 
 
