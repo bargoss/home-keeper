@@ -18,6 +18,7 @@ namespace DefenderGame.Scripts.Systems
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
+            state.RequireForUpdate<NetworkTime>();
             state.RequireForUpdate<BuildPhysicsWorldData>();
             state.RequireForUpdate<CharacterMovement>();
         }
@@ -26,6 +27,9 @@ namespace DefenderGame.Scripts.Systems
         public void OnUpdate(ref SystemState state)
         {
             var buildPhysicsWorld = SystemAPI.GetSingleton<BuildPhysicsWorldData>();
+            var networkTime = SystemAPI.GetSingleton<NetworkTime>();
+            
+            if(networkTime.IsPartialTick) return;
             
             foreach (var aspect in SystemAPI.Query<CharacterMovementAspect>().WithAll<Simulate>())
             {

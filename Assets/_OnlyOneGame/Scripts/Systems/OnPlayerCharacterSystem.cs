@@ -47,6 +47,7 @@ namespace _OnlyOneGame.Scripts.Systems
             var healthLookup = SystemAPI.GetComponentLookup<Health>();
             var factionLookup = SystemAPI.GetComponentLookup<Faction>();
             var ghostDestroyedLookup = SystemAPI.GetComponentLookup<DestroyableGhost>();
+            var ghostOwnerLookup = SystemAPI.GetComponentLookup<GhostOwner>();
             
             var interactionRadius = 1f;
 
@@ -59,7 +60,7 @@ namespace _OnlyOneGame.Scripts.Systems
             var tickInt = tick.TickIndexForValidTick;
             var time = (float)tickInt * deltaTime;
             
-            if(!networkTime.IsFirstTimeFullyPredictingTick) return;
+            if(networkTime.IsPartialTick) return;
             
 
 
@@ -74,10 +75,11 @@ namespace _OnlyOneGame.Scripts.Systems
                              Faction,
                              Health
                          >()
-                         .WithEntityAccess().WithAll<Simulate>())
+                         .WithEntityAccess().WithAny<GhostOwner>().WithAll<Simulate>())
             {
                 var playerCharacter = playerCharacterRw.ValueRO;
                 var characterMovement = characterMovementRw.ValueRO;
+                ghostOwnerLookup.TryGetComponent(entity, out var ghostOwner);
                 
                 
                 if (health.IsDead)
@@ -157,7 +159,7 @@ namespace _OnlyOneGame.Scripts.Systems
                             inventoryStack.RemoveAt(inventoryStack.Length - 1);
                             playerCharacterEvents.Add(new PlayerEvent(new EventThrownItem(item, throwItem.ThrowVelocity)));
 
-                            ThrowItem(throwPosition, throwVelocity, item, in prefabs, ref ecb, true, tick);
+                            ThrowItem(throwPosition, throwVelocity, item, in prefabs, ref ecb, true, tick, ghostOwner);
                         },
                         dropItem =>
                         {
@@ -170,7 +172,7 @@ namespace _OnlyOneGame.Scripts.Systems
                             var dropPosition = playerPosition + Utility.Up * 0.5f + localTransform.Forward();
                             playerCharacterEvents.Add(new PlayerEvent(new EventDroppedItem(item)));
                             
-                            ThrowItem(dropPosition, Utility.Up * 2f, item, in prefabs, ref ecb, false, tick);
+                            ThrowItem(dropPosition, Utility.Up * 2f, item, in prefabs, ref ecb, false, tick, ghostOwner);
                         } 
                     );
                 }
@@ -267,10 +269,11 @@ namespace _OnlyOneGame.Scripts.Systems
 
         
         
-        private static Entity ThrowItem(float3 position, float3 velocity, Item item, in OnPrefabs prefabs, ref EntityCommandBuffer ecb, bool activated, NetworkTick currentTick)
+        private static Entity ThrowItem(float3 position, float3 velocity, Item item, in OnPrefabs prefabs, ref EntityCommandBuffer ecb, bool activated, NetworkTick currentTick, GhostOwner ghostOwner)
         {
-            var instance = CreateAndThrow(position, velocity, prefabs.GroundItemPrefab.Entity, ref ecb);
+            var instance = CreateAndThrow(position, velocity, prefabs.GroundItemPrefab.Entity, ref ecb, ghostOwner);
             ecb.SetComponent(instance, new GroundItem(item));
+            ecb.AddComponent<PredictedGhost>(instance);
             
             if (activated)
             {
@@ -283,12 +286,13 @@ namespace _OnlyOneGame.Scripts.Systems
             return instance;
         }
         
-        private static Entity CreateAndThrow(float3 position, float3 velocity, Entity prefab, ref EntityCommandBuffer ecb)
+        private static Entity CreateAndThrow(float3 position, float3 velocity, Entity prefab, ref EntityCommandBuffer ecb, GhostOwner ghostOwner)
         {
             var instance = ecb.Instantiate(prefab);
-            //ecb.AddComponent<PredictedGhostSpawnRequest>(instance);
+            
             ecb.SetLocalPositionRotation(instance, position, quaternion.identity);
             ecb.SetVelocity(instance, velocity);
+            ecb.AddComponent(instance, ghostOwner);
             return instance;
         }
 

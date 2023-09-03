@@ -34,7 +34,7 @@ namespace DefenderGame.Scripts.GoViews
             var acceleration = velocityDelta / deltaTime;
             
             var upTilt = Vector3.ProjectOnPlane(acceleration * 0.1f, Vector3.up);
-            m_SmoothUpTilt = Vector3.Lerp(m_SmoothUpTilt, upTilt, deltaTime *0.5f);
+            m_SmoothUpTilt = Vector3.Lerp(m_SmoothUpTilt, upTilt, deltaTime *0.85f);
             //print("m_SmoothUpTilt: " + m_SmoothUpTilt);
             var right = Vector3.Cross(lookDirection, Vector3.up);
             var up = (Vector3.up + m_SmoothUpTilt).normalized;
