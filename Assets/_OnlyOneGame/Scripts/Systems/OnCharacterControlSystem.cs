@@ -49,12 +49,15 @@ namespace _OnlyOneGame.Scripts.Systems
                 {
                     if (SystemAPI.GetComponentLookup<OnPlayerCharacter>().TryGetRw(controlledCharacterEntity, out var controlledCharacterRw))
                     {
-                        controlledCharacterRw.ValueRW.SetMovementInput(playerInput.MovementInput);
-                        controlledCharacterRw.ValueRW.SetLookInput(playerInput.LookInput);
-                        controlledCharacterRw.ValueRW.PickupButtonTap = playerInput.PickupButtonTap.IsSet;
-                        controlledCharacterRw.ValueRW.PickupButtonReleasedFromHold = playerInput.PickupButtonReleasedFromHold.IsSet;
-                        controlledCharacterRw.ValueRW.DropButtonTap = playerInput.DropButtonTap.IsSet;
-                        controlledCharacterRw.ValueRW.DropButtonReleasedFromHold = playerInput.DropButtonReleasedFromHold.IsSet;
+                        controlledCharacterRw.ValueRW.Input = new OnPlayerCharacterInput
+                        {
+                            Movement = playerInput.MovementInput,
+                            Look = playerInput.LookInput,
+                            PickupButtonTap = playerInput.PickupButtonTap.IsSet,
+                            PickupButtonReleasedFromHold = playerInput.PickupButtonReleasedFromHold.IsSet,
+                            DropButtonTap = playerInput.DropButtonTap.IsSet,
+                            DropButtonReleasedFromHold = playerInput.DropButtonReleasedFromHold.IsSet
+                        };
                     }
                 }
             }

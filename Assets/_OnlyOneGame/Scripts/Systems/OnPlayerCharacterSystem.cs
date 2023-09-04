@@ -15,7 +15,6 @@ using Unity.Physics;
 using Unity.Physics.Systems;
 using Unity.Transforms;
 using UnityEngine;
-using UnityEngine.UIElements;
 using ValueVariant;
 
 namespace _OnlyOneGame.Scripts.Systems
@@ -26,7 +25,7 @@ namespace _OnlyOneGame.Scripts.Systems
     public partial struct OnPlayerCharacterSystem : ISystem
     {
         private NativeList<(float3, Entity)> m_OverlapSphereResultBuffer;
-        
+
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
@@ -35,15 +34,13 @@ namespace _OnlyOneGame.Scripts.Systems
             state.RequireForUpdate<OnPlayerCharacter>();
             state.RequireForUpdate<NetworkTime>();
             m_OverlapSphereResultBuffer = new NativeList<(float3, Entity)>(Allocator.Persistent);
+            
         }
         
         
         
         public void OnUpdate(ref SystemState state)
         {
-            var buildPhysicsWorld = SystemAPI.GetSingleton<BuildPhysicsWorldData>();
-            var prefabs = SystemAPI.GetSingleton<OnPrefabs>();
-            
             var deployedItemLookup = SystemAPI.GetComponentLookup<DeployedItem>();
             var groundItemLookup = SystemAPI.GetComponentLookup<GroundItem>();
             var localTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>();
@@ -51,6 +48,9 @@ namespace _OnlyOneGame.Scripts.Systems
             var factionLookup = SystemAPI.GetComponentLookup<Faction>();
             var ghostDestroyedLookup = SystemAPI.GetComponentLookup<DestroyableGhost>();
             var ghostOwnerLookup = SystemAPI.GetComponentLookup<GhostOwner>();
+            
+            var buildPhysicsWorld = SystemAPI.GetSingleton<BuildPhysicsWorldData>();
+            var prefabs = SystemAPI.GetSingleton<OnPrefabs>();
             
             var interactionRadius = 1f;
 
@@ -91,7 +91,7 @@ namespace _OnlyOneGame.Scripts.Systems
                     continue;
                 }
                 
-                characterMovement.MovementInput = playerCharacter.MovementInput;
+                characterMovement.MovementInput = playerCharacter.Input.Movement;
                 
                 if(math.lengthsq(playerCharacter.LookDirection) < 0.5f)
                 {
@@ -99,7 +99,7 @@ namespace _OnlyOneGame.Scripts.Systems
                 }
 
                 //Debug.Log("look direction input: " + playerCharacter.LookInput);
-                playerCharacter.LookDirection = math.normalizesafe(math.lerp(playerCharacter.LookDirection,  playerCharacter.LookInput, 0.1f));
+                playerCharacter.LookDirection = math.normalizesafe(math.lerp(playerCharacter.LookDirection,  playerCharacter.Input.Look, 0.1f));
 
 
                 var playerCharacterEvents = playerCharacter.Events.Get();
@@ -125,11 +125,15 @@ namespace _OnlyOneGame.Scripts.Systems
                         itemNearby = true;
                     }
                 }
+                
+                // figure out action:
+                //if()
+                
 
                 // process action
                 if (!silenced)
                 {
-                    if (playerCharacter.PickupButtonTap)
+                    if (playerCharacter.Input.PickupButtonTap)
                     {
                         if (itemNearby)
                         {
@@ -146,7 +150,7 @@ namespace _OnlyOneGame.Scripts.Systems
                             );
                         }
                     }
-                    else if (playerCharacter.DropButtonTap)
+                    else if (playerCharacter.Input.DropButtonTap)
                     {
 
                         // drop Item
@@ -162,19 +166,19 @@ namespace _OnlyOneGame.Scripts.Systems
                                 ghostOwner);
                         }
                     }
-                    else if (playerCharacter.ActionButton0Tap)
+                    else if (playerCharacter.Input.ActionButton0Tap)
                     {
                         playerCharacter.OnGoingActionOpt.Set(new OnGoingAction(time,
                             2, new OnGoingActionData(new ActionMeleeAttacking(playerCharacter.LookDirection.X0Y()))));
                         playerCharacter.CommandsBlockedDuration += (int)(2f / deltaTime);
                         playerCharacterEvents.Add(new PlayerEvent(new EventMeleeAttackStarted()));
                     }
-                    else if (playerCharacter.DropButtonReleasedFromHold)
+                    else if (playerCharacter.Input.DropButtonReleasedFromHold)
                     {
                         if (inventoryStack.Length != 0)
                         {
                             var item = inventoryStack[^1];
-                            var throwVelocity = playerCharacter.LookInput.X0Y() * 5 + Utility.Up * 5;
+                            var throwVelocity = playerCharacter.Input.Look.X0Y() * 5 + Utility.Up * 5;
                             var throwDirection = throwVelocity / (math.length(throwVelocity) + 0.001f);
                             var throwPosition = playerPosition + throwDirection * 0.5f + Utility.Up;
 
@@ -279,7 +283,6 @@ namespace _OnlyOneGame.Scripts.Systems
         }
 
         
-        
         private static Entity ThrowItem(float3 position, float3 velocity, Item item, in OnPrefabs prefabs, ref EntityCommandBuffer ecb, bool activated, NetworkTick currentTick, GhostOwner ghostOwner)
         {
             var instance = CreateAndThrow(position, velocity, prefabs.GroundItemPrefab.Entity, ref ecb, ghostOwner);
@@ -382,6 +385,18 @@ namespace _OnlyOneGame.Scripts.Systems
         public void OnDestroy(ref SystemState state)
         {
 
+        }
+    }
+
+    public static class OnCharacterSystemUtils
+    {
+        public static ActionCommand GetActionCommand(
+            OnPlayerCharacter character, 
+            float3 characterPosition,
+            ref ComponentLookup<GroundItem> groundItemLookup
+        )
+        {
+            return default;
         }
     }
 }

@@ -6,26 +6,32 @@ using Unity.NetCode;
 using ValueVariant;
 
 namespace _OnlyOneGame.Scripts.Components
-{ 
+{
     public struct OnPlayerCharacter : IComponentData
     {
         // state:
         [GhostField] public BytesAs<FixedList128Bytes<Item>, Data128Bytes> InventoryStack;
         [GhostField] public BytesAs<Option<OnGoingAction>, Data32Bytes> OnGoingActionOpt;
         
-        public BytesAs<FixedList128Bytes<PlayerEvent>, Data128Bytes> Events; // [GhostField] 
-
         [GhostField] public int CommandsBlockedDuration;
         [GhostField] public int MovementBlockedDuration;
         [GhostField] public float2 LookDirection;
-
-
-        // these fields can be removed if we be careful about execution order
-        // input:
-        public float2 MovementInput; // [GhostField(Quantization = 1000)]
-        public float2 LookInput; // [GhostField(Quantization = 1000)]
         
-        //public BytesAs<Option<ActionCommand>, Data32Bytes> ActionCommandOpt;
+        // events
+        public BytesAs<FixedList128Bytes<PlayerEvent>, Data128Bytes> Events; // [GhostField]
+
+        // input
+        public OnPlayerCharacterInput Input;
+        
+        
+        // stats:
+        public int InventoryCapacity;
+    }
+    
+    public struct OnPlayerCharacterInput
+    {
+        public float2 Movement;
+        public float2 Look;
         public bool DropButtonTap;
         public bool DropButtonReleasedFromHold;
         
@@ -33,19 +39,8 @@ namespace _OnlyOneGame.Scripts.Components
         public bool PickupButtonReleasedFromHold;
         
         public bool ActionButton0Tap;
-
-        public void SetMovementInput(float2 movementInput)
-        {
-            MovementInput = movementInput;
-        }
-        
-        public void SetLookInput(float2 lookInput)
-        {
-            LookInput = lookInput;
-        }
-        
-        // stats:
-        public int InventoryCapacity;
+        public bool ActionButton1Tap;
+        public bool ActionButton2Tap;
     }
 
     [ValueVariant]
