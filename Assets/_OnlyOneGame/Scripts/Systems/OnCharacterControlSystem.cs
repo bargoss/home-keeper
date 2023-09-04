@@ -56,7 +56,8 @@ namespace _OnlyOneGame.Scripts.Systems
                             PickupButtonTap = playerInput.PickupButtonTap.IsSet,
                             PickupButtonReleasedFromHold = playerInput.PickupButtonReleasedFromHold.IsSet,
                             DropButtonTap = playerInput.DropButtonTap.IsSet,
-                            DropButtonReleasedFromHold = playerInput.DropButtonReleasedFromHold.IsSet
+                            DropButtonReleasedFromHold = playerInput.DropButtonReleasedFromHold.IsSet,
+                            ActionButton0Tap = playerInput.Action0.IsSet,
                         };
                     }
                 }

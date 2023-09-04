@@ -81,24 +81,26 @@ public static class SerializationUtils
     
     
     public static unsafe void Serialize<T, TDataBytes>(T data, ref TDataBytes serializedData) 
-        where T : struct where TDataBytes : unmanaged, IDataBytes
+        where T : unmanaged where TDataBytes : unmanaged, IDataBytes
     {
         // Debug.LogError if T size is bigger than TDataBytes size
-        if (Marshal.SizeOf(typeof(T)) > Marshal.SizeOf(typeof(TDataBytes)))
+        if (sizeof(T) > sizeof(TDataBytes))
         {
-            throw new Exception("size of " + typeof(T) + " (" + Marshal.SizeOf(typeof(T)) + ") is bigger than size of " + typeof(TDataBytes) + " (" + Marshal.SizeOf(typeof(TDataBytes)) + ")");
+            // dont use typeof
+            throw new Exception("size of T is bigger than size of TDataBytes by " + (sizeof(T) - sizeof(TDataBytes)) + " bytes");
         }
         var ptr = UnsafeUtility.AddressOf(ref serializedData);
         UnsafeUtility.CopyStructureToPtr(ref data, ptr);
     }
     
     public static unsafe T Deserialize<T, TDataBytes>(ref TDataBytes serializedData) 
-        where T : struct where TDataBytes : unmanaged, IDataBytes
+        where T : unmanaged where TDataBytes : unmanaged, IDataBytes
     {
         // Debug.LogError if T size is bigger than TDataBytes size
-        if (Marshal.SizeOf(typeof(T)) > Marshal.SizeOf(typeof(TDataBytes)))
+        
+        if (sizeof(T) > sizeof(TDataBytes))
         {
-            throw new Exception("size of " + typeof(T) + " (" + Marshal.SizeOf(typeof(T)) + ") is bigger than size of " + typeof(TDataBytes) + " (" + Marshal.SizeOf(typeof(TDataBytes)) + ")");
+            throw new Exception("size of T is bigger than size of TDataBytes by " + (sizeof(T) - sizeof(TDataBytes)) + " bytes");
         }
         
         var ptr = UnsafeUtility.AddressOf(ref serializedData);
