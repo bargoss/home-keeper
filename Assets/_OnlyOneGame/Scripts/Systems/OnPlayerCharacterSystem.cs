@@ -102,8 +102,8 @@ namespace _OnlyOneGame.Scripts.Systems
                 playerCharacter.LookDirection = math.normalizesafe(math.lerp(playerCharacter.LookDirection,  playerCharacter.Input.Look, 0.1f));
 
 
-                var playerCharacterEvents = playerCharacter.Events.Get();
-                var inventoryStack = playerCharacter.InventoryStack.Get();
+                var playerCharacterEvents = playerCharacter.Events;
+                var inventoryStack = playerCharacter.InventoryStack;
                 
                 playerCharacterEvents.Clear();
                 
@@ -192,7 +192,7 @@ namespace _OnlyOneGame.Scripts.Systems
                 }
 
 
-                if (playerCharacter.OnGoingActionOpt.Get().TryGet(out var onGoingAction))
+                if (playerCharacter.OnGoingActionOpt.TryGet(out var onGoingAction))
                 {
                     onGoingAction.Data.Switch(
                         meleeAttacking =>
@@ -225,8 +225,8 @@ namespace _OnlyOneGame.Scripts.Systems
                 if (playerCharacter.MovementBlockedDuration < 0) playerCharacter.MovementBlockedDuration = 0;
 
                 // write back
-                playerCharacter.Events.Set(playerCharacterEvents);
-                playerCharacter.InventoryStack.Set(inventoryStack);
+                playerCharacter.Events = playerCharacterEvents;
+                playerCharacter.InventoryStack = inventoryStack;
                 
 
                 playerCharacterRw.ValueRW = playerCharacter;
@@ -250,7 +250,7 @@ namespace _OnlyOneGame.Scripts.Systems
                 //characterView.LastAttacked = networkTime.ServerTick;
                 //characterView.LastItemThrown = networkTime.ServerTick;
 
-                var events = onPlayerCharacterRo.ValueRO.Events.Get();
+                var events = onPlayerCharacterRo.ValueRO.Events;
                 foreach (var playerEvent in events)
                 {
                     playerEvent.Switch(
@@ -351,7 +351,7 @@ namespace _OnlyOneGame.Scripts.Systems
         private static void ProcessDismantleCommand(ref OnPlayerCharacter playerCharacter, ComponentLookup<LocalTransform> localTransformLookup,
             float3 playerPosition, float interactionRadius, ref BuildPhysicsWorldData buildPhysicsWorld, float time, ref ComponentLookup<DeployedItem> deployedItemLookup)
         {
-            if (playerCharacter.OnGoingActionOpt.Get().TryGet(out var onGoingAction) &&
+            if (playerCharacter.OnGoingActionOpt.TryGet(out var onGoingAction) &&
                 onGoingAction.Data.TryGetValue(out ActionDismantling dismantling))
             {
                 // still unbuilding

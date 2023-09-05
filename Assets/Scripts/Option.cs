@@ -2,8 +2,8 @@
 
 public struct Option<T> 
 {
-    private T m_Value;
-    private bool m_HasValue;
+    public T m_Value;
+    public bool m_HasValue;
     public readonly bool TryGet(out T value)
     {
         value = m_Value;

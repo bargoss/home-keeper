@@ -9,16 +9,17 @@ namespace _OnlyOneGame.Scripts.Components
 {
     public struct OnPlayerCharacter : IComponentData
     {
+        
         // state:
-        [GhostField] public BytesAs<FixedList128Bytes<Item>, Data128Bytes> InventoryStack;
-        [GhostField] public BytesAs<Option<OnGoingAction>, Data32Bytes> OnGoingActionOpt;
+        [GhostField] public FixedList128Bytes<Item> InventoryStack;
+        [GhostField] public Option<OnGoingAction> OnGoingActionOpt;
         
         [GhostField] public int CommandsBlockedDuration;
         [GhostField] public int MovementBlockedDuration;
         [GhostField] public float2 LookDirection;
         
         // events
-        public BytesAs<FixedList128Bytes<PlayerEvent>, Data128Bytes> Events; // [GhostField]
+        public FixedList128Bytes<PlayerEvent> Events; // [GhostField]
 
         // input
         public OnPlayerCharacterInput Input;

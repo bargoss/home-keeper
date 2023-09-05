@@ -63,25 +63,24 @@ namespace DefenderGame.Scripts.Tests
             worldSource.EntityManager.AddComponent<OnPlayerCharacter>(eSource);
             var playerCharacter = new OnPlayerCharacter();
             playerCharacter.Events = new FixedList128Bytes<PlayerEvent>();
-            //playerCharacter.Events.Value.Add(new EventItemPickedUp(){Item = MinionType.Tank });
-            playerCharacter.Events.Edit((ref FixedList128Bytes<PlayerEvent> value) => value.Add(new EventMeleeAttackStarted() { Direction = new float3(0.15f, 0.25f, 0.35f) })); 
-            //playerCharacter.Events.Value.Add(new EventMeleeAttackStarted() { Direction = new float3(0.15f, 0.25f, 0.35f) });
-            playerCharacter.Events.Edit((ref FixedList128Bytes<PlayerEvent> value) => value.Add(new EventThrownItem() { Item = new Item() }));
-            //playerCharacter.OnGoingAction = Option<OnGoingAction>.Some(new ItemPickedUpEvent(){Item = new Item()});
+            
+            //playerCharacter.Events.Edit((ref FixedList128Bytes<PlayerEvent> value) => value.Add(new EventMeleeAttackStarted() { Direction = new float3(0.15f, 0.25f, 0.35f) })); 
+            
+            //playerCharacter.Events.Edit((ref FixedList128Bytes<PlayerEvent> value) => value.Add(new EventThrownItem() { Item = new Item() }));
+            
             worldSource.EntityManager.SetComponentData(eSource, playerCharacter);
 
             var sourceEntitiesToCopy = new NativeArray<Entity>(1, Allocator.Temp);
             sourceEntitiesToCopy[0] = eSource;
 
             worldDestination.EntityManager.CopyEntitiesFrom(worldSource.EntityManager, sourceEntitiesToCopy);
-            
-            // m_ReadonlyTestQuery = entityManager.CreateEntityQuery(ComponentType.ReadOnly<OcclusionTest>());
+
             worldDestination.EntityManager.CreateEntityQuery(typeof(OnPlayerCharacter));
             
             // get the first entity
             var eDestination = worldDestination.EntityManager.CreateEntityQuery(typeof(OnPlayerCharacter)).GetSingletonEntity();
             var playerCharacterDestination = worldDestination.EntityManager.GetComponentData<OnPlayerCharacter>(eDestination);
-            var playerEvent = playerCharacterDestination.Events.Get()[0];
+            //var playerEvent = playerCharacterDestination.Events.Get()[0];
             
             var a = 3;
         }
@@ -238,9 +237,9 @@ namespace DefenderGame.Scripts.Tests
     
     
     [ValueVariant]
-    public readonly partial struct SampleVariant: IValueVariant<SampleVariant, int> { }
+    public partial struct SampleVariant: IValueVariant<SampleVariant, int> { }
     
     [ValueVariant]
-    public readonly partial struct SampleVariant2: IValueVariant<SampleVariant2, SampleVariant, long> { }
+    public partial struct SampleVariant2: IValueVariant<SampleVariant2, SampleVariant, long> { }
 #endif
 }
