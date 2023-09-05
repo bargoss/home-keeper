@@ -1,4 +1,5 @@
-﻿using DefaultNamespace;
+﻿using System.Runtime.InteropServices;
+using DefaultNamespace;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -7,12 +8,41 @@ using ValueVariant;
 
 namespace _OnlyOneGame.Scripts.Components
 {
+    [StructLayout(LayoutKind.Explicit)]
+    public struct SusUnion
+    {
+        [FieldOffset(0)] public float3 Item0;
+        [FieldOffset(0)] public double3 Item1;
+        [FieldOffset(0)] public int Item2;
+        [FieldOffset(0)] public EventUnbuilt Item3;
+        [FieldOffset(0)] public ActionMeleeAttacking Item4;
+    }
+
+    public struct SusStruct3
+    {
+        public float3 Item;
+        public double2 Item2;
+        public SusUnion Item3;
+    }
+    public struct SusStruct2
+    {
+        public float3 Item;
+        public SusStruct3 Item2;
+    }
+    public struct SusStruct
+    {
+        public double2 Item;
+        public SusStruct2 Item2;
+    }
     public struct OnPlayerCharacter : IComponentData
     {
         
         // state:
         [GhostField] public FixedList128Bytes<Item> InventoryStack;
-        [GhostField] public Option<OnGoingAction> OnGoingActionOpt;
+        public Option<OnGoingAction> OnGoingActionOpt;
+        //[GhostField] public OnGoingAction TestField;
+        //[GhostField] public SusUnion TestField2;
+        [GhostField] public SusStruct TestField3;
         
         [GhostField] public int CommandsBlockedDuration;
         [GhostField] public int MovementBlockedDuration;
@@ -123,7 +153,10 @@ namespace _OnlyOneGame.Scripts.Components
             Target = target;
         }
     }
-    public struct EventUnbuilt { }
+    public struct EventUnbuilt
+    {
+        public int Dummy;
+    }
     
     public struct CommandPickupItem { }
 

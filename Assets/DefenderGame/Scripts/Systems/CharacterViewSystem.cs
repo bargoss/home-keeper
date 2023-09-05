@@ -4,6 +4,7 @@ using DefenderGame.Scripts.GoViews;
 using HomeKeeper.Components;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.NetCode;
 using Unity.Physics;
 using Unity.Transforms;
 using UnityEngine;
@@ -13,7 +14,7 @@ using Random = Unity.Mathematics.Random;
 namespace DefenderGame.Scripts.Systems
 {
     [UpdateInGroup(typeof(SimulationSystemGroup))]
-    [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
+    [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation | WorldSystemFilterFlags.ServerSimulation)]
     public partial class CharacterViewSystem : SystemBase
     {
         private readonly PairMaintainer<ViewId, CharacterGOView> m_PairMaintainer = new(
@@ -59,7 +60,7 @@ namespace DefenderGame.Scripts.Systems
 
                 viewPair.SetDead(characterView.Dead);
 
-                var offsetForServer = World.Flags.HasFlag(WorldFlags.GameServer) ? new float3(0, 2f, 0) : float3.zero;
+                var offsetForServer = World.IsServer() ? new float3(0, 2f, 0) : float3.zero;
                 //Debug.Log("look direction: " + characterView.LookDirection);
                 viewPair.HandleFixedUpdate(
                     localTransform.Position + offsetForServer,
