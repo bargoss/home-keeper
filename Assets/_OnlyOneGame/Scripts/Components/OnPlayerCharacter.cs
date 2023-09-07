@@ -1,4 +1,5 @@
-﻿using DefaultNamespace;
+﻿using _OnlyOneGame.Scripts.Components.Data;
+using DefaultNamespace;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -11,14 +12,14 @@ namespace _OnlyOneGame.Scripts.Components
     {
         // state:
         [GhostField] public BytesAs<FixedList128Bytes<Item>, Data128Bytes> InventoryStack;
-        [GhostField] public BytesAs<Option<OnGoingAction>, Data32Bytes> OnGoingActionOpt;
+        [GhostField] public Option<OnGoingAction> OnGoingActionOpt;
         
         [GhostField] public int CommandsBlockedDuration;
         [GhostField] public int MovementBlockedDuration;
         [GhostField] public float2 LookDirection;
         
         // events
-        public BytesAs<FixedList128Bytes<PlayerEvent>, Data128Bytes> Events; // [GhostField]
+        public FixedList128Bytes<PlayerEvent> Events; // [GhostField]
 
         // input
         public OnPlayerCharacterInput Input;
@@ -56,11 +57,11 @@ namespace _OnlyOneGame.Scripts.Components
     >
     { }
 
-    [ValueVariant]
-    public partial struct OnGoingActionData : IValueVariant<OnGoingActionData
-        , ActionMeleeAttacking
-        , ActionDismantling
-    > { }
+    //[ValueVariant]
+    //public partial struct OnGoingActionData : IValueVariant<OnGoingActionData
+    //    , ActionMeleeAttacking
+    //    , ActionDismantling
+    //> { }
 
     [ValueVariant]
     public partial struct ActionCommand : IValueVariant<ActionCommand,
@@ -97,31 +98,19 @@ namespace _OnlyOneGame.Scripts.Components
             Direction = direction;
         }
     }
-    public struct ActionMeleeAttacking
+    
+    public struct EventMeleeAttackStarted
     {
         public float3 Direction;
         
-        public ActionMeleeAttacking(float3 direction)
+        public EventMeleeAttackStarted(float3 direction)
         {
             Direction = direction;
         }
     }
-    public struct EventMeleeAttackStarted
-    {
-        public float3 Direction;
-    }
 
     public struct CommandDismantle { }
 
-    public struct ActionDismantling
-    {
-        public Entity Target;
-
-        public ActionDismantling(Entity target)
-        {
-            Target = target;
-        }
-    }
     public struct EventUnbuilt { }
     
     public struct CommandPickupItem { }

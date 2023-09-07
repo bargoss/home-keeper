@@ -1,5 +1,6 @@
 ﻿using System;
 using _OnlyOneGame.Scripts.Components;
+using _OnlyOneGame.Scripts.Components.Data;
 using Components;
 using DefaultNamespace;
 using DefenderGame.Scripts.Components;
@@ -102,7 +103,7 @@ namespace _OnlyOneGame.Scripts.Systems
                 playerCharacter.LookDirection = math.normalizesafe(math.lerp(playerCharacter.LookDirection,  playerCharacter.Input.Look, 0.1f));
 
 
-                var playerCharacterEvents = playerCharacter.Events.Get();
+                var playerCharacterEvents = playerCharacter.Events;
                 var inventoryStack = playerCharacter.InventoryStack.Get();
                 
                 playerCharacterEvents.Clear();
@@ -169,7 +170,8 @@ namespace _OnlyOneGame.Scripts.Systems
                     else if (playerCharacter.Input.ActionButton0Tap)
                     {
                         playerCharacter.OnGoingActionOpt.Set(new OnGoingAction(time,
-                            2, new OnGoingActionData(new ActionMeleeAttacking(playerCharacter.LookDirection.X0Y()))));
+                            2,
+                            new ActionMeleeAttacking(playerCharacter.LookDirection.X0Y())));
                         playerCharacter.CommandsBlockedDuration += (int)(2f / deltaTime);
                         playerCharacterEvents.Add(new PlayerEvent(new EventMeleeAttackStarted()));
                     }
@@ -192,31 +194,29 @@ namespace _OnlyOneGame.Scripts.Systems
                 }
 
 
-                if (playerCharacter.OnGoingActionOpt.Get().TryGet(out var onGoingAction))
+                if (playerCharacter.OnGoingActionOpt.TryGet(out var onGoingAction))
                 {
-                    onGoingAction.Data.Switch(
-                        meleeAttacking =>
+                    if (onGoingAction.Data.TryGet(out ActionDismantling dismantling))
+                    {
+                        
+                    }
+                    else if (onGoingAction.Data.TryGet(out ActionMeleeAttacking meleeAttacking))
+                    {
+                        if (time >= onGoingAction.StartTime + onGoingAction.Duration)
                         {
-                            if (time >= onGoingAction.StartTime + onGoingAction.Duration)
-                            {
-                                playerCharacter.OnGoingActionOpt = Option<OnGoingAction>.None();
-                                Utility.DamageNearby(
-                                    playerPosition + meleeAttacking.Direction * 0.5f, 
-                                    1.5f, 
-                                    5.5f,
-                                    Option<Faction>.Some(faction), 
-                                    Option<Entity>.Some(entity),
-                                    ref buildPhysicsWorld,
-                                    ref healthLookup,
-                                    ref factionLookup
-                                );
-                            }
-                        },
-                        dismantling =>
-                        {
-                            
+                            playerCharacter.OnGoingActionOpt = Option<OnGoingAction>.None();
+                            Utility.DamageNearby(
+                                playerPosition + meleeAttacking.Direction * 0.5f, 
+                                1.5f, 
+                                5.5f,
+                                Option<Faction>.Some(faction), 
+                                Option<Entity>.Some(entity),
+                                ref buildPhysicsWorld,
+                                ref healthLookup,
+                                ref factionLookup
+                            );
                         }
-                    );
+                    }
                 }
                 
                 playerCharacter.CommandsBlockedDuration -= 1;
@@ -225,7 +225,7 @@ namespace _OnlyOneGame.Scripts.Systems
                 if (playerCharacter.MovementBlockedDuration < 0) playerCharacter.MovementBlockedDuration = 0;
 
                 // write back
-                playerCharacter.Events.Set(playerCharacterEvents);
+                playerCharacter.Events = playerCharacterEvents;
                 playerCharacter.InventoryStack.Set(inventoryStack);
                 
 
@@ -250,7 +250,7 @@ namespace _OnlyOneGame.Scripts.Systems
                 //characterView.LastAttacked = networkTime.ServerTick;
                 //characterView.LastItemThrown = networkTime.ServerTick;
 
-                var events = onPlayerCharacterRo.ValueRO.Events.Get();
+                var events = onPlayerCharacterRo.ValueRO.Events;
                 foreach (var playerEvent in events)
                 {
                     playerEvent.Switch(
@@ -351,8 +351,8 @@ namespace _OnlyOneGame.Scripts.Systems
         private static void ProcessDismantleCommand(ref OnPlayerCharacter playerCharacter, ComponentLookup<LocalTransform> localTransformLookup,
             float3 playerPosition, float interactionRadius, ref BuildPhysicsWorldData buildPhysicsWorld, float time, ref ComponentLookup<DeployedItem> deployedItemLookup)
         {
-            if (playerCharacter.OnGoingActionOpt.Get().TryGet(out var onGoingAction) &&
-                onGoingAction.Data.TryGetValue(out ActionDismantling dismantling))
+            if (playerCharacter.OnGoingActionOpt.TryGet(out var onGoingAction) &&
+                onGoingAction.Data.TryGet(out ActionDismantling dismantling))
             {
                 // still unbuilding
                 if (localTransformLookup.TryGetComponent(dismantling.Target, out var targetTransform) &&
@@ -371,11 +371,8 @@ namespace _OnlyOneGame.Scripts.Systems
                         out var deployedItem
                     ))
                 {
-                    //playerCharacter.OnGoingActionOpt.Value = new OnGoingAction(
-                    //    time, 2, new OnGoingActionData(new ActionDismantling(deployedItemEntity))
-                    //);
                     playerCharacter.OnGoingActionOpt = Option<OnGoingAction>.Some(new OnGoingAction(
-                        time, 2, new OnGoingActionData(new ActionDismantling(deployedItemEntity))
+                        time, 2, new ActionDismantling(deployedItemEntity)
                     ));
                 }
             }

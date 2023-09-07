@@ -50,28 +50,10 @@ namespace _OnlyOneGame.Scripts.Systems.ViewSystems
                     groundItemRw.ValueRW = groundItem;
                     
                     var groundItemView = m_ItemPairMaintainer.GetOrCreateView(groundItemRw.ValueRO.ViewId);
-                    
-                    var itemText = "?";
 
-                    groundItemRw.ValueRO.Item.Get().Switch(deployable =>
-                        {
-                            itemText = Enum.GetName(typeof(ItemTypeDeployable), deployable);
-                        },
-                        minion =>
-                        {
-                            itemText = Enum.GetName(typeof(ItemTypeMinion), minion);
-                        },
-                        throwable =>
-                        {
-                            itemText = Enum.GetName(typeof(ItemTypeThrowable), throwable);
-                        },
-                        resource =>
-                        {
-                            itemText = Enum.GetName(typeof(ItemTypeResource), resource);
-                        }
-                    );
-                
-                    groundItemView.Restore(itemText);
+                    var name = Enum.GetName(typeof(ItemType), groundItemRw.ValueRO.Item.ItemType);
+                    
+                    groundItemView.Restore(name);
                 }
                 
                 var groundItemViewTransform = m_ItemPairMaintainer.GetOrCreateView(groundItemRw.ValueRO.ViewId).transform;

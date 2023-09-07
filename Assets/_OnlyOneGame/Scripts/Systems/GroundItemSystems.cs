@@ -41,36 +41,18 @@ namespace _OnlyOneGame.Scripts.Systems
 
                 if (tick.TicksSince(activatedItem.ActivatedTick) > activatedItem.ActivationDurationTicks)
                 {
-                    groundItem.ValueRO.Item.Get().Switch(
-                        deployable =>
-                        {
-                            switch (deployable)
-                            {
-                                case ItemTypeDeployable.Turret:
-                                {
-                                    var turret = ecb.Instantiate(prefabs.TurretPrefab);
-                                    ecb.SetLocalPositionRotation(turret, localTransform.Position,
-                                        quaternion.LookRotationSafe(activatedItem.Direction, Utility.Forward));
-                                    break;
-                                }
-                                case ItemTypeDeployable.Wall:
-                                case ItemTypeDeployable.AutoRepairModule:
-                                case ItemTypeDeployable.BubbleShieldModule:
-                                case ItemTypeDeployable.MiningModule:
-                                case ItemTypeDeployable.SpawnPoint:
-                                case ItemTypeDeployable.Landmine:
-                                case ItemTypeDeployable.BarbedWire:
-                                    Debug.Log("Deployable not implemented: " + deployable);
-                                    break;
-                                default:
-                                    Debug.Log("Unknown deployable type: " + deployable);
-                                    break;
-                            }
-                        },
-                        minion => { Debug.Log("Minion not implemented: " + minion); },
-                        throwable => { Debug.Log("Throwable not implemented: " + throwable); },
-                        resource => { Debug.Log("Resource not implemented: " + resource); }
-                    );
+                    switch (groundItem.ValueRO.Item.ItemType)
+                    {
+                        case ItemType.Turret:
+                            var turret = ecb.Instantiate(prefabs.TurretPrefab);
+                            ecb.SetLocalPositionRotation(turret, localTransform.Position,
+                                quaternion.LookRotationSafe(activatedItem.Direction, Utility.Forward));
+                            break;
+                        default:
+                            Debug.Log("Deployable not implemented: " + groundItem.ValueRO.Item.ItemType);
+                            break;
+                    }
+                    
                     ecb.DestroyEntity(entity);
                 }
             }

@@ -7,7 +7,7 @@ namespace _OnlyOneGame.Scripts.Components
 {
     public struct GroundItem : IComponentData
     {
-        [GhostField] public BytesAs<Item, Data16Bytes> Item;
+        [GhostField] public Item Item;
         public ViewId ViewId;
 
         //ctor
