@@ -84,7 +84,7 @@ namespace DefenderGame.Scripts.GoViews
         {
             m_PreviousVelocity = Vector3.zero;
             m_SmoothUpTilt = Vector3.zero;
-            SetDead(false);
+            SetDead(false, Vector3.zero, 0);
             m_Animator.SetBool(AnimatorParamMoving, false);
             m_Animator.SetBool(AnimatorParamJump, true);
             
@@ -103,7 +103,7 @@ namespace DefenderGame.Scripts.GoViews
         /// <summary>
         /// goes ragdoll
         /// </summary>
-        public void SetDead(bool dead)
+        public void SetDead(bool dead, Vector3 ragdollForcePoint, float ragdollForce)
         {
             if(Dead == dead) return;
             Dead = dead;
@@ -111,6 +111,10 @@ namespace DefenderGame.Scripts.GoViews
             foreach (var limb in m_Limbs)
             {
                 limb.isKinematic = !dead;
+                if (dead)
+                {
+                    limb.AddExplosionForce(ragdollForce, ragdollForcePoint, 3f);
+                }
             }
         }
         

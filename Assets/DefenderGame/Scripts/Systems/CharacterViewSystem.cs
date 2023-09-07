@@ -57,7 +57,7 @@ namespace DefenderGame.Scripts.Systems
                 
                 var viewPair = m_PairMaintainer.GetOrCreateView(characterView.ViewId);
 
-                viewPair.SetDead(characterView.Dead);
+                viewPair.SetDead(characterView.Dead, characterView.RagdollForcePoint, characterView.RagdollForce);
 
                 var offsetForServer = World.Flags.HasFlag(WorldFlags.GameServer) ? new float3(0, 2f, 0) : float3.zero;
                 //Debug.Log("look direction: " + characterView.LookDirection);

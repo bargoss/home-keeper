@@ -43,34 +43,43 @@ namespace DefaultNamespace
             Option<Entity> ignoreOpt,
             ref BuildPhysicsWorldData buildPhysicsWorldData,
             ref ComponentLookup<Health> healthLookup,
-            ref ComponentLookup<Faction> factionLookup
+            ref ComponentLookup<Faction> factionLookup,
+            ref ComponentLookup<PhysicsVelocity> physicsVelocityLookup
         )
         {
-            var targets = GetAllOverlapSphere<Health>(
+            var targets = GetAllOverlapSphere(
                 ref buildPhysicsWorldData,
                 position,
-                radius,
-                ref healthLookup
+                radius
             );
-            
-            foreach (var (targetPos, entity, healthRw) in targets)
+            foreach (var (targetPos, entity) in targets)
             {
-                if (ignoreOpt.TryGet(out var ignore) && ignore == entity)
+                if (healthLookup.TryGetRw(entity, out var healthRw))
                 {
-                    continue;
-                }
+                    if (ignoreOpt.TryGet(out var ignore) && ignore == entity)
+                    {
+                        continue;
+                    }
 
-                if (attackingFactionOpt.TryGet(out var attackingFaction) &&
-                    factionLookup.TryGetComponent(entity, out var faction) &&
-                    attackingFaction.Value == faction.Value)
-                {
-                    continue;
+                    if (attackingFactionOpt.TryGet(out var attackingFaction) &&
+                        factionLookup.TryGetComponent(entity, out var faction) &&
+                        attackingFaction.Value == faction.Value)
+                    {
+                        continue;
+                    }
+                    
+                    var health = healthRw.ValueRO;
+                    var damageNormal = math.normalize(position - targetPos);
+                    health.HandleDamage(damage, position, damageNormal);
+                    healthRw.ValueRW = health;
+                    
+                    if(physicsVelocityLookup.TryGetRw(entity, out var physicsVelocityRw))
+                    {
+                        var physicsVelocity = physicsVelocityRw.ValueRW;
+                        physicsVelocity.Linear += damageNormal * 10 + Up * 5;
+                        physicsVelocityRw.ValueRW = physicsVelocity;
+                    }
                 }
-
-                var health = healthRw.ValueRO;
-                var damageNormal = math.normalize(position - targetPos);
-                health.HandleDamage(damage, position, damageNormal);
-                healthRw.ValueRW = health;
             }
             
             targets.Dispose();

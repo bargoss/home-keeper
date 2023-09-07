@@ -4,15 +4,17 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.NetCode;
 
 namespace Systems
 {
-    [UpdateInGroup(typeof(SimulationSystemGroup))]
+    [UpdateInGroup(typeof(PredictedFixedStepSimulationSystemGroup))]
     public partial struct HealthSystem : ISystem
     {
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
+            state.RequireForUpdate<NetworkTime>();
             state.RequireForUpdate<Health>();
         }
         
@@ -20,11 +22,12 @@ namespace Systems
         public void OnUpdate(ref SystemState state)
         {
             var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
+            var networkTick = SystemAPI.GetSingleton<NetworkTime>().ServerTick;
             
             foreach (var (healthRw, entity) in SystemAPI.Query<RefRW<Health>>().WithEntityAccess())
             {
                 var health = healthRw.ValueRO;
-                health.Update((float)SystemAPI.Time.ElapsedTime);
+                health.Update(networkTick);
                 
                 
                 if (health is { HitPoints: <= 0, DestroyOnDeath: true })

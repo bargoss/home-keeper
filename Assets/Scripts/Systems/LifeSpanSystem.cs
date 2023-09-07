@@ -7,7 +7,7 @@ using Unity.NetCode;
 
 namespace Systems
 {
-    [UpdateInGroup(typeof(PredictedSimulationSystemGroup))]
+    [UpdateInGroup(typeof(PredictedFixedStepSimulationSystemGroup))]
     public partial struct LifeSpanSystem : ISystem
     {
         [BurstCompile]

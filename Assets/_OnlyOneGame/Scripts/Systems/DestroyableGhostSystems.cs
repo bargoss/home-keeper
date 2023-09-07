@@ -2,19 +2,26 @@
 using Unity.Collections;
 using Unity.Entities;
 using Unity.NetCode;
+using UnityEngine;
 
 namespace _OnlyOneGame.Scripts.Systems
 {
-    [UpdateInGroup(typeof(PredictedSimulationSystemGroup), OrderLast = true)]
+    [UpdateInGroup(typeof(PredictedFixedStepSimulationSystemGroup), OrderLast = true)]
     [WorldSystemFilter(WorldSystemFilterFlags.ServerSimulation)]
     public partial struct DestroyableGhostServerSystem : ISystem
     {
+        public void OnCreate(ref SystemState state)
+        {
+            state.RequireForUpdate<NetworkTime>();
+        }
+
         public void OnUpdate(ref SystemState state)
         {
+            var tick = SystemAPI.GetSingleton<NetworkTime>().ServerTick;
             var ecb = new EntityCommandBuffer(Allocator.Temp);
             foreach (var destroyableGhostAspect in SystemAPI.Query<DestroyableGhostAspect>())
             {
-                if (destroyableGhostAspect.GhostDestroyed)
+                if (destroyableGhostAspect.GetGhostDestroyed(tick))
                 {
                     ecb.DestroyEntity(destroyableGhostAspect.Self);                    
                 }                
@@ -29,22 +36,38 @@ namespace _OnlyOneGame.Scripts.Systems
     }
     
     
-    [UpdateInGroup(typeof(PredictedSimulationSystemGroup), OrderLast = true)]
+    [UpdateInGroup(typeof(PredictedFixedStepSimulationSystemGroup), OrderLast = true)]
     [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation | WorldSystemFilterFlags.ThinClientSimulation)]
     public partial struct DestroyableGhostClientSystem : ISystem
     {
+        public void OnCreate(ref SystemState state)
+        {
+            state.RequireForUpdate<NetworkTime>();
+        }
+
         public void OnUpdate(ref SystemState state)
         {
+            var tick = SystemAPI.GetSingleton<NetworkTime>().ServerTick;
             var ecb = new EntityCommandBuffer(Allocator.Temp);
-            foreach (var destroyableGhostAspect in SystemAPI.Query<DestroyableGhostAspect>())
+            var disabledLookup = SystemAPI.GetComponentLookup<Disabled>();
+            
+            foreach (var (destroyableGhost, entity) in SystemAPI.Query<DestroyableGhost>().WithEntityAccess().WithOptions(EntityQueryOptions.IncludeDisabledEntities))
             {
-                if (destroyableGhostAspect is { GhostDestroyed: true, IsEnabled: true })
+                var disabled = disabledLookup.HasComponent(entity);
+                var ghostDestroyed = destroyableGhost.GetDestroyed(tick);
+                if (disabled)
                 {
-                    ecb.SetEnabled(destroyableGhostAspect.Self, false);
+                    Debug.Log("baran - a disabled entity : " + entity);
                 }
-                else if(destroyableGhostAspect is { GhostDestroyed: false, IsEnabled: false })
+                if (!disabled && ghostDestroyed)
                 {
-                    ecb.SetEnabled(destroyableGhostAspect.Self, true);
+                    ecb.SetEnabled(entity, false);
+                    Debug.Log("baran - disabled : " + entity); 
+                }
+                else if(disabled && !ghostDestroyed)
+                {
+                    ecb.SetEnabled(entity, true);
+                    Debug.Log("baran - enabled : " + entity);
                 }
             }
             
@@ -65,10 +88,9 @@ namespace _OnlyOneGame.Scripts.Systems
         
         public bool IsEnabled => !m_Disabled.IsValid;
 
-        public bool GhostDestroyed
+        public bool GetGhostDestroyed(NetworkTick tick)
         {
-            get => m_DestroyableGhost.ValueRO.Destroyed;
-            set => m_DestroyableGhost.ValueRW = new DestroyableGhost {Destroyed = value};
+            return m_DestroyableGhost.ValueRO.GetDestroyed(tick);
         }
 
     }

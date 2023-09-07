@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace DefenderGame.Scripts.Systems
 {
-    [UpdateInGroup(typeof(PredictedSimulationSystemGroup))]
+    [UpdateInGroup(typeof(PredictedFixedStepSimulationSystemGroup))]
     public partial struct CharacterMovementSystem : ISystem
     {
         [BurstCompile]

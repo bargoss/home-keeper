@@ -14,7 +14,7 @@ using Unity.Transforms;
 
 namespace _OnlyOneGame.Scripts.Systems
 {
-    [UpdateInGroup(typeof(PredictedSimulationSystemGroup))]
+    [UpdateInGroup(typeof(PredictedFixedStepSimulationSystemGroup))]
     [UpdateAfter(typeof(HealthSystem))]
     public partial struct OnTurretSystem : ISystem
     {

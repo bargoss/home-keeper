@@ -34,11 +34,9 @@ namespace HomeKeeper.Components
         [GhostField] public float MaxHitPoints;
         [GhostField] public bool DestroyOnDeath;
         public bool IsDead => HitPoints <= 0;
-        public float DeathTime { get; private set; }
+        public NetworkTick DeathTick { get; private set; }
         public bool DiedNow { get; private set; }
-        public HealthStatus Status => IsDead ? new HealthStatus.Dead {DeathTime = DeathTime, DiedNow = DiedNow} : new HealthStatus.Alive();
-    
-        
+
         public float TotalDamageThisFrame { get; private set; }
 
         private float m_Damage;
@@ -46,9 +44,9 @@ namespace HomeKeeper.Components
         public float3 BiggestDamageNormal { get; private set; }
         public float BiggestDamage { get; private set; }
         
-        public float3 m_BiggestDamagePositionInternal;
-        public float3 m_BiggestDamageNormalInternal;
-        public float m_BiggestDamageInternal;
+        private float3 m_BiggestDamagePositionInternal;
+        private float3 m_BiggestDamageNormalInternal;
+        private float m_BiggestDamageInternal;
         
         public void HandleDamage(float damage, float3 damagePosition, float3 damageNormal)
         {
@@ -63,7 +61,7 @@ namespace HomeKeeper.Components
         }
         
         
-        public void Update(float time)
+        public void Update(NetworkTick tick)
         {
             TotalDamageThisFrame = m_Damage;
             var isDeadPrev = IsDead;
@@ -79,7 +77,7 @@ namespace HomeKeeper.Components
             if(IsDead && !isDeadPrev)
             {
                 DiedNow = true;
-                DeathTime = time;
+                DeathTick = tick;
             }
             
             BiggestDamage = m_BiggestDamageInternal;
@@ -99,7 +97,7 @@ namespace HomeKeeper.Components
             DestroyOnDeath = destroyOnDeath;
             TotalDamageThisFrame = 0;
             m_Damage = 0;
-            DeathTime = 0;
+            DeathTick = new NetworkTick(1);
             DiedNow = false;
             BiggestDamagePosition = float3.zero;
             BiggestDamageNormal = float3.zero;

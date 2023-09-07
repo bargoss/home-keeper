@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace _OnlyOneGame.Scripts.Systems
 {
-    [UpdateInGroup(typeof(PredictedSimulationSystemGroup))]
+    [UpdateInGroup(typeof(PredictedFixedStepSimulationSystemGroup))]
     [UpdateBefore(typeof(OnPlayerCharacterSystem))]
     public partial class OnCharacterControlSystem : SystemBase
     {

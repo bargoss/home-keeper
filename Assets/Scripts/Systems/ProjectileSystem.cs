@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace Systems
 {
-    [UpdateInGroup(typeof(PredictedSimulationSystemGroup))]
+    [UpdateInGroup(typeof(PredictedFixedStepSimulationSystemGroup))]
     [UpdateBefore(typeof(HealthSystem))]
     public partial struct ProjectileSystem : ISystem
     {

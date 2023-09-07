@@ -3,6 +3,7 @@ using HomeKeeper.Components;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.NetCode;
 using Unity.Physics;
 using Unity.Physics.Aspects;
 using Unity.Physics.Authoring;
@@ -11,6 +12,7 @@ using ValueVariant;
 
 namespace DefenderGame.Scripts.Systems
 {
+    [UpdateInGroup(typeof(PredictedFixedStepSimulationSystemGroup))]
     public partial class DeEnemySystem : SystemBase
     {
         protected override void OnCreate()
@@ -24,6 +26,8 @@ namespace DefenderGame.Scripts.Systems
 
             var ecb = new EntityCommandBuffer(Allocator.Temp);
 
+            var tick = SystemAPI.GetSingleton<NetworkTime>().ServerTick;
+            
             var targetPosition = float3.zero;
             if (SystemAPI.TryGetSingletonEntity<DeEnemyTarget>(out var targetEntity))
             {
@@ -52,11 +56,15 @@ namespace DefenderGame.Scripts.Systems
                     //colliderAspect.SetCollisionResponse(CollisionResponsePolicy.None);
                     ecb.RemoveComponent<PhysicsWorldIndex>(entity);
                 }
-                //if (health.IsDead && (float)SystemAPI.Time.ElapsedTime > health.DeathTime + 2)
-                if (health.Status.TryGetValue(out HealthStatus.Dead dead) && (float)SystemAPI.Time.ElapsedTime > dead.DeathTime + 2)
+                
+                if (health.IsDead && tick.TicksSince(health.DeathTick) > 2 * 50)
                 {
                     ecb.DestroyEntity(entity);
                 }
+                //if (health..TryGetValue(out HealthStatus.Dead dead) && (float)SystemAPI.Time.ElapsedTime > dead.DeathTime + 2)
+                //{
+                //    ecb.DestroyEntity(entity);
+                //}
                 
                 var movementDirection = math.normalize(targetPosition - localTransformRo.ValueRO.Position);
                 //movementDirection = new float3(1, 0, 0);

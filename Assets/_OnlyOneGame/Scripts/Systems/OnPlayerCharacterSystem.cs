@@ -20,7 +20,7 @@ using ValueVariant;
 
 namespace _OnlyOneGame.Scripts.Systems
 {
-    [UpdateInGroup(typeof(PredictedSimulationSystemGroup))]
+    [UpdateInGroup(typeof(PredictedFixedStepSimulationSystemGroup))]
     [UpdateBefore(typeof(CharacterMovementSystem))]
     [UpdateAfter(typeof(HealthSystem))]
     public partial struct OnPlayerCharacterSystem : ISystem
@@ -35,13 +35,14 @@ namespace _OnlyOneGame.Scripts.Systems
             state.RequireForUpdate<OnPlayerCharacter>();
             state.RequireForUpdate<NetworkTime>();
             m_OverlapSphereResultBuffer = new NativeList<(float3, Entity)>(Allocator.Persistent);
-            
         }
         
         
         
         public void OnUpdate(ref SystemState state)
         {
+            state.CompleteDependency();
+            
             var deployedItemLookup = SystemAPI.GetComponentLookup<DeployedItem>();
             var groundItemLookup = SystemAPI.GetComponentLookup<GroundItem>();
             var localTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>();
@@ -49,6 +50,7 @@ namespace _OnlyOneGame.Scripts.Systems
             var factionLookup = SystemAPI.GetComponentLookup<Faction>();
             var ghostDestroyedLookup = SystemAPI.GetComponentLookup<DestroyableGhost>();
             var ghostOwnerLookup = SystemAPI.GetComponentLookup<GhostOwner>();
+            var physicsVelocityLookup = SystemAPI.GetComponentLookup<PhysicsVelocity>();
             
             var buildPhysicsWorld = SystemAPI.GetSingleton<BuildPhysicsWorldData>();
             var prefabs = SystemAPI.GetSingleton<OnPrefabs>();
@@ -64,7 +66,7 @@ namespace _OnlyOneGame.Scripts.Systems
             var tickInt = tick.TickIndexForValidTick;
             var time = (float)tickInt * deltaTime;
             
-            if(networkTime.IsPartialTick) return;
+            //if(networkTime.IsPartialTick) return;
             
 
 
@@ -147,7 +149,8 @@ namespace _OnlyOneGame.Scripts.Systems
                                 playerCharacter.InventoryCapacity,
                                 ref playerCharacter.CommandsBlockedDuration,
                                 ref playerCharacterEvents,
-                                ref ghostDestroyedLookup
+                                ref ghostDestroyedLookup,
+                                tick
                             );
                         }
                     }
@@ -189,6 +192,8 @@ namespace _OnlyOneGame.Scripts.Systems
 
                             ThrowItem(throwPosition, throwVelocity, item, in prefabs, ref ecb, true, tick,
                                 ghostOwner);
+                            
+                            playerCharacter.CommandsBlockedDuration += (int)(0.5f / deltaTime);
                         }
                     }
                 }
@@ -205,6 +210,8 @@ namespace _OnlyOneGame.Scripts.Systems
                         if (time >= onGoingAction.StartTime + onGoingAction.Duration)
                         {
                             playerCharacter.OnGoingActionOpt = Option<OnGoingAction>.None();
+                            
+                            
                             Utility.DamageNearby(
                                 playerPosition + meleeAttacking.Direction * 0.5f, 
                                 1.5f, 
@@ -213,7 +220,8 @@ namespace _OnlyOneGame.Scripts.Systems
                                 Option<Entity>.Some(entity),
                                 ref buildPhysicsWorld,
                                 ref healthLookup,
-                                ref factionLookup
+                                ref factionLookup,
+                                ref physicsVelocityLookup
                             );
                         }
                     }
@@ -268,7 +276,12 @@ namespace _OnlyOneGame.Scripts.Systems
                 characterView.MovementVelocity = physicsVelocityRo.ValueRO.Linear.xz;
                 characterView.LookDirection = onPlayerCharacterRo.ValueRO.LookDirection.X0Y();
 
-                characterView.Dead = healthRo.ValueRO.Status.TryGetValue(out HealthStatus.Dead _);
+                characterView.Dead = healthRo.ValueRO.IsDead;
+                if (healthRo.ValueRO.DiedNow)
+                {
+                    characterView.RagdollForce = 200;
+                    characterView.RagdollForcePoint = healthRo.ValueRO.BiggestDamageNormal + localTransform.Position;
+                }
 
                 characterView.IsGrounded = characterMovementRo.ValueRO.IsGrounded;
 
@@ -313,7 +326,7 @@ namespace _OnlyOneGame.Scripts.Systems
             float interactionRadius, ref ComponentLookup<GroundItem> groundItemLookup, ref FixedList128Bytes<Item> inventoryStack, int inventoryCapacity,
             ref int commandBlockedDuration,
             ref FixedList128Bytes<PlayerEvent> playerEvents,
-            ref ComponentLookup<DestroyableGhost> ghostDestroyedLookup)
+            ref ComponentLookup<DestroyableGhost> ghostDestroyedLookup, NetworkTick tick)
         {
             if (buildPhysicsWorld.TryGetFirstOverlapSphere(
                     playerPosition,
@@ -332,7 +345,7 @@ namespace _OnlyOneGame.Scripts.Systems
                     if(ghostDestroyedLookup.TryGetRw(groundItemEntity, out var ghostDestroyedRw))
                     {
                         var ghostDestroyed = ghostDestroyedRw.ValueRO;
-                        ghostDestroyed.Destroyed = true;
+                        ghostDestroyed.SetDestroyed(tick);
                         ghostDestroyedRw.ValueRW = ghostDestroyed;
                     }
                     else

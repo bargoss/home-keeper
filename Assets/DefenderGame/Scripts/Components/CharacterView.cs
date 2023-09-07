@@ -14,8 +14,8 @@ namespace DefenderGame.Scripts.Components
         [GhostField] public NetworkTick LastAttacked;
         [GhostField] public NetworkTick LastItemThrown;
         [GhostField] public bool Dead;
-        
-        
+        [GhostField(Quantization = 1000)] public float3 RagdollForcePoint;
+        [GhostField(Quantization = 1000)] public float RagdollForce;
     }
     public struct ViewId
     {

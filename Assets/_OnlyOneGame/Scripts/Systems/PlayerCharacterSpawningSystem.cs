@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using _OnlyOneGame.Scripts.Components;
+using Components;
 using DefaultNamespace;
 using Unity.Collections;
 using Unity.Entities;
@@ -14,6 +15,7 @@ namespace _OnlyOneGame.Scripts.Systems
     [WorldSystemFilter(WorldSystemFilterFlags.ServerSimulation)]
     public partial class PlayerCharacterSpawningSystem : SystemBase
     {
+        private int m_NextFaction = 1;
         protected override void OnCreate()
         {
             RequireForUpdate<OnPlayer>();
@@ -47,6 +49,8 @@ namespace _OnlyOneGame.Scripts.Systems
                     ecb.SetComponent(spawnedCharacter, ghostOwner);
                     var syncedId = new SyncedId(random.NextInt());
                     ecb.SetComponent(spawnedCharacter, syncedId);
+                    ecb.SetComponent(spawnedCharacter, new Faction(m_NextFaction));
+                    m_NextFaction++;
                     onPlayerAndNewCharacter.Add((entity, spawnedCharacter));
                     
                     onPlayer.ControlledCharacterSyncedId = syncedId;
