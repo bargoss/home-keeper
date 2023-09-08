@@ -6,6 +6,7 @@ using DefenderGame.Scripts.GoViews;
 using DefenderGame.Scripts.Systems;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.NetCode;
 using Unity.Transforms;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -38,6 +39,7 @@ namespace _OnlyOneGame.Scripts.Systems.ViewSystems
 
         protected override void OnUpdate()
         {
+            var predictedGhostLookup = SystemAPI.GetComponentLookup<PredictedGhost>();
             var random = new Unity.Mathematics.Random((uint)(SystemAPI.Time.ElapsedTime * 10000 + 1));
             foreach (var (groundItemRw, localTransform, entity) in SystemAPI.Query<RefRW<GroundItem>, LocalTransform>().WithEntityAccess())
             {
@@ -52,6 +54,15 @@ namespace _OnlyOneGame.Scripts.Systems.ViewSystems
                     var groundItemView = m_ItemPairMaintainer.GetOrCreateView(groundItemRw.ValueRO.ViewId);
 
                     var name = Enum.GetName(typeof(ItemType), groundItemRw.ValueRO.Item.ItemType);
+                    if (predictedGhostLookup.HasComponent(entity))
+                    {
+                        name += " (P)";
+                    }
+                    else
+                    {
+                        name += " (I)";
+                    }
+                    
                     
                     groundItemView.Restore(name);
                 }

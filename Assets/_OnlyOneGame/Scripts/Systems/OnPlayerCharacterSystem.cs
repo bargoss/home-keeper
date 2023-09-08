@@ -53,6 +53,7 @@ namespace _OnlyOneGame.Scripts.Systems
             var physicsVelocityLookup = SystemAPI.GetComponentLookup<PhysicsVelocity>();
             
             var buildPhysicsWorld = SystemAPI.GetSingleton<BuildPhysicsWorldData>();
+            
             var prefabs = SystemAPI.GetSingleton<OnPrefabs>();
             
             var interactionRadius = 1f;
@@ -300,6 +301,10 @@ namespace _OnlyOneGame.Scripts.Systems
         {
             var instance = CreateAndThrow(position, velocity, prefabs.GroundItemPrefab.Entity, ref ecb, ghostOwner);
             ecb.SetComponent(instance, new GroundItem(item));
+            //var turnInterpolated = currentTick;
+            //turnInterpolated.Add(50);
+            //ecb.SetComponent(instance, new TurnInterpolatedAfterDelay(currentTick,turnInterpolated));
+            
             
             if (activated)
             {

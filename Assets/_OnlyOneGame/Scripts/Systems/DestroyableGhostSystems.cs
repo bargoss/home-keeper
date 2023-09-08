@@ -78,8 +78,82 @@ namespace _OnlyOneGame.Scripts.Systems
             ecb.Dispose();
         }
     }
+
+    [UpdateInGroup(typeof(PredictedFixedStepSimulationSystemGroup), OrderLast = true)]
+    [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation | WorldSystemFilterFlags.ThinClientSimulation)]
+    public partial struct TurnInterpolatedAfterDelaySystem : ISystem
+    {
+        public void OnCreate(ref SystemState state)
+        {
+            state.RequireForUpdate<GhostPredictionSwitchingQueues>();
+            state.RequireForUpdate<NetworkTime>();
+        }
+
+        public void OnDestroy(ref SystemState state)
+        {
+            
+        }
+
+        public void OnUpdate(ref SystemState state)
+        {
+            var time = SystemAPI.GetSingleton<NetworkTime>();
+            if (!time.IsFirstTimeFullyPredictingTick) return;
+
+            var tick = time.ServerTick;
+            var ghostPredictionSwitchingQueuesRw = SystemAPI.GetSingletonRW<GhostPredictionSwitchingQueues>();
+            
+            foreach (var (turnInterpolatedAfterDelay, predictedGhost, entity) in SystemAPI.Query<TurnInterpolatedAfterDelay, PredictedGhost>().WithEntityAccess())
+            {
+                if (turnInterpolatedAfterDelay.PredictionStart.IsValid && turnInterpolatedAfterDelay.PredictionEnd.IsValid)
+                {
+                    var ticksSincePredictionStart = tick.TicksSince(turnInterpolatedAfterDelay.PredictionStart);
+                    var ticksSincePredictionEnd = tick.TicksSince(turnInterpolatedAfterDelay.PredictionEnd);
+                    
+                    if(ticksSincePredictionStart < 0 || ticksSincePredictionEnd >= 0)
+                    {
+                        Debug.Log("turned interpolated");
+                        ghostPredictionSwitchingQueuesRw.ValueRW.ConvertToInterpolatedQueue.Enqueue(new ConvertPredictionEntry()
+                        {
+                            TargetEntity = entity,
+                            TransitionDurationSeconds = 0f,
+                        });
+                    }
+                }
+            }
+            foreach (var (turnInterpolatedAfterDelay, entity) in SystemAPI.Query<TurnInterpolatedAfterDelay>().WithNone<PredictedGhost>().WithEntityAccess())
+            {
+                if (turnInterpolatedAfterDelay.PredictionStart.IsValid && turnInterpolatedAfterDelay.PredictionEnd.IsValid)
+                {
+                    var ticksSincePredictionStart = tick.TicksSince(turnInterpolatedAfterDelay.PredictionStart);
+                    var ticksSincePredictionEnd = tick.TicksSince(turnInterpolatedAfterDelay.PredictionEnd);
+                    
+                    if(ticksSincePredictionStart >= 0 && ticksSincePredictionEnd < 0)
+                    {
+                        Debug.Log("turned predicted");
+                        ghostPredictionSwitchingQueuesRw.ValueRW.ConvertToPredictedQueue.Enqueue(new ConvertPredictionEntry()
+                        {
+                            TargetEntity = entity,
+                            TransitionDurationSeconds = 0.0f,
+                        });
+                    }
+                }
+            }
+        }
+    }
     
-    
+    public struct TurnInterpolatedAfterDelay : IComponentData
+    {
+        public NetworkTick PredictionStart;
+        public NetworkTick PredictionEnd;
+        
+        public TurnInterpolatedAfterDelay(NetworkTick predictionStart, NetworkTick predictionEnd)
+        {
+            PredictionStart = predictionStart;
+            PredictionEnd = predictionEnd;
+        }
+    }
+
+
     public readonly partial struct DestroyableGhostAspect : IAspect
     {
         public readonly Entity Self;
