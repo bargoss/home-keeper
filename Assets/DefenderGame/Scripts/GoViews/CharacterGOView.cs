@@ -106,6 +106,7 @@ namespace DefenderGame.Scripts.GoViews
         public void SetDead(bool dead, Vector3 ragdollForcePoint, float ragdollForce)
         {
             if(Dead == dead) return;
+            Debug.Log("baran- view dead: " + dead + " force: " + ragdollForce + " point: " + ragdollForcePoint);
             Dead = dead;
             m_Animator.enabled = !dead;
             foreach (var limb in m_Limbs)

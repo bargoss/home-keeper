@@ -76,7 +76,7 @@ namespace DefaultNamespace
                     if(physicsVelocityLookup.TryGetRw(entity, out var physicsVelocityRw))
                     {
                         var physicsVelocity = physicsVelocityRw.ValueRW;
-                        physicsVelocity.Linear += damageNormal * 10 + Up * 5;
+                        physicsVelocity.Linear -= damageNormal * 2 + Up * 0;
                         physicsVelocityRw.ValueRW = physicsVelocity;
                     }
                 }

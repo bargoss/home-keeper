@@ -174,7 +174,7 @@ namespace _OnlyOneGame.Scripts.Systems
                     else if (playerCharacter.Input.ActionButton0Tap)
                     {
                         playerCharacter.OnGoingActionOpt.Set(new OnGoingAction(time,
-                            2,
+                            0.35f,
                             new ActionMeleeAttacking(playerCharacter.LookDirection.X0Y())));
                         playerCharacter.CommandsBlockedDuration += (int)(2f / deltaTime);
                         playerCharacterEvents.Add(new PlayerEvent(new EventMeleeAttackStarted()));
@@ -216,7 +216,7 @@ namespace _OnlyOneGame.Scripts.Systems
                             Utility.DamageNearby(
                                 playerPosition + meleeAttacking.Direction * 0.5f, 
                                 1.5f, 
-                                5.5f,
+                                0.5f,
                                 Option<Faction>.Some(faction), 
                                 Option<Entity>.Some(entity),
                                 ref buildPhysicsWorld,
@@ -280,8 +280,9 @@ namespace _OnlyOneGame.Scripts.Systems
                 characterView.Dead = healthRo.ValueRO.IsDead;
                 if (healthRo.ValueRO.DiedNow)
                 {
-                    characterView.RagdollForce = 200;
+                    characterView.RagdollForce = 400;
                     characterView.RagdollForcePoint = healthRo.ValueRO.BiggestDamageNormal + localTransform.Position;
+                    Debug.Log("baran- ragdoll force: " + characterView.RagdollForcePoint);
                 }
 
                 characterView.IsGrounded = characterMovementRo.ValueRO.IsGrounded;
