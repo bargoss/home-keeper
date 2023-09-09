@@ -43,9 +43,7 @@ namespace _OnlyOneGame.Scripts.Systems
         {
             state.CompleteDependency();
             
-            var deployedItemLookup = SystemAPI.GetComponentLookup<DeployedItem>();
             var groundItemLookup = SystemAPI.GetComponentLookup<GroundItem>();
-            var localTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>();
             var healthLookup = SystemAPI.GetComponentLookup<Health>();
             var factionLookup = SystemAPI.GetComponentLookup<Faction>();
             var ghostDestroyedLookup = SystemAPI.GetComponentLookup<DestroyableGhost>();
@@ -179,24 +177,20 @@ namespace _OnlyOneGame.Scripts.Systems
                         playerCharacter.CommandsBlockedDuration += (int)(2f / deltaTime);
                         playerCharacterEvents.Add(new PlayerEvent(new EventMeleeAttackStarted()));
                     }
-                    else if (playerCharacter.Input.DropButtonReleasedFromHold)
+                    else if (playerCharacter.Input.DropButtonReleasedFromHold && inventoryStack.Length != 0)
                     {
-                        if (inventoryStack.Length != 0)
-                        {
-                            var item = inventoryStack[^1];
-                            var throwVelocity = playerCharacter.Input.Look.X0Y() * 5 + Utility.Up * 5;
-                            var throwDirection = throwVelocity / (math.length(throwVelocity) + 0.001f);
-                            var throwPosition = playerPosition + throwDirection * 0.5f + Utility.Up;
+                        var item = inventoryStack[^1];
+                        var throwVelocity = playerCharacter.Input.Look.X0Y() * 5 + Utility.Up * 5;
+                        var throwDirection = throwVelocity / (math.length(throwVelocity) + 0.001f);
+                        var throwPosition = playerPosition + throwDirection * 0.5f + Utility.Up;
 
-                            inventoryStack.RemoveAt(inventoryStack.Length - 1);
-                            playerCharacterEvents.Add(new PlayerEvent(new EventThrownItem(item, throwVelocity)));
+                        inventoryStack.RemoveAt(inventoryStack.Length - 1);
+                        playerCharacterEvents.Add(new PlayerEvent(new EventThrownItem(item, throwVelocity)));
 
-                            ThrowItem(throwPosition, throwVelocity, item, in prefabs, ref ecb, true, tick,
-                                ghostOwner);
+                        ThrowItem(throwPosition, throwVelocity, item, in prefabs, ref ecb, true, tick,
+                            ghostOwner);
                             
-                            playerCharacter.CommandsBlockedDuration += (int)(0.5f / deltaTime);
-                        }
-                    }
+                        playerCharacter.CommandsBlockedDuration += (int)(0.5f / deltaTime);                    }
                 }
 
 
