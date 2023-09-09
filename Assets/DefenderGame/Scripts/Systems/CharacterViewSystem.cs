@@ -12,8 +12,8 @@ using Random = Unity.Mathematics.Random;
 
 namespace DefenderGame.Scripts.Systems
 {
-    [UpdateInGroup(typeof(SimulationSystemGroup))]
-    [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)]
+    [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
+    [WorldSystemFilter(WorldSystemFilterFlags.ClientSimulation)] //  | WorldSystemFilterFlags.ServerSimulation
     public partial class CharacterViewSystem : SystemBase
     {
         private readonly PairMaintainer<ViewId, CharacterGOView> m_PairMaintainer = new(
