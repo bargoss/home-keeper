@@ -1,4 +1,5 @@
-﻿using _OnlyOneGame.Scripts.Components;
+﻿using System;
+using _OnlyOneGame.Scripts.Components;
 using _OnlyOneGame.Scripts.Components.Deployed;
 using Components;
 using DefaultNamespace;
@@ -11,6 +12,7 @@ using Unity.Mathematics;
 using Unity.NetCode;
 using Unity.Physics.Systems;
 using Unity.Transforms;
+using Unity.VisualScripting;
 
 namespace _OnlyOneGame.Scripts.Systems
 {
@@ -32,7 +34,10 @@ namespace _OnlyOneGame.Scripts.Systems
             
             m_Cache = new NativeList<(float3, Entity)>(Allocator.Persistent);
         }
-
+        
+            
+        public delegate int TestLambdaSumFunc(int a, int b);
+        
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
@@ -141,6 +146,11 @@ namespace _OnlyOneGame.Scripts.Systems
                 ecb.Playback(state.EntityManager);
             }
             ecb.Dispose();
+        }
+
+        private int Func(int a, int b)
+        {
+            return a + b;
         }
 
         [BurstCompile]

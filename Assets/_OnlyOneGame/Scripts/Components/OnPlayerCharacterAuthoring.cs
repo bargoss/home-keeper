@@ -36,7 +36,7 @@ namespace _OnlyOneGame.Scripts.Components
                             new(ItemType.MinionHealer),
                             new(ItemType.FlashBang)
                         },
-                        OnGoingActionOpt = Option<OnGoingAction>.Some(new OnGoingAction(){Duration = 1.19f, StartTime = 0.12f,
+                        OnGoingActionOpt = Opt<OnGoingAction>.Some(new OnGoingAction(){Duration = 1.19f, StartTime = 0.12f,
                             Data = new OnGoingActionData {
                                 Int0 = actionDismantling.Target.Index,
                                 Int1 = actionDismantling.Target.Version,
