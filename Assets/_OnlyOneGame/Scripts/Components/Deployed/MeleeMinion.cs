@@ -32,6 +32,8 @@ namespace _OnlyOneGame.Scripts.Components.Deployed
         public float3 TargetPosition;
         
         // const:
-        public float CanAttackRange;
+        public float AttackRange;
+        public float CombatDistanceMin;
+        public float CombatDistanceMax;
     }
 }
