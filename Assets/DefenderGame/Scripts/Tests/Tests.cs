@@ -37,8 +37,8 @@ namespace DefenderGame.Scripts.Tests
         [MenuItem("DefenderGame/Tests/251321321690fkdf")]
         public static void BytesAsVVSerializationTest()
         {
-            var bytesAs = new BytesAs<Option<ActionCommand>, Data32Bytes>(
-                Option<ActionCommand>.Some(new ActionCommand(new CommandMeleeAttack(new float3(0.5f, 0.5f, 0.5f))))
+            var bytesAs = new BytesAs<Opt<ActionCommand>, Data32Bytes>(
+                Opt<ActionCommand>.Some(new ActionCommand(new CommandMeleeAttack(new float3(0.5f, 0.5f, 0.5f))))
             );
 
             var innerValue = bytesAs.Get();

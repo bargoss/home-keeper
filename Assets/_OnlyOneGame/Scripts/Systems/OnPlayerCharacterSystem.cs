@@ -204,15 +204,15 @@ namespace _OnlyOneGame.Scripts.Systems
                     {
                         if (time >= onGoingAction.StartTime + onGoingAction.Duration)
                         {
-                            playerCharacter.OnGoingActionOpt = Option<OnGoingAction>.None();
+                            playerCharacter.OnGoingActionOpt = Opt<OnGoingAction>.None();
                             
                             
                             Utility.DamageNearby(
                                 playerPosition + meleeAttacking.Direction * 0.5f, 
                                 1.5f, 
                                 0.5f,
-                                Option<Faction>.Some(faction), 
-                                Option<Entity>.Some(entity),
+                                Opt<Faction>.Some(faction), 
+                                Opt<Entity>.Some(entity),
                                 ref buildPhysicsWorld,
                                 ref healthLookup,
                                 ref factionLookup,
@@ -384,7 +384,7 @@ namespace _OnlyOneGame.Scripts.Systems
                         out var deployedItem
                     ))
                 {
-                    playerCharacter.OnGoingActionOpt = Option<OnGoingAction>.Some(new OnGoingAction(
+                    playerCharacter.OnGoingActionOpt = Opt<OnGoingAction>.Some(new OnGoingAction(
                         time, 2, new ActionDismantling(deployedItemEntity)
                     ));
                 }

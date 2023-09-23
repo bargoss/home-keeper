@@ -12,7 +12,7 @@ namespace _OnlyOneGame.Scripts.Components
     {
         // state:
         [GhostField] public BytesAs<FixedList128Bytes<Item>, Data128Bytes> InventoryStack;
-        [GhostField] public Option<OnGoingAction> OnGoingActionOpt;
+        [GhostField] public Opt<OnGoingAction> OnGoingActionOpt;
         
         [GhostField] public int CommandsBlockedDuration;
         [GhostField] public int MovementBlockedDuration;
